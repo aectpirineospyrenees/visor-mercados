@@ -4,15 +4,15 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Cargar GeoJSON de límites (archivo local en la misma carpeta)
+// Cargar GeoJSON de límites
 fetch('data/limites.geojson')
     .then(response => response.json())
     .then(data => {
         L.geoJSON(data, {
             style: function(feature) {
                 return {
-                    color: "#333333",  // gris oscuro
-                    weight: 4,         // grosor de la línea
+                    color: "#333333",
+                    weight: 4,
                     opacity: 1
                 };
             }
@@ -53,7 +53,7 @@ function ordenarSegunLista(array, listaReferencia) {
     });
 }
 
-// Cargar GeoJSON
+// Cargar GeoJSON de mercados
 fetch('data/mercados_aect.geojson')
     .then(response => response.json())
     .then(data => {
@@ -73,19 +73,23 @@ fetch('data/mercados_aect.geojson')
         initFilters();
     });
 
-// Popups
+// Popups tipo tarjeta con filas flexibles
 function updatePopup(layer, props) {
-    let popupContent = '';
+    let popupContent = '<div class="popup-tarjeta">';
+
+    // Nombre centrado
+    const nombre = props.nombre || 'Sin nombre';
+    popupContent += `<h3>${nombre}</h3>`;
+
     const customTitles = {
-        nombre: "Nombre",
-        nombre_tipo: "Tipo de Mercado",
-        nombre_frecuencia: "Frecuencia",
+        nombre_tipo: "Tipo de Mercado/Type de marché",
+        nombre_frecuencia: "Frecuencia/Fréquence",
         nombre_semana: "Semana del mes",
-        nombre_dia: "Día de la semana",
-        nombre_apertura: "Horario de apertura",
-        direccion: "Dirección",
-        horario: "Horario",
-        num_postes: "Número de postes",
+        nombre_dia: "Día de la semana/Semaine du mois",
+        nombre_apertura: "Horario de apertura/Horaires d'ouverture",
+        direccion: "Dirección/Adresse",
+        horario: "Horario/Horaires",
+        num_postes: "Número de postes/Nombre de postes",
         municipios_communes: "Municipio/Commune",
         comarca: "Comarca",
         provincia_departement: "Provincia/Departement"
@@ -93,13 +97,20 @@ function updatePopup(layer, props) {
 
     for (let key in props) {
         if (props.hasOwnProperty(key)) {
-            if (key === "row_number" || key.toLowerCase().includes("coord") || key.toLowerCase().includes("id_")) continue;
+            if (key === "row_number" || key.toLowerCase().includes("coord") || key.toLowerCase().includes("id_") || key === "nombre") continue;
             let title = customTitles[key] || key;
-            popupContent += `<b>${title}:</b> ${props[key]}<br>`;
+            popupContent += `<div class="popup-row"><b>${title}:</b> <span>${props[key]}</span></div>`;
         }
     }
 
-    layer.bindPopup(popupContent);
+    popupContent += '</div>';
+
+    layer.bindPopup(popupContent, {
+        className: 'popup-tarjeta-popup',
+        minWidth: 250,
+        maxWidth: 600,
+        autoPanPadding: [10, 10]
+    });
 }
 
 // Filtrar marcadores usando cluster
@@ -134,11 +145,9 @@ function initFilters() {
         const filtro = document.getElementById(filtroIds[index]);
         let valoresUnicos = [...new Set(markers.map(m => m.props[key]).filter(v => v))];
 
-        // Ordenar según lista de referencia si aplica
         if (key === 'nombre_dia') valoresUnicos = ordenarSegunLista(valoresUnicos, ordenDias);
         if (key === 'nombre_semana') valoresUnicos = ordenarSegunLista(valoresUnicos, ordenSemanas);
 
-        // Para otros filtros, se ordena alfabéticamente
         if (key !== 'nombre_dia' && key !== 'nombre_semana') valoresUnicos.sort();
 
         valoresUnicos.forEach(val => {
