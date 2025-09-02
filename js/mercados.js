@@ -86,7 +86,7 @@ function updatePopup(layer, props) {
         direccion: "Dirección",
         horario: "Horario",
         num_postes: "Número de postes",
-        municipio_communes: "Municipio/Commune",
+        municipios_communes: "Municipio/Commune",
         comarca: "Comarca",
         provincia_departement: "Provincia/Departement"
     };
