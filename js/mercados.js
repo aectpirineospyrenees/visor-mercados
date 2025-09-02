@@ -5,7 +5,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 // Cargar GeoJSON de límites (archivo local en la misma carpeta)
-fetch('/data/limites.geojson')
+fetch('../data/limites.geojson')
     .then(response => response.json())
     .then(data => {
         L.geoJSON(data, {
@@ -22,7 +22,7 @@ fetch('/data/limites.geojson')
 
 // Icono SVG
 const marketIcon = L.icon({
-    iconUrl: '/icons/market.svg',
+    iconUrl: '../icons/market.svg',
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32]
@@ -54,7 +54,7 @@ function ordenarSegunLista(array, listaReferencia) {
 }
 
 // Cargar GeoJSON
-fetch('/data/mercados_aect.geojson')
+fetch('../data/mercados_aect.geojson')
     .then(response => response.json())
     .then(data => {
         L.geoJSON(data, {
