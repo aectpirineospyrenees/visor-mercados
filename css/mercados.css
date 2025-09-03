@@ -166,3 +166,44 @@
     vertical-align: middle;
     margin-right: 5px;
 }
+
+/*ESTILOS CLUSTERS*/
+/* Clusters suaves personalizados */
+/* Clusters modernos y suaves */
+.marker-cluster-small {
+    background-color: #90caf9; /* azul claro */
+    color: #0d47a1; /* azul oscuro para el número */
+    border: 2px solid #64b5f6;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.marker-cluster-medium {
+    background-color: #a5d6a7; /* verde claro */
+    color: #1b5e20; /* verde oscuro para el número */
+    border: 2px solid #81c784;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.marker-cluster-large {
+    background-color: #ffcc80; /* naranja suave */
+    color: #e65100; /* naranja oscuro para el número */
+    border: 2px solid #ffb74d;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Ajuste del círculo y número */
+.marker-cluster div {
+    font-size: 14px;
+    width: 45px;
+    height: 45px;
+    line-height: 45px;
+    border-radius: 50%;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Opcional: animación suave al hacer zoom */
+.marker-cluster {
+    transition: all 0.3s ease;
+}
+
