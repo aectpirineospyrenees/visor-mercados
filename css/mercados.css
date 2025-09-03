@@ -1,102 +1,168 @@
 #contenedor-mapa {
     height: 1150px;
 }
+
+/*Separador entre los filtros y el mapa*/
 #separador {
     height: 10px;
 }
 
-/* Popup tipo tarjeta */
-.popup-tarjeta {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  padding: 16px 20px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-  color: #333;
-  line-height: 1.4;
-  display: block;
-  max-width: 600px;
-  min-width: 250px;
-  word-wrap: break-word;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+#separador-titulo-filtros {
+    height: 30px;
+}
+/*Configuración de los pop-ups y los filtros*/
+        /* Popup tipo tarjeta */
+        .popup-tarjeta {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        color: #333;
+        line-height: 1.4;
+        display: block;
+        max-width: 600px;
+        min-width: 250px;
+        word-wrap: break-word;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        /* Animación al aparecer */
+        .leaflet-popup {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s, transform 0.3s;
+        }
+        .leaflet-popup.leaflet-zoom-animated {
+        opacity: 1;
+        transform: translateY(0);
+        }
+
+        /* Ocultar punta del popup */
+        .leaflet-popup-tip-container {
+        display: none;
+        }
+
+        /* Título centrado y destacado */
+        .popup-tarjeta h3 {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 18px;
+        font-weight: 700;
+        color: #2c3e50;
+        }
+
+        /* Filas flexibles con etiqueta y valor */
+        .popup-tarjeta .popup-row {
+        display: flex;
+        margin-bottom: 4px;
+        flex-wrap: nowrap;
+        }
+
+        .popup-tarjeta .popup-row b {
+        flex: 0 0 auto;          /* no se reduce, permanece en una línea */
+        margin-right: 6px;       /* separación entre etiqueta y valor */
+        white-space: nowrap;     /* evita salto de línea en la etiqueta */
+        }
+
+        .popup-tarjeta .popup-row span {
+        flex: 1 1 auto;          /* valor ocupa el resto del espacio */
+        word-wrap: break-word;   /* permite que el valor largo se divida */
+        }
+        .filtros-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding: 0 10px;
+        }
+
+        .filtro {
+        display: flex;
+        flex-direction: column;
+        min-width: 180px;
+        flex: 1;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        .filtro label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 4px;
+        }
+
+        .filtro select {
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        font-size: 14px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        transition: all 0.2s;
+        }
+
+        .filtro select:focus {
+        outline: none;
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 3px rgba(74,144,226,0.2);
+        }
+    
+/*CONFIGURACIÓN DEL HEADER*/
+    .header {
+        display: flex;                 /* Flexbox: alinea horizontalmente */
+        justify-content: space-between; /* Separa título y logos */
+        align-items: center;           /* Centra verticalmente */
+        background-color: #f0f0f0;    /* Color del rectángulo */
+        padding: 20px 20px;            /* Espacio dentro del rectángulo */
+        border: 1px solid #ccc;        /* Borde opcional */
+        border-radius: 8px;            /* Bordes redondeados */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Sombra suave */
+        }
+    
+    .header h1 {
+        font-family: 'Montserrat', sans-serif; /* Fuente moderna */
+        font-weight: 700;                       /* Negrita */
+        font-size: 3rem;                        /* Tamaño grande y legible */
+        letter-spacing: 1px;                    /* Espaciado entre letras */
+        color: #333;                            /* Color moderno y neutro */
+        margin: 0;                               /* Quita márgenes predeterminados */
+        }
+        
+    .logos {
+        display: flex;
+        gap: 10px;
+    }       
+
+    .logo {
+        height: 80px;     /* altura fija */
+        width: auto;      /* ancho se ajusta automáticamente */
+        object-fit: contain; /* asegura que no se deforme */
+        display: block;   /* elimina posibles espacios extra de línea */
+    }
+
+    .logos img:hover {
+        transform: scale(1.1);         /* Efecto al pasar el mouse */
+        }
+
+/*LEYENDA*/
+.leyenda {
+    background: #f9f9f9; /* fondo suave */
+    padding: 10px;
+    line-height: 20px;
+    color: #333;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    font-size: 14px;
+    text-align: center; /* centra todo el contenido */
 }
 
-/* Animación al aparecer */
-.leaflet-popup {
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 0.3s, transform 0.3s;
-}
-.leaflet-popup.leaflet-zoom-animated {
-  opacity: 1;
-  transform: translateY(0);
+.leyenda-titulo {
+    margin: 0 0 5px 0;
+    font-weight: bold;
+    font-size: 16px;
 }
 
-/* Ocultar punta del popup */
-.leaflet-popup-tip-container {
-  display: none;
-}
-
-/* Título centrado y destacado */
-.popup-tarjeta h3 {
-  text-align: center;
-  margin-bottom: 10px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #2c3e50;
-}
-
-/* Filas flexibles con etiqueta y valor */
-.popup-tarjeta .popup-row {
-  display: flex;
-  margin-bottom: 4px;
-  flex-wrap: nowrap;
-}
-
-.popup-tarjeta .popup-row b {
-  flex: 0 0 auto;          /* no se reduce, permanece en una línea */
-  margin-right: 6px;       /* separación entre etiqueta y valor */
-  white-space: nowrap;     /* evita salto de línea en la etiqueta */
-}
-
-.popup-tarjeta .popup-row span {
-  flex: 1 1 auto;          /* valor ocupa el resto del espacio */
-  word-wrap: break-word;   /* permite que el valor largo se divida */
-}
-.filtros-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
-  padding: 0 10px;
-}
-
-.filtro {
-  display: flex;
-  flex-direction: column;
-  min-width: 180px;
-  flex: 1;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-}
-
-.filtro label {
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 4px;
-}
-
-.filtro select {
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: all 0.2s;
-}
-
-.filtro select:focus {
-  outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 3px rgba(74,144,226,0.2);
+.leyenda img {
+    vertical-align: middle;
+    margin-right: 5px;
 }

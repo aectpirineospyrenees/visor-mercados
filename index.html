@@ -10,51 +10,62 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-    <title>Mercados AECT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <title id = titulo>Mercados AECT</title>
 </head>
 <body>
-   <h1>MERCADOS AECT / MARCHÉS GECT</h1>
+  <header class = "header">
+    <h1>MERCADOS AECT / MARCHÉS GECT</h1>
+    <div class="logos">
+        <a href="https://www.pirineos-pyrenees.eu/" target="_blank" rel="noopener">
+            <img src="icons/aect.JPG" alt="Logo 1" class="logo">
+        </a>
+        <a href="https://www.pirineos-pyrenees.eu/interreg-poctefa-for-alimenta/" target="_blank" rel="noopener">
+            <img src="icons/foralimenta.png" alt="Logo 2" class="logo">
+        </a>
+    </div>
+    </header>
+    <div id = "separador-titulo-filtros"></div>
+    <div class="filtros-container">
+        <div class="filtro">
+            <label for="filtro-tipo">Tipo/Type:</label>
+            <select id="filtro-tipo">
+                <option value="">Todos/Tous</option>
+            </select>
+        </div>
 
-<div class="filtros-container">
-  <div class="filtro">
-    <label for="filtro-tipo">Tipo/Type:</label>
-    <select id="filtro-tipo">
-        <option value="">Todos/Tous</option>
-    </select>
-  </div>
+        <div class="filtro">
+            <label for="filtro-frecuencia">Frecuencia/Fréquence:</label>
+            <select id="filtro-frecuencia">
+                <option value="">Todos/Tous</option>
+            </select>
+        </div>
 
-  <div class="filtro">
-    <label for="filtro-frecuencia">Frecuencia/Fréquence:</label>
-    <select id="filtro-frecuencia">
-        <option value="">Todos/Tous</option>
-    </select>
-  </div>
+        <div class="filtro">
+            <label for="filtro-semana">Semana/Semaine:</label>
+            <select id="filtro-semana">
+                <option value="">Todos/Tous</option>
+            </select>
+        </div>
 
-  <div class="filtro">
-    <label for="filtro-semana">Semana/Semaine:</label>
-    <select id="filtro-semana">
-        <option value="">Todos/Tous</option>
-    </select>
-  </div>
+        <div class="filtro">
+            <label for="filtro-dia">Día/Jour:</label>
+            <select id="filtro-dia">
+                <option value="">Todos/Tous</option>
+            </select>
+        </div>
 
-  <div class="filtro">
-    <label for="filtro-dia">Día/Jour:</label>
-    <select id="filtro-dia">
-        <option value="">Todos/Tous</option>
-    </select>
-  </div>
+        <div class="filtro">
+            <label for="filtro-apertura">Horario apertura/Horaires d'ouverture:</label>
+            <select id="filtro-apertura">
+                <option value="">Todos/Tous</option>
+            </select>
+        </div>
+    </div>
 
-  <div class="filtro">
-    <label for="filtro-apertura">Horario apertura/Horaires d'ouverture:</label>
-    <select id="filtro-apertura">
-        <option value="">Todos/Tous</option>
-    </select>
-  </div>
-</div>
+    <div id="separador"></div>
+    <div id="contenedor-mapa"></div>
 
-<div id="separador"></div>
-<div id="contenedor-mapa"></div>
-
-<script src="js/mercados.js"></script>
+    <script src="js/mercados.js"></script>
 </body>
 </html>
