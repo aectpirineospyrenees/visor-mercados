@@ -444,6 +444,12 @@ async function initMap(){
         "Límites AECT/Limites GECT": limitesLayer
     };
     L.control.layers(basemaps, overlayMaps).addTo(map);
+    L.control.scale({
+        position: 'bottomleft',   // puedes poner 'bottomright', 'topleft', etc.
+        metric: true,             // muestra metros/kilómetros
+        imperial: false,          // desactiva millas/yardas si quieres solo métrico
+        maxWidth: 120             // ancho máximo en píxeles
+    }).addTo(map);
     actualizarLeyenda()
 }
 initMap();
