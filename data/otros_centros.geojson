@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "otros_centrosç",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "id": 2, "Name": "Espacio Altoaragón (Huesca)", "sitio_web": "https://www.cabreroehijos.es/", "descripcion": "Talleres de cocina puntuales" }, "geometry": { "type": "Point", "coordinates": [ -0.4088244, 42.1453072 ] } },
+{ "type": "Feature", "properties": { "id": 3, "Name": "Espacio Altoaragón (Jaca)", "sitio_web": "https://www.cabreroehijos.es/", "descripcion": "Talleres de cocina puntuales" }, "geometry": { "type": "Point", "coordinates": [ -0.5698732, 42.561973 ] } },
+{ "type": "Feature", "properties": { "id": 1, "Name": "Gastroespacio de Villanúa", "sitio_web": "https://turismovillanua.es/villanua-servicios/gastroespacio/", "descripcion": "Actividades gastronómicas variadas" }, "geometry": { "type": "Point", "coordinates": [ -0.5375993, 42.6794631 ] } },
+{ "type": "Feature", "properties": { "id": 4, "Name": "Centro de Innovación Gastronómica de Aragón (CIGA)", "sitio_web": "https://ciga-aragon.com/", "descripcion": "Actividades gastronómicas variadas" }, "geometry": { "type": "Point", "coordinates": [ -0.4594219, 42.1070088 ] } }
+]
+}

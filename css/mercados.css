@@ -1,5 +1,5 @@
 #contenedor-mapa {
-    height: 1150px;
+    height: 1000px;
 }
 
 /*Separador entre los filtros y el mapa*/
@@ -11,103 +11,221 @@
     height: 30px;
 }
 /*Configuración de los pop-ups y los filtros*/
-        /* Popup tipo tarjeta */
-        .popup-tarjeta {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 12px;
-        padding: 16px 20px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        font-family: 'Segoe UI', Tahoma, sans-serif;
-        color: #333;
-        line-height: 1.4;
-        display: block;
-        max-width: 600px;
-        min-width: 250px;
-        word-wrap: break-word;
-        transition: transform 0.2s ease, opacity 0.2s ease;
+        /* --- Popup Mercados (igual que tienes) --- */
+        .popup-mercados {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: #333;
+            line-height: 1.4;
+            display: block;
+            max-width: 600px;
+            min-width: 250px;
+            word-wrap: break-word;
         }
 
-        /* Animación al aparecer */
-        .leaflet-popup {
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: opacity 0.3s, transform 0.3s;
-        }
-        .leaflet-popup.leaflet-zoom-animated {
-        opacity: 1;
-        transform: translateY(0);
+        .popup-mercados h3 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
         }
 
-        /* Ocultar punta del popup */
-        .leaflet-popup-tip-container {
-        display: none;
+        .popup-mercados .popup-row {
+            display: flex;
+            margin-bottom: 4px;
+            flex-wrap: nowrap;
         }
 
-        /* Título centrado y destacado */
-        .popup-tarjeta h3 {
-        text-align: center;
-        margin-bottom: 10px;
-        font-size: 18px;
-        font-weight: 700;
-        color: #2c3e50;
+        .popup-mercados .popup-row b {
+            flex: 0 0 auto;
+            margin-right: 6px;
+            white-space: nowrap;
         }
 
-        /* Filas flexibles con etiqueta y valor */
-        .popup-tarjeta .popup-row {
-        display: flex;
-        margin-bottom: 4px;
-        flex-wrap: nowrap;
+        .popup-mercados .popup-row span {
+            flex: 1 1 auto;
+            word-wrap: break-word;
         }
 
-        .popup-tarjeta .popup-row b {
-        flex: 0 0 auto;          /* no se reduce, permanece en una línea */
-        margin-right: 6px;       /* separación entre etiqueta y valor */
-        white-space: nowrap;     /* evita salto de línea en la etiqueta */
+        /* --- Popup Escuelas --- */
+        .popup-escuelas {
+            background: rgba(240, 248, 255, 0.95); /* ligero azul para diferenciar */
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: #333;
+            text-align: center; /* centra todo */
+            max-width: 400px;
+            min-width: 250px;
         }
 
-        .popup-tarjeta .popup-row span {
-        flex: 1 1 auto;          /* valor ocupa el resto del espacio */
-        word-wrap: break-word;   /* permite que el valor largo se divida */
-        }
-        .filtros-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 16px;
-        padding: 0 10px;
+        .popup-escuelas h3 {
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a5276;
         }
 
-        .filtro {
-        display: flex;
-        flex-direction: column;
-        min-width: 180px;
-        flex: 1;
-        font-family: 'Segoe UI', Tahoma, sans-serif;
+        /* Cada fila: etiqueta arriba, contenido debajo */
+        .popup-escuelas .popup-row {
+            margin-bottom: 8px;
         }
 
-        .filtro label {
-        font-weight: 600;
-        color: #2c3e50;
-        margin-bottom: 4px;
+        .popup-escuelas .popup-row b {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
 
-        .filtro select {
-        padding: 8px 12px;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-        background-color: #fff;
-        font-size: 14px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        transition: all 0.2s;
+        .popup-escuelas .popup-row span {
+            display: block;
         }
 
-        .filtro select:focus {
-        outline: none;
-        border-color: #4a90e2;
-        box-shadow: 0 0 0 3px rgba(74,144,226,0.2);
+        /* Listas dentro del popup escuelas */
+        .popup-escuelas .popup-row ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            text-align: left; /* listas alineadas a la izquierda */
         }
+        
+        /* PRODUCTOS AGRO*/
+        .popup-productos {
+            background: rgba(230, 245, 238, 0.95); /* ligero azul para diferenciar */
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: #333;
+            text-align: center; /* centra todo */
+            max-width: 400px;
+            min-width: 250px;
+        }
+
+        .popup-productos h3 {
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #68967d;
+        }
+
+        /* Cada fila: etiqueta arriba, contenido debajo */
+        .popup-productos .popup-row {
+            margin-bottom: 8px;
+        }
+
+        .popup-productos .popup-row b {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .popup-productos .popup-row span {
+            display: block;
+        }
+
+        /* Listas dentro del popup escuelas */
+        .popup-productos .popup-row ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            text-align: left; /* listas alineadas a la izquierda */
+        }
+        
+        /*-----filtros-----*/
+        /* Contenedor de filtros */
+            .contenedor-filtros {
+                display: none; /* oculto al inicio */
+                margin-top: 5px;
+                padding: 10px 15px;
+                background: #f9f9f9;
+                border-radius: 8px;
+                box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+                transition: max-height 0.4s ease, opacity 0.4s ease;
+                overflow: hidden;
+            }
+
+            /* Botón acordeón */
+            .toggle-filtros {
+                width: 100%;
+                text-align: left;
+                cursor: pointer;
+                background: #ffffff;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                padding: 10px 15px;
+                font-weight: 600;
+                font-size: 16px;
+                color: #2c3e50;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                transition: background 0.3s, box-shadow 0.3s;
+            }
+
+            .toggle-filtros:hover {
+                background: #f0f0f0;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+
+            /* Flecha del acordeón */
+            .toggle-filtros::after {
+                content: '▼';
+                font-size: 12px;
+                transition: transform 0.3s;
+            }
+
+            .toggle-filtros.active::after {
+                transform: rotate(180deg);
+            }
+
+            /* Mostrar contenedor cuando está activo */
+            .toggle-filtros.active + .contenedor-filtros {
+                display: block;
+                max-height: 500px; /* suficiente para todo el contenido */
+                opacity: 1;
+            }
+
+            /* Selects modernos */
+            .contenedor-filtros select {
+                width: 100%;
+                padding: 6px 10px;
+                margin-bottom: 8px;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+                font-size: 14px;
+                transition: border-color 0.3s, box-shadow 0.3s;
+            }
+
+            .contenedor-filtros select:focus {
+                border-color: #3498db;
+                box-shadow: 0 0 5px rgba(52,152,219,0.5);
+                outline: none;
+            }
+
+            /* Etiquetas */
+            .contenedor-filtros label {
+                display: block;
+                font-size: 13px;
+                margin-bottom: 3px;
+                font-weight: 500;
+                color: #34495e;
+            }
+
     
 /*CONFIGURACIÓN DEL HEADER*/
+    
+    #filtros-mapa {
+        font-family: 'Montserrat', sans-serif; /* Fuente moderna */
+        font-weight: 700;                       /* Negrita */
+        font-size: 1rem;                        /* Tamaño grande y legible */
+        letter-spacing: 1px;                    /* Espaciado entre letras */
+        color: #333;                            /* Color moderno y neutro */
+        margin: 0;                               /* Quita márgenes predeterminados */
+    }
     .header {
         display: flex;                 /* Flexbox: alinea horizontalmente */
         justify-content: space-between; /* Separa título y logos */
@@ -170,40 +288,70 @@
 /*ESTILOS CLUSTERS*/
 /* Clusters suaves personalizados */
 /* Clusters modernos y suaves */
-.marker-cluster-small {
-    background-color: #90caf9; /* azul claro */
-    color: #0d47a1; /* azul oscuro para el número */
-    border: 2px solid #64b5f6;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-}
-
-.marker-cluster-medium {
-    background-color: #a5d6a7; /* verde claro */
-    color: #1b5e20; /* verde oscuro para el número */
-    border: 2px solid #81c784;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-}
-
-.marker-cluster-large {
-    background-color: #ffcc80; /* naranja suave */
-    color: #e65100; /* naranja oscuro para el número */
-    border: 2px solid #ffb74d;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-}
-
-/* Ajuste del círculo y número */
-.marker-cluster div {
-    font-size: 14px;
-    width: 45px;
-    height: 45px;
-    line-height: 45px;
-    border-radius: 50%;
-    text-align: center;
-    font-weight: bold;
-}
+    .custom-cluster { background: transparent; border: none; text-align: center; }
+    .cluster-icon { position: relative; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
+    .cluster-icon img { width: 32px; height: 32px; }
+    .cluster-count { position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; border-radius: 50%;
+        background: #bbbbbb; color: white; font-size: 12px; display: flex; justify-content: center; align-items: center;
+        border: 2px solid white; box-shadow: 0 0 1px rgba(0,0,0,0.5); }
 
 /* Opcional: animación suave al hacer zoom */
 .marker-cluster {
     transition: all 0.3s ease;
 }
 
+/*CONTROL DE CAPAS*/
+
+/* Contenedor base del control de capas */
+.leaflet-control-layers {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Título de capas */
+.leaflet-control-layers h4 {
+    margin: 0 0 8px 0;
+    font-weight: bold;
+    font-size: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+}
+
+/* Lista de capas */
+.leaflet-control-layers label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    padding: 4px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+/* Hover sobre las capas */
+.leaflet-control-layers label:hover {
+    background: #f0f0f0;
+}
+
+/* Checkbox / radio moderno */
+.leaflet-control-layers input[type="checkbox"],
+.leaflet-control-layers input[type="radio"] {
+    accent-color: #bbddbd; /* verde moderno */
+    width: 18px;
+    height: 18px;
+}
+
+/* Separadores entre grupos */
+.layer-group-title {
+    font-weight: bold;
+    margin-top: 6px;
+    padding-top: 4px;
+    border-top: 1px solid #ccc;
+    font-size: 13px;
+}

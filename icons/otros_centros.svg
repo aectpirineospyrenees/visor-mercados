@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   fill="#000000"
+   version="1.1"
+   id="Capa_1"
+   width="800px"
+   height="800px"
+   viewBox="0 0 800 800"
+   xml:space="preserve"
+   sodipodi:docname="otros_centros.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs3" /><sodipodi:namedview
+   id="namedview3"
+   pagecolor="#ffffff"
+   bordercolor="#000000"
+   borderopacity="0.25"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="0.80212426"
+   inkscape:cx="286.11527"
+   inkscape:cy="-156.45955"
+   inkscape:window-width="3840"
+   inkscape:window-height="2054"
+   inkscape:window-x="3829"
+   inkscape:window-y="-11"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Capa_1" />
+<circle
+   style="fill:#f3eeb8;fill-opacity:1;stroke:#616161;stroke-width:0.377953;stroke-linecap:round;stroke-linejoin:round"
+   id="path4"
+   cx="392.74866"
+   cy="409.56192"
+   r="345.95639" /><g
+   id="g3"
+   transform="matrix(0.71368668,0,0,0.70595423,114.44468,79.15651)">
+	<path
+   d="M 214.418,263.604 V 726.908 H 345.627 V 574.348 H 454.594 V 726.91 H 585.805 V 263.604 L 400.111,139.322 Z m 120.311,288.95 h -65.38 v -65.382 h 65.38 z m 0,-98.072 h -65.38 v -65.376 h 65.38 z m 0,-98.068 h -65.38 v -65.382 h 65.38 z M 465.49,291.032 h 65.383 v 65.382 H 465.49 Z m 0,98.073 h 65.383 v 65.376 H 465.49 Z m 0,98.067 h 65.383 v 65.382 H 465.49 Z m -32.685,65.382 h -65.384 v -65.382 h 65.384 z m 0,-98.072 h -65.384 v -65.376 h 65.384 z m 0,-98.068 h -65.384 v -65.382 h 65.384 z"
+   id="path1" />
+	<polygon
+   points="394.047,117.16 406.176,117.16 597.959,245.506 658.913,245.506 400.111,73.09 141.31,245.506 202.262,245.506 "
+   id="polygon1" />
+	<path
+   d="M 783.654,452.672 H 616.572 V 726.908 H 783.654 Z M 732.805,649.501 H 667.43 V 584.12 h 65.375 z m 0,-96.947 H 667.43 v -65.382 h 65.375 z"
+   id="path2" />
+	<rect
+   x="616.57202"
+   y="411.32501"
+   width="183.42799"
+   height="19.555"
+   id="rect2" />
+	<path
+   d="M 183.43,452.672 H 16.344 V 726.908 H 183.43 Z M 132.572,649.501 H 67.191 V 584.12 h 65.381 z m 0,-96.947 H 67.191 v -65.382 h 65.381 z"
+   id="path3" />
+	<rect
+   y="411.32501"
+   width="183.42999"
+   height="19.555"
+   id="rect3"
+   x="0" />
+</g>
+</svg>
