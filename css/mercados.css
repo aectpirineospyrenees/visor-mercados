@@ -220,7 +220,7 @@
     
     #filtros-mapa {
         font-family: 'Montserrat', sans-serif; /* Fuente moderna */
-        font-weight: 700;                       /* Negrita */
+        font-weight: 400;                       /* Negrita */
         font-size: 1rem;                        /* Tamaño grande y legible */
         letter-spacing: 1px;                    /* Espaciado entre letras */
         color: #333;                            /* Color moderno y neutro */
@@ -231,7 +231,7 @@
         justify-content: space-between; /* Separa título y logos */
         align-items: center;           /* Centra verticalmente */
         background-color: #f0f0f0;    /* Color del rectángulo */
-        padding: 20px 20px;            /* Espacio dentro del rectángulo */
+        padding: 10px 10px;            /* Espacio dentro del rectángulo */
         border: 1px solid #ccc;        /* Borde opcional */
         border-radius: 8px;            /* Bordes redondeados */
         box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Sombra suave */
@@ -239,7 +239,7 @@
     
     .header h1 {
         font-family: 'Montserrat', sans-serif; /* Fuente moderna */
-        font-weight: 700;                       /* Negrita */
+        font-weight: 600;                       /* Negrita */
         font-size: 3rem;                        /* Tamaño grande y legible */
         letter-spacing: 1px;                    /* Espaciado entre letras */
         color: #333;                            /* Color moderno y neutro */
@@ -252,7 +252,7 @@
     }       
 
     .logo {
-        height: 80px;     /* altura fija */
+        height: 60px;     /* altura fija */
         width: auto;      /* ancho se ajusta automáticamente */
         object-fit: contain; /* asegura que no se deforme */
         display: block;   /* elimina posibles espacios extra de línea */
