@@ -5,97 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/mercados.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-sidebar-v2@3.1.0/css/leaflet-sidebar.min.css" />
     <title>GEOPORTAL AECT</title>
 </head>
 <body>
-
-<header class="header">
-    <h1>GEOPORTAL AECT/GÉOPORTAIL GECT</h1>
-    <div class="logos">
-        <a href="https://www.pirineos-pyrenees.eu/" target="_blank" rel="noopener">
-            <img src="icons/aect.JPG" alt="Logo 1" class="logo">
-        </a>
-        <a href="https://www.pirineos-pyrenees.eu/interreg-poctefa-for-alimenta/" target="_blank" rel="noopener">
-            <img src="icons/foralimenta.png" alt="Logo 2" class="logo">
-        </a>
-    </div>
-</header>
-
-<div id="separador-titulo-filtros"></div>
-
-<div id="filtros-mapa">
-    <div class="filtro-capa">
-        <h3 id = "subtitulos-filtos">MERCADOS Y ESCUELAS DE FORMACIÓN/MARCHÉS ET ÉCOLES DE FORMATION</h3>
-        <button class="toggle-filtros">MERCADOS/MARCHÉS</button>
-        <div class="contenedor-filtros">
-            <label>Tipo/Type:</label>
-            <select id="filtro-tipo-mercado"><option value="">Todos/Tous</option></select>
-
-            <label>Frecuencia/Fréquence:</label>
-            <select id="filtro-frecuencia"><option value="">Todos/Tous</option></select>
-
-            <label>Semana/Semaine:</label>
-            <select id="filtro-semana"><option value="">Todos/Tous</option></select>
-
-            <label>Día/Jour:</label>
-            <select id="filtro-dia"><option value="">Todos/Tous</option></select>
-
-            <label>Horario apertura/Horaires d'ouverture:</label>
-            <select id="filtro-apertura"><option value="">Todos/Tous</option></select>
+    <header class="header">
+        <h1>GEOPORTAL AECT/GÉOPORTAIL GECT</h1>
+        <div class="logos">
+            <a href="https://www.pirineos-pyrenees.eu/" target="_blank" rel="noopener">
+                <img src="icons/aect.JPG" alt="Logo 1" class="logo">
+            </a>
+            <a href="https://www.pirineos-pyrenees.eu/interreg-poctefa-for-alimenta/" target="_blank" rel="noopener">
+                <img src="icons/foralimenta.png" alt="Logo 2" class="logo">
+            </a>
         </div>
+    </header>
 
-        <button class="toggle-filtros">ESCUELAS DE FORMACIÓN/ÉCOLES DE FORMATION</button>
-        <div class = "contenedor-filtros">
-            <label>Tipo centro/Type centre:</label>
-            <select id="filtro-tipo-centro"><option value="">Todos/Tous</option></select>
+    <div id="separador-titulo-filtros"></div>
+    <div id="separador"></div>
 
-            <label>Estudios ofertados/Études proposées:</label>
-            <select id="filtro-tipo-oferta"><option value="">Todos/Tous</option></select>
-        </div>
+    <div id="sidebar" class="leaflet-sidebar collapsed"></div>
+    <div id="contenedor-mapa"></div>
 
-        <h3>PRODUCTOS AGROALIMENTARIOS/PRODUITS AGROALIMENTAIRES</h3>
-        <button class="toggle-filtros">PRODUCTOS AGROALIMENTARIOS/PRODUITS AGROALIMENTAIRES</button>
-        <div class = "contenedor-filtros">
-            <label>Tipo de producto/Type de produit:</label>
-            <select id="filtro-tipo-producto"><option value="">Todos/Tous</option></select>
-
-            <label>Comercialización/Commercialisation:</label>
-            <select id="filtro-comercializacion-producto"><option value="">Todos/Tous</option></select>
-
-            <label>Temporada/Saison:</label>
-            <select id="filtro-temporada-producto"><option value="">Todos/Tous</option></select>
-        </div>
-            
-    </div>
-</div>
-
-<div id="separador"></div>
-<div id="contenedor-mapa"></div>
-
-<script src="js/mercados.js"></script>
-
-<script>
-// Acordeón de filtros
-document.querySelectorAll('.toggle-filtros').forEach(btn => {
-    btn.addEventListener('click', () => {
-        btn.classList.toggle('active');
-        const contenedor = btn.nextElementSibling;
-        if (contenedor.style.display === "block") {
-            contenedor.style.display = "none";
-            btn.textContent = btn.textContent.replace("▲","▼");
-        } else {
-            contenedor.style.display = "block";
-            btn.textContent = btn.textContent.replace("▼","▲");
-        }
-    });
-});
-</script>
-
+    <!-- SCRIPTS EXTERNOS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-sidebar-v2@3.1.0/js/leaflet-sidebar.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script src="js/mercados.js"></script>
 </body>
 </html>
