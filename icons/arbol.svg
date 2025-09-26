@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   version="1.0"
+   id="Layer_1"
+   width="800px"
+   height="800px"
+   viewBox="0 0 64 64"
+   enable-background="new 0 0 64 64"
+   xml:space="preserve"
+   sodipodi:docname="arbol.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs2" /><sodipodi:namedview
+   id="namedview2"
+   pagecolor="#ffffff"
+   bordercolor="#000000"
+   borderopacity="0.25"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="1.134375"
+   inkscape:cx="198.78788"
+   inkscape:cy="166.1708"
+   inkscape:window-width="3840"
+   inkscape:window-height="2054"
+   inkscape:window-x="3829"
+   inkscape:window-y="-11"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Layer_1" />
+<circle
+   style="opacity:1;fill:#c6e9af;stroke:#000000;stroke-width:0.919632;stroke-linecap:round;stroke-linejoin:round"
+   id="path3"
+   cx="32"
+   cy="32"
+   r="31.540184" /><g
+   id="g2"
+   transform="matrix(0.72948122,0,0,0.72948122,8.656601,8.9586062)">
+	<path
+   fill="#231f20"
+   d="M 47.231,20.893 C 47.727,19.35 48,17.707 48,16 48,7.164 40.837,0 32,0 23.163,0 16,7.164 16,16 c 0,1.707 0.273,3.35 0.769,4.893 C 10.505,23.062 6,28.998 6,36 c 0,8.836 7.163,16 16,16 3.465,0 6.661,-1.117 9.28,-2.99 L 23.27,41 H 19 c -0.553,0 -1,-0.447 -1,-1 0,-0.553 0.447,-1 1,-1 h 4 v -4 c 0,-0.553 0.447,-1 1,-1 0.553,0 1,0.447 1,1 v 4.901 l 6,5.997 V 33.416 l -3.7,-3.7 c -0.391,-0.391 -0.348,-0.98 0.044,-1.372 0.391,-0.391 0.934,-0.48 1.324,-0.09 l 3.332,3.332 3.29,-3.29 c 0.391,-0.391 1.038,-0.405 1.429,-0.015 0.391,0.39 0.39,1.024 -10e-4,1.415 L 33,33.414 v 12.485 l 6,-6.001 V 35 c 0,-0.553 0.447,-1 1,-1 0.553,0 1,0.447 1,1 v 4 h 4 c 0.553,0 1,0.447 1,1 0,0.553 -0.447,1 -1,1 h -4.27 l -8.01,8.01 C 35.34,50.883 38.535,52 42,52 50.837,52 58,44.836 58,36 58,28.998 53.495,23.062 47.231,20.893 Z"
+   id="path1" />
+	<path
+   fill="#231f20"
+   d="M 28,52.961 V 63 c 0,0.553 0.447,1 1,1 h 6 c 0.553,0 1,-0.447 1,-1 V 52.961 c -1.422,-0.504 -2.768,-1.17 -4,-1.996 -1.232,0.826 -2.578,1.492 -4,1.996 z"
+   id="path2" />
+</g>
+</svg>

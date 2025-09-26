@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="800px"
+   height="800px"
+   viewBox="0 0 24 24"
+   fill="none"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="monumentos_religiosos.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.134375"
+     inkscape:cx="289.58678"
+     inkscape:cy="472.06612"
+     inkscape:window-width="3840"
+     inkscape:window-height="2054"
+     inkscape:window-x="3829"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <circle
+     style="opacity:1;fill:#dac4e6;stroke:#000000;stroke-width:0.3;stroke-linecap:round;stroke-linejoin:round;fill-opacity:1"
+     id="path2"
+     cx="12"
+     cy="12"
+     r="12" />
+  <path
+     d="m 11.788361,8.3940495 -2.2833895,1.113155 c -0.4650492,0.226709 -0.6975702,0.340057 -0.8675846,0.5111905 -0.150334,0.151382 -0.2648011,0.334495 -0.334966,0.536005 -0.079349,0.227822 -0.079349,0.486449 -0.079349,1.003843 v 6.105558 H 15.35365 v -6.105558 c 0,-0.517394 0,-0.776021 -0.07936,-1.003843 C 15.20413,10.35289 15.089679,10.169777 14.939366,10.018395 14.769302,9.8472615 14.536774,9.7339135 14.071718,9.5072045 Z m 0,0 V 4.8287603 m 1.426116,1.4261157 h -2.852232 m -2.1391732,5.704462 -1.5909961,0.795488 c -0.457883,0.228891 -0.6868244,0.343337 -0.8540935,0.514114 -0.1479168,0.151026 -0.2604088,0.33307 -0.3293401,0.532869 -0.077944,0.226039 -0.077944,0.481955 -0.077944,0.993931 v 2.868061 H 18.205739 v -2.868132 c 0,-0.511905 0,-0.767892 -0.07794,-0.99386 -0.06895,-0.199799 -0.181402,-0.381843 -0.32929,-0.532869 -0.167284,-0.170777 -0.396247,-0.285223 -0.854101,-0.514186 l -1.590761,-0.795416 m -2.139173,5.704463 V 14.81157 c 0,-0.787644 -0.638473,-1.426116 -1.426116,-1.426116 -0.787644,0 -1.426116,0.638472 -1.426116,1.426116 v 2.852231 z"
+     stroke="#000000"
+     stroke-width="1.42612"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     id="path1"
+     style="fill:#b3b3b3" />
+</svg>

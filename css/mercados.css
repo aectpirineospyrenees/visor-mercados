@@ -135,6 +135,116 @@
             text-align: left; /* listas alineadas a la izquierda */
         }
         
+        /* PRODUCTORES*/
+        .popup-productores {
+            background: rgba(230, 245, 238, 0.95); /* ligero azul para diferenciar */
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: #333;
+            text-align: center; /* centra todo */
+            max-width: 700px;
+            min-width: 250px;
+        }
+
+        .popup-productores h3 {
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #68967d;
+        }
+
+        /* Cada fila: etiqueta arriba, contenido debajo */
+        .popup-productores .popup-row {
+            margin-bottom: 8px;
+        }
+
+        .popup-productores .popup-row b {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .popup-productores .popup-row span {
+            display: block;
+        }
+        .popup-productores .productos-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px 10px;
+        margin-top: 5px;
+        max-height: 150px; /* altura máxima para scroll */
+        overflow-y: auto;   /* scroll si excede la altura */
+        }
+
+        .popup-productores .producto-item {
+            background-color: #f2f2f2; /* mantiene estilo general */
+            padding: 3px 5px;
+            border-radius: 3px;
+            font-size: 0.9em; /* opcional: texto más compacto */
+        }
+
+        /* COMERCIOS - nueva temática morado-azulado */
+        .popup-comercios {
+            background: rgba(240, 234, 255, 0.95); /* morado claro translúcido */
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: #2f2f4f; /* tono oscuro para texto legible sobre morado */
+            text-align: center; /* centra todo */
+            max-width: 700px;
+            min-width: 250px;
+        }
+
+        .popup-comercios h3 {
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #6e6984; /* morado-azulado */
+        }
+
+        /* Cada fila: etiqueta arriba, contenido debajo */
+        .popup-comercios .popup-row {
+            margin-bottom: 8px;
+        }
+
+        .popup-comercios .popup-row b {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .popup-comercios .popup-row span {
+            display: block;
+        }
+
+        .popup-comercios .productos-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px 10px;
+            margin-top: 5px;
+            max-height: 150px; /* altura máxima para scroll */
+            overflow-y: auto;   /* scroll si excede la altura */
+        }
+
+        .popup-comercios .producto-item {
+            background-color: rgba(200, 190, 240, 0.5); /* morado muy claro translúcido */
+            padding: 3px 5px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+
+
+        /* Listas dentro del popup escuelas */
+        .popup-productos .popup-row ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            text-align: left; /* listas alineadas a la izquierda */
+        }
+
         /*-----filtros-----*/
         /* Contenedor de filtros */
             .contenedor-filtros {
@@ -410,6 +520,71 @@
 }
 
 
+/*=====Subgrupos de cada panel=====*/
+
+.div-acordeones {
+    height: 10px;
+}
+.accordion {
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 8px 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.accordion-item {
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  margin-bottom:0px
+}
+
+.accordion-header {
+  width: 100%;
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  background: #f9f9f9;
+  border: none;
+  outline: none;
+  transition: background 0.2s ease;
+}
+
+.accordion-header:hover {
+  background: #f1f1f1;
+}
+
+.accordion-header .arrow {
+  transition: transform 0.3s ease;
+}
+
+.accordion-header.active .arrow {
+  transform: rotate(90deg);
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  background: #fff;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 16px;
+}
+
+.accordion-content.show {
+  max-height: 500px; /* suficiente para el contenido */
+  padding: 12px 16px;
+}
+
+.sidebar-checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
+  font-size: 13px;
+}
 
 /* ================= LEYENDA ================= */
 .leYenda {
@@ -434,3 +609,40 @@
     border-bottom: 1px solid #ccc;
     padding-bottom: 3px;
 }
+
+/*==========AVISOS==========*/
+#toast-container {
+    position: fixed; /* Fija la posición en la pantalla */
+    bottom: 20px;    /* 20px desde la parte inferior */
+    left: 50%;       /* Centrado horizontalmente */
+    transform: translateX(-50%); /* Ajuste para centrarlo perfectamente */
+    z-index: 10000;  /* Asegura que esté por encima de otros elementos */
+    display: flex;   /* Permite apilar avisos si hay más de uno */
+    flex-direction: column; /* Apila verticalmente */
+    align-items: center; /* Centra los avisos individualmente */
+    pointer-events: none; /* Permite clics a través del contenedor si no hay toast */
+}
+
+.toast {
+    background-color: rgba(68, 68, 68, 0.9); /* Fondo oscuro semitransparente */
+    color: white; /* Texto blanco */
+    padding: 12px 20px; /* Espaciado interno */
+    border-radius: 8px; /* Bordes redondeados */
+    margin-bottom: 10px; /* Espacio entre avisos si hay varios */
+    font-family: Arial, sans-serif; /* Fuente legible */
+    font-size: 16px; /* Tamaño de fuente */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+    opacity: 0; /* Inicialmente oculto */
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; /* Transición suave */
+    transform: translateY(20px); /* Ligeramente hacia abajo al aparecer */
+    pointer-events: auto; /* Permite interacción con el toast */
+    min-width: 250px; /* Ancho mínimo */
+    text-align: center; /* Centrar texto */
+}
+
+.toast.show {
+    opacity: 1; /* Mostrar */
+    transform: translateY(0); /* Posición final */
+}
+
+/*==============FUENTES=========*/

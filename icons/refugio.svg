@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="800px"
+   height="800px"
+   viewBox="0 0 16 16"
+   fill="none"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="refugio.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.134375"
+     inkscape:cx="334.98623"
+     inkscape:cy="256.9697"
+     inkscape:window-width="3840"
+     inkscape:window-height="2054"
+     inkscape:window-x="3829"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <circle
+     style="opacity:1;fill:#c8beb7;stroke:#000000;stroke-width:0.206933;stroke-linecap:round;stroke-linejoin:round"
+     id="path2"
+     cx="7.9999995"
+     cy="8.000001"
+     r="7.896533" />
+  <path
+     d="M 3.2567488,6.5626403 V 12.584574 H 6.6022675 V 9.908159 c 0,-0.739072 0.5991356,-1.338207 1.3382075,-1.338207 0.7390719,0 1.3382074,0.599135 1.3382074,1.338207 v 2.676415 H 12.624201 V 6.5626403 L 7.940475,2.5480178 Z"
+     fill="#000000"
+     id="path1"
+     style="fill:#808080;stroke-width:0.669104" />
+</svg>
