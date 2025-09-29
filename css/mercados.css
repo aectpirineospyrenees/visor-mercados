@@ -236,7 +236,51 @@
             font-size: 0.9em;
         }
 
+        /* RESTAURANTES - versión moderna gourmet */
+        .popup-restaurantes {
+            background: #fff8f0; /* crema cálido */
+            border-radius: 14px;
+            padding: 18px 22px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: #4a2f1a; /* marrón oscuro para texto principal */
+            text-align: center;
+            max-width: 700px;
+            min-width: 250px;
+            transition: transform 0.2s ease;
+        }
 
+        .popup-restaurantes:hover {
+            transform: scale(1.02);
+        }
+
+        /* Título */
+        .popup-restaurantes h3 {
+            margin-bottom: 14px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #4a2f1a; /* naranja terracota */
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Cada fila: etiqueta arriba, contenido debajo */
+        .popup-restaurantes .popup-row {
+            margin-bottom: 12px;
+        }
+
+        .popup-restaurantes .popup-row b {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #a04000; /* marrón-naranja para etiquetas */
+        }
+
+        .popup-restaurantes .popup-row span {
+            display: block;
+            color: #4a2f1a;
+        }
+
+        
 
         /* Listas dentro del popup escuelas */
         .popup-productos .popup-row ul {
@@ -645,4 +689,8 @@
     transform: translateY(0); /* Posición final */
 }
 
-/*==============FUENTES=========*/
+/*==============BLOQUEO FILTROS INICIO=========*/
+.filtros-mapa-control .toggle-filtros,
+.filtros-mapa-control .contenedor-filtros {
+    display: none ;
+}

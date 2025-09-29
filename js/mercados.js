@@ -244,56 +244,6 @@ async function cargarLimites(){
     }catch(e){console.error(e);}
 }
 
-async function cargarMercados(){
-    try{
-        const data = await (await fetch('data/mercados_aect.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer:(feature, latlng)=>{
-                const marker = L.marker(latlng,{icon:marketIconMercados});
-                markers.push({marker, props:feature.properties});
-                mercadosCluster.addLayer(marker);
-                return marker;
-            },
-            onEachFeature:(feature, layer)=>updatePopupMercados(layer, feature.properties)
-        });
-        // NO agregar al mapa por defecto
-    }catch(e){console.error(e);}
-}
-
-async function cargarEscuelas(){
-    try{
-        const data = await (await fetch('data/escuelas_formacion.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer:(feature,latlng)=>{
-                const marker = L.marker(latlng,{icon:marketIconEscuelas});
-                centrosCluster.addLayer(marker);
-                markersCentros.push({marker, props:feature.properties});
-                return marker;
-            },
-            onEachFeature:(feature, layer)=>updatePopupEscuelas(layer, feature.properties)
-        });
-        // NO agregar al mapa por defecto
-    }catch(e){console.error(e);}
-}
-
-async function cargarOtrosCentros(){
-    try{
-        const data = await (await fetch('data/otros_centros.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer:(feature, latlng)=>{
-                const marker = L.marker(latlng,{icon:marketIconOtrosCentros});
-                otrosCentrosCluster.addLayer(marker);
-                return marker;
-            },
-            onEachFeature:(feature, layer)=>{
-                const nombre = feature.properties.Name || 'Sin nombre';
-                layer.bindPopup(`<div class="popup-mercados"><h3>${nombre}</h3></div>`);
-            }
-        });
-        // NO agregar al mapa por defecto
-    }catch(e){console.error(e);}
-}
-
 async function cargarProductosAgro(){
     try{
         const data = await (await fetch('data/productos_agro.geojson')).json();
@@ -312,331 +262,37 @@ async function cargarProductosAgro(){
     }catch(e){console.error(e);}
 }
 
-async function cargarOficinasTurismo(){
-    try{
-        const data = await (await fetch('data/oficinas_turismo.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer:(feature, latlng)=>{
-                const marker = L.marker(latlng, {icon: turismoIcon});
-                turismoCluster.addLayer(marker);
-                turismoMarkers.push({marker, props: feature.properties});
+async function cargarGeoJSON(url, cluster, markersArray, icon, popupFn) {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log("Cargando:", url, "features:", data.features.length);
+        L.geoJSON(data, {
+            pointToLayer: (feature, latlng) => {
+                const marker = icon ? L.marker(latlng, { icon }) : L.marker(latlng);
+                cluster.addLayer(marker);
+                if (markersArray) markersArray.push({ marker, props: feature.properties });
                 return marker;
             },
-            onEachFeature:(feature, layer)=>updatePopupOficinasTurismo(layer, feature.properties)
+            onEachFeature: (feature, layer) => {
+                if (popupFn) popupFn(layer, feature.properties);
+            }
         });
         // NO agregar al mapa por defecto
-    }catch(e){ console.error(e); }
-}
-
-async function cargarRestaurantes(){
-    try{
-        const data = await (await fetch('data/restaurantes/restaurantes.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer: (feature, latlng)=>{
-                const marker = L.marker(latlng, {icon: restaurantesIcon});
-                restaurantesCluster.addLayer(marker);
-                restaurantesMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer)=>{
-                const nombre = feature.properties.nombre_establecimiento || feature.properties.Nom || 'Sin nombre';
-                layer.bindPopup(`<div class="popup-mercados"><h3>${nombre}</h3></div>`, {className:'popup-mercados', minWidth:250, maxWidth:400});
-            }
-        });
-    }catch(e){console.error(e);}
-}
-
-async function cargarHoteles(){
-    try{
-        const data = await (await fetch('data/alojamientos/hoteles_64.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer: (feature, latlng)=>{
-                const marker = L.marker(latlng, {icon: hotelesIcon});
-                hotelesCluster.addLayer(marker);
-                hotelesMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer) => updatePopupAlojamientos(layer, feature.properties)
-        });
-        // No agregar al mapa por defecto
-    }catch(e){console.error(e);}
-}
-
-async function cargarCampings(){
-    try{
-        const data = await (await fetch('data/alojamientos/campings.geojson')).json();
-        L.geoJSON(data, {
-            pointToLayer: (feature, latlng) => {
-                const marker = L.marker(latlng, {icon: campingIcon});
-                campingsCluster.addLayer(marker);
-                campingsMarkers.push({marker, props:feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer) => updatePopupAlojamientos(layer, feature.properties)
-        });
-    }catch(e){console.error(e);}
-}
-
-async function cargarAlbergues(){
-    try{
-        const data = await (await fetch('data/alojamientos/albergues_64_Huesca.geojson')).json();
-        L.geoJSON(data, {
-            pointToLayer: (feature, latlng) => {
-                const marker = L.marker(latlng, {icon: albergueIcon});
-                alberguesCluster.addLayer(marker);
-                alberguesMarkers.push({marker, props:feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer) => updatePopupAlojamientos(layer, feature.properties)
-            
-        });
-        // No agregar al mapa por defecto
-    } catch(e){ console.error(e); }
-}
-
-async function cargarRefugios(){
-    try{
-        const data = await (await fetch('data/alojamientos/refugios.geojson')).json();
-        L.geoJSON(data, {
-            pointToLayer: (feature, latlng) => {
-                const marker = L.marker(latlng, {icon: refugioIcon});
-                refugiosCluster.addLayer(marker);
-                refugiosMarkers.push({marker, props:feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer) => updatePopupAlojamientos(layer, feature.properties)
-        });
-    } catch(e){ console.error(e); }
-}
-
-async function cargarFortalezas() {
-    try{
-        const data = await (await fetch('data/patrimonio_cultural/fortalezas_castillos_Huesca.geojson')).json();
-        L.geoJSON(data, {
-            pointToLayer: (feature, latlng) => {
-                const marker = L.marker(latlng, {icon: castilloIcon});
-                fortalezasCluster.addLayer(marker);
-                fortalezasMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer) => updatePopupPatrimonioCultural(layer, feature.properties)
-        });
-    } catch(e){ console.error(e); }
-}
-
-async function cargarMonumentos() {
-    try{
-        const data = await (await fetch('data/patrimonio_cultural/monumentos.geojson')).json();
-        L.geoJSON(data, {
-            pointToLayer: (feature, latlng) => {
-                const marker = L.marker(latlng, {icon: monumentoIcon});
-                monumentosCluster.addLayer(marker);
-                monumentosMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer) => updatePopupPatrimonioCultural(layer, feature.properties)
-        });
-    } catch(e){ console.error(e); }
-}
-
-async function cargarMonumentosReligiosos() {
-    try{
-        const data = await (await fetch('data/patrimonio_cultural/monumentos_religiosos.geojson')).json();
-        L.geoJSON(data, {
-            pointToLayer: (feature, latlng) => {
-                const marker = L.marker(latlng, {icon: monumentoReligiosoIcon});
-                monumentosReligiososCluster.addLayer(marker);
-                monumentosReligiososMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer) => updatePopupPatrimonioCultural(layer, feature.properties)
-        });
-    } catch(e){ console.error(e); }
-}
-
-async function cargarRestosArqueologicos() {
-    try{
-        const data = await (await fetch('data/patrimonio_cultural/restos_arqueologicos.geojson')).json();
-        L.geoJSON(data, {
-            pointToLayer: (feature, latlng) => {
-                const marker = L.marker(latlng, {icon: restosArqueologicosIcon});
-                restosArqueologicosCluster.addLayer(marker);
-                restosArqueologicosMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer) => updatePopupPatrimonioCultural(layer, feature.properties)
-        });
-    } catch(e){ console.error(e); }
-}
-
-async function cargarBalnearios(){
-    try{
-        const data = await (await fetch('data/equipamiento/balnearios_Huesca.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer: (feature, latlng)=>{
-                const marker = L.marker(latlng, {icon: balneariosIcon});
-                balneariosCluster.addLayer(marker);
-                balneariosMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer)=>{
-                const nombre = feature.properties.nombre|| feature.properties.Nom || 'Sin nombre';
-                layer.bindPopup(`<div class="popup-mercados"><h3>${nombre}</h3></div>`, {className:'popup-mercados', minWidth:250, maxWidth:400});
-            }
-        });
-    }catch(e){console.error(e);}
-}
-
-async function cargarMuseos(){
-    try{
-        const data = await (await fetch('data/equipamiento/museos.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer: (feature, latlng)=>{
-                const marker = L.marker(latlng, {icon: museosIcon});
-                museosCluster.addLayer(marker);
-                museosMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer)=>{
-                const nombre = feature.properties.nombre || feature.properties.Nom || 'Sin nombre';
-                layer.bindPopup(`<div class="popup-mercados"><h3>${nombre}</h3></div>`, {className:'popup-mercados', minWidth:250, maxWidth:400});
-            }
-        });
-    }catch(e){console.error(e);}
-}
-
-async function cargarArboles(){
-    try{
-        const data = await (await fetch('data/turismo_natural/arboles_emblematicos_huesca.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer: (feature, latlng)=>{
-                const marker = L.marker(latlng, {icon: arbolesIcon});
-                arbolesCluster.addLayer(marker);
-                arbolesMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer)=>{
-                const nombre = feature.properties.nombre || feature.properties.Nom || 'Sin nombre';
-                layer.bindPopup(`<div class="popup-mercados"><h3>${nombre}</h3></div>`, {className:'popup-mercados', minWidth:250, maxWidth:400});
-            }
-        });
-    }catch(e){console.error(e);}
-}
-
-async function cargarMiradores(){
-    try{
-        const data = await (await fetch('data/turismo_natural/miradores.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer: (feature, latlng)=>{
-                const marker = L.marker(latlng, {icon: miradoresIcon});
-                miradoresCluster.addLayer(marker);
-                miradoresMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer)=>{
-                const nombre = feature.properties.nombre || feature.properties.Nom || 'Sin nombre';
-                layer.bindPopup(`<div class="popup-mercados"><h3>${nombre}</h3></div>`, {className:'popup-mercados', minWidth:250, maxWidth:400});
-            }
-        });
-    }catch(e){console.error(e);}
-}
-
-async function cargarGlaciares(){
-    try{
-        const data = await (await fetch('data/turismo_natural/glaciares_Huesca.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer: (feature, latlng)=>{
-                const marker = L.marker(latlng, {icon: glaciaresIcon});
-                glaciaresClusters.addLayer(marker);
-                glaciaresMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer)=>{
-                const nombre = feature.properties.nombre || feature.properties.Nom || 'Sin nombre';
-                layer.bindPopup(`<div class="popup-mercados"><h3>${nombre}</h3></div>`, {className:'popup-mercados', minWidth:250, maxWidth:400});
-            }
-        });
-    }catch(e){console.error(e);}
-}
-
-async function cargarZonasBanos (){
-    try{
-        const data = await (await fetch('data/turismo_natural/zonas_bano_Huesca.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer: (feature, latlng)=>{
-                const marker = L.marker(latlng, {icon: zonaBanoIcon});
-                zonasBanosClusters.addLayer(marker);
-                zonasBanosMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer)=>{
-                const nombre = feature.properties.nombre || feature.properties.Nom || 'Sin nombre';
-                layer.bindPopup(`<div class="popup-mercados"><h3>${nombre}</h3></div>`, {className:'popup-mercados', minWidth:250, maxWidth:400});
-            },
-        });
-    }catch(e){console.error(e);}
-}
-
-async function cargarPiscinas (){
-    try{
-        const data = await (await fetch('data/equipamiento/piscinas.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer: (feature, latlng)=>{
-                const marker = L.marker(latlng, {icon: piscinasIcon});
-                piscinasClusters.addLayer(marker);
-                piscinasMarkers.push({marker, props: feature.properties});
-                return marker;
-            },
-            onEachFeature: (feature, layer) => updatePopupPiscinas(layer, feature.properties)
-        });
-    }catch(e){console.error(e);}
-}
-
-async function cargarProductores() {
-    try {
-        const data = await (await fetch('data/productores/productores_64.geojson')).json();
-
-        L.geoJSON(data, {
-            pointToLayer: (feature, latlng) => {
-                // pequeño desplazamiento
-                const offsetLat = (Math.random() - 0.5) * 0.0003; // ±0.00005
-                const offsetLng = (Math.random() - 0.5) * 0.0003;
-                const marker = L.marker([latlng.lat + offsetLat, latlng.lng + offsetLng], { icon: productorIcon });
-                productoresClusters.addLayer(marker);
-                productoresMarkers.push({ marker, props: feature.properties });
-                return marker;
-            },
-            onEachFeature: (feature, layer) => updatePopupProductores(layer, feature.properties)
-        });
-
+        // map.addLayer(cluster);
     } catch (e) {
-        console.error(e);
+        console.error("Error loading GeoJSON:", url, e);
     }
 }
-
-async function cargarComercios() {
-    try {
-        const data = await (await fetch('data/productores/comercios_64.geojson')).json();
-
-        L.geoJSON(data, {
-            pointToLayer: (feature, latlng) => {
-                const offsetLat = (Math.random() - 0.5) * 0.0003;
-                const offsetLng = (Math.random() - 0.5) * 0.0003;
-                const marker = L.marker([latlng.lat + offsetLat, latlng.lng + offsetLng], { icon: comerciosIcon });
-                comerciosClusters.addLayer(marker);
-                comerciosMarkers.push({ marker, props: feature.properties });
-                return marker;
-            },
-            onEachFeature: (feature, layer) => updatePopupComercios(layer, feature.properties)
-        });
-
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-
 // ================= POPUPS =================
+
+function popupSoloNombre(layer, props, className = 'popup-mercados', minWidth = 250, maxWidth = 400) {
+    const nombre = props.nombre || props.Nom || props.Name || 'Sin nombre';
+    layer.bindPopup(
+        `<div class="${className}"><h3>${nombre}</h3></div>`,
+        { className, minWidth, maxWidth }
+    );
+}
 function updatePopupMercados(layer, props){
     let html = `<div class="popup-mercados"><h3>${props.nombre||'Sin nombre'}</h3>`;
     const titles = {nombre_tipo:"Tipo/Type", nombre_frecuencia:"Frecuencia / Fréquence", nombre_semana:"Semana / Semaine", nombre_dia:"Día / Jour", nombre_apertura:"Franja Horaria / Plage horaire", direccion:"Dirección / Adresse", horario:"Horario / Horaires", num_postes:"Nº postes", municipios_communes:"Municipio / Commune", comarca:"Comarca", provincia_departement:"Provincia / Departement"};
@@ -726,6 +382,33 @@ function updatePopupAlojamientos(layer, props){
     layer.bindPopup(html,{className:'popup-mercados', minWidth:250, maxWidth:400});
 }
 
+function updatePopupRestaurantes(layer, props){
+    let html = `<div class="popup-restaurantes" style="background:#fef3e0;padding:10px;border-radius:8px;">
+                    <h3>${props.Nom || props.nombre_establecimiento || 'Sin nombre'}</h3>`;
+
+    const titles = {
+        direccion_establecimiento: "Dirección/Adresse",
+        tipo_establecimiento: "Tipo / Type",
+        etiqueta_calidad: "Etiquetas de calidad / Labels de qualité",
+        descripcion_establecimiento: "Descripción establecimiento / Description de l'établissement",
+        idiomas: "Idiomas hablados / Langues parlées",
+        formas_pago: "Formas de pago / Moyens de paiement",
+        animales_bienvenidos: "Animales bienvenidos / Animaux bienvenus",
+        num_plazas_totales: "Nº plazas totales / Nbr de places totales",
+        num_plazas_bar: "Nº plazas bar / Nbr de places au bar",
+        num_plazas_mesas: "Nº plazas mesas / Nbr de places aux tables",
+        num_plazas_terraza: "Nº plazas terraza / Nbr de places en terrasse",
+    };
+
+    for(let key of Object.keys(titles)){
+        if(props[key]){
+            html += `<div class="popup-row"><b>${titles[key]}:</b> <span>${props[key]}</span></div>`;
+        }
+    }
+
+    html += "</div>";
+    layer.bindPopup(html,{className:'popup-restaurantes', minWidth:250, maxWidth:400});
+}
 function updatePopupPatrimonioCultural(layer, props){
     let html = `<div class="popup-mercados" style="background:#E6FCFE;padding:10px;border-radius:8px;">
                     <h3>${props.Nom || props.nombre || 'Sin nombre'}</h3>`;
@@ -1177,6 +860,14 @@ const filtrosControl = new FiltrosControl();
 map.addControl(filtrosControl);
 
 function initAcordeonFiltros(){
+    // Hide all filter buttons and containers at startup
+    document.querySelectorAll('.filtros-mapa-control .toggle-filtros').forEach(btn => {
+        btn.style.display = 'none';
+        const contenedor = btn.nextElementSibling;
+        contenedor.style.display = 'none';
+    });
+
+    // Existing accordion logic
     document.querySelectorAll('.filtros-mapa-control .toggle-filtros').forEach(btn => {
         btn.addEventListener('click', () => {
             const contenedor = btn.nextElementSibling;
@@ -1186,6 +877,7 @@ function initAcordeonFiltros(){
         });
     });
 }
+
 
 
 // ================= ACTUALIZACIÓN DINÁMICA DE FILTROS =================
@@ -1724,35 +1416,34 @@ map.on('overlayadd overlayremove', actualizarLeyenda);
 
 // ================= INICIALIZACIÓN =================
 async function initMap(){
-    await cargarLimites();         // solo esta capa visible al inicio
-    await cargarMercados();
-    await cargarEscuelas();
-    await cargarOtrosCentros();
-    await cargarProductosAgro();
-    await cargarOficinasTurismo(); 
-    await cargarRestaurantes();
-    await cargarHoteles();
-    await cargarCampings();
-    await cargarAlbergues();
-    await cargarRefugios();
-    await cargarFortalezas();
-    await cargarMonumentos();
-    await cargarMonumentosReligiosos();
-    await cargarRestosArqueologicos();
-    await cargarBalnearios();
-    await cargarMuseos();
-    await cargarArboles();
-    await cargarMiradores();
-    await cargarGlaciares();
-    await cargarZonasBanos();
-    await cargarPiscinas();
-    await cargarProductores();
-    await cargarComercios();
-
-    // Inicia filtros y acordeón
-    initFilters();             
-    initFiltersCentros();      
-    initFiltersProductosAgro();
+    await cargarLimites();
+    await Promise.all([
+        cargarGeoJSON('data/mercados_aect.geojson', mercadosCluster, markers, marketIconMercados, updatePopupMercados),
+        cargarGeoJSON('data/escuelas_formacion.geojson', centrosCluster, markersCentros, marketIconEscuelas, updatePopupEscuelas),
+        cargarGeoJSON('data/oficinas_turismo.geojson', turismoCluster, turismoMarkers, turismoIcon, updatePopupOficinasTurismo),
+        cargarGeoJSON('data/alojamientos/hoteles_64.geojson', hotelesCluster, hotelesMarkers, hotelesIcon, updatePopupAlojamientos),
+        cargarGeoJSON('data/alojamientos/campings.geojson', campingsCluster, campingsMarkers, campingIcon, updatePopupAlojamientos),
+        cargarGeoJSON('data/alojamientos/albergues_64_Huesca.geojson', alberguesCluster, alberguesMarkers, albergueIcon, updatePopupAlojamientos),
+        cargarGeoJSON('data/alojamientos/refugios.geojson', refugiosCluster, refugiosMarkers, refugioIcon, updatePopupAlojamientos),
+        cargarGeoJSON('data/patrimonio_cultural/fortalezas_castillos_Huesca.geojson', fortalezasCluster, fortalezasMarkers, castilloIcon, updatePopupPatrimonioCultural),
+        cargarGeoJSON('data/patrimonio_cultural/monumentos.geojson', monumentosCluster, monumentosMarkers, monumentoIcon, updatePopupPatrimonioCultural),
+        cargarGeoJSON('data/patrimonio_cultural/monumentos_religiosos.geojson', monumentosReligiososCluster, monumentosReligiososMarkers, monumentoReligiosoIcon, updatePopupPatrimonioCultural),
+        cargarGeoJSON('data/patrimonio_cultural/restos_arqueologicos.geojson', restosArqueologicosCluster, restosArqueologicosMarkers, restosArqueologicosIcon, updatePopupPatrimonioCultural),
+        cargarGeoJSON('data/otros_centros.geojson', otrosCentrosCluster, null, marketIconOtrosCentros, popupSoloNombre),
+        cargarGeoJSON('data/restaurantes/restaurantes.geojson', restaurantesCluster, restaurantesMarkers, restaurantesIcon, updatePopupRestaurantes),
+        cargarGeoJSON('data/equipamiento/balnearios_Huesca.geojson', balneariosCluster, balneariosMarkers, balneariosIcon, popupSoloNombre),
+        cargarGeoJSON('data/equipamiento/museos.geojson', museosCluster, museosMarkers, museosIcon, popupSoloNombre),
+        cargarGeoJSON('data/turismo_natural/arboles_emblematicos_huesca.geojson', arbolesCluster, arbolesMarkers, arbolesIcon, popupSoloNombre),
+        cargarGeoJSON('data/turismo_natural/miradores.geojson', miradoresCluster, miradoresMarkers, miradoresIcon, popupSoloNombre),
+        cargarGeoJSON('data/turismo_natural/glaciares_Huesca.geojson', glaciaresClusters, glaciaresMarkers, glaciaresIcon, popupSoloNombre),
+        cargarGeoJSON('data/turismo_natural/zonas_bano_Huesca.geojson', zonasBanosClusters, zonasBanosMarkers, zonaBanoIcon, popupSoloNombre),
+        cargarGeoJSON('data/equipamiento/piscinas.geojson', piscinasClusters, piscinasMarkers, piscinasIcon, updatePopupPiscinas),
+        cargarGeoJSON('data/productores/productores_64.geojson', productoresClusters, productoresMarkers, productorIcon, updatePopupProductores),
+        cargarGeoJSON('data/productores/comercios_64.geojson', comerciosClusters, comerciosMarkers, comerciosIcon, updatePopupComercios),
+        cargarGeoJSON('data/productos_agro.geojson', productosAgroCluster, productosMarkers, null, updatePopupProductosAgro) // productos agroalimentarios: icono se decide en pointToLayer
+    ]);
+    map.fitBounds(limitesLayer.getBounds());
+    actualizarLeyenda();
     initAcordeonFiltros();
     actualizarFiltrosAcordeon();  
     actualizarLeyenda();
