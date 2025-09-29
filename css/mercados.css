@@ -135,6 +135,39 @@
             text-align: left; /* listas alineadas a la izquierda */
         }
         
+        /* Ajuste automático de etiquetas de meses en el popup de productos agro */
+        .meses-temporada {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+            justify-content: center; /* centra las etiquetas */
+            max-width: 100%;         /* asegura que no se desborde */
+        }
+
+        .mes-temporada {
+        background: #eee;
+        color: #888;
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 13px;
+        margin-bottom: 2px;
+        transition: background 0.2s, color 0.2s;
+        flex: 1 1 100px;        /* permite más ancho por etiqueta */
+        min-width: 80px;        /* ancho mínimo mayor */
+        max-width: 120px;       /* ancho máximo mayor */
+        text-align: center;
+        box-sizing: border-box;
+        white-space: normal;    /* permite salto de línea si es necesario */
+        overflow: visible;      /* no recorta el texto */
+        text-overflow: unset;   /* no pone puntos suspensivos */
+        }
+
+        .mes-temporada.activo {
+            background: #8fd19e;
+            color: #1b4d2b;
+            font-weight: bold;
+        }
         /* PRODUCTORES*/
         .popup-productores {
             background: rgba(230, 245, 238, 0.95); /* ligero azul para diferenciar */
@@ -694,3 +727,30 @@
 .filtros-mapa-control .contenedor-filtros {
     display: none ;
 }
+
+#btn-restaurar-mapa {
+    background: linear-gradient(135deg, #E0F2FE 0%, #C7D2FE 100%);
+    color: #374151;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 15px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600; /* ahora en negrita */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    margin-bottom: 14px;
+    margin-top: 8px;
+    display: block;
+    width: 100%;
+    letter-spacing: 0.4px;
+}
+
+#btn-restaurar-mapa:hover {
+    background: linear-gradient(135deg, #C7D2FE 0%, #E0F2FE 100%);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+}
+
+

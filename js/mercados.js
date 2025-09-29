@@ -284,6 +284,25 @@ async function cargarGeoJSON(url, cluster, markersArray, icon, popupFn) {
         console.error("Error loading GeoJSON:", url, e);
     }
 }
+
+async function cargarProductosAgro(){
+    try{
+        const data = await (await fetch('data/productos_agro.geojson')).json();
+        L.geoJSON(data,{
+            pointToLayer:(feature, latlng)=>{
+                const tipo = feature?.properties?.tipo_producto;
+                const icono = getIconoProductoAgro(tipo);
+                const marker = L.marker(latlng,{icon:icono});
+                productosAgroCluster.addLayer(marker);
+                productosMarkers.push({marker, props:feature.properties});
+                return marker;
+            },
+            onEachFeature:(feature, layer)=>updatePopupProductosAgro(layer, feature.properties)
+        });
+        // NO agregar al mapa por defecto
+    }catch(e){console.error(e);}
+}
+
 // ================= POPUPS =================
 
 function popupSoloNombre(layer, props, className = 'popup-mercados', minWidth = 250, maxWidth = 400) {
@@ -323,10 +342,32 @@ function updatePopupEscuelas(layer, props){
 
 function updatePopupProductosAgro(layer, props){
     let html = `<div class="popup-productos"><h3>${props.producto || 'Sin nombre'}</h3>`;
-    const titles = { producto: "Producto", tipo_producto: "Tipo de producto", comercializacion: "Comercialización", meses_temporada: "Temporada", municipio_nombre: "Municipio/Commune", comarca_nombre: "Comarca", provincia: "Provincia/Departement"};
+    const titles = { producto: "Producto", tipo_producto: "Tipo de producto", comercializacion: "Comercialización", municipio_nombre: "Municipio/Commune", comarca_nombre: "Comarca", provincia: "Provincia/Departement"};
+    
+    // Mostrar todos los meses y colorear los de temporada
+    const meses = [
+        "enero","febrero","marzo","abril","mayo","junio",
+        "julio","agosto","septiembre","octubre","noviembre","diciembre"
+    ];
+    let temporada = [];
+    if (Array.isArray(props.meses_temporada)) {
+        temporada = props.meses_temporada.map(m => normalizaTexto(m));
+    } else if (typeof props.meses_temporada === "string") {
+        temporada = props.meses_temporada.split(",").map(m => normalizaTexto(m));
+    }
+
+    html += `<div class="popup-row"><b>Temporada:</b><div class="meses-temporada">`;
+    meses.forEach(mes => {
+        const mesNorm = normalizaTexto(mes);
+        const activo = temporada.includes(mesNorm);
+        html += `<span class="mes-temporada${activo ? ' activo' : ''}">${mes.charAt(0).toUpperCase() + mes.slice(1)}</span>`;
+    });
+    html += `</div></div>`;
+
+    // Resto de campos
     for(let key in props){
         if(!props.hasOwnProperty(key)) continue;
-        if(["row_number","fid","producto"].includes(key)) continue;
+        if(["row_number","fid","producto","meses_temporada"].includes(key)) continue;
         if(key.toLowerCase().includes("coord") || key.toLowerCase().includes("id")) continue;
         if(Array.isArray(props[key])){
             html += `<div class="popup-row"><b>${titles[key] || key}:</b><ul>${props[key].map(i=>`<li>${i}</li>`).join('')}</ul></div>`;
@@ -848,7 +889,6 @@ const FiltrosControl = L.Control.extend({
                     <label>Tipo de tienda / Type de Boutique:</label>
                     <select id="filtro-tipo-comercios"><option value="">Todos/Tous</option></select>
                 </div>
-
             </div>
         `;
         L.DomEvent.disableClickPropagation(container);
@@ -1414,6 +1454,51 @@ function actualizarLeyenda(){
 
 map.on('overlayadd overlayremove', actualizarLeyenda);
 
+
+// ================= BOTÓN RESTAURAR MAPA =================
+// Añade el botón al control de filtros (puedes ajustar el lugar si lo prefieres)
+document.addEventListener('DOMContentLoaded', () => {
+    const filtros = document.querySelector('.filtros-mapa-control');
+    if (filtros) {
+        const btn = document.createElement('button');
+        btn.id = 'btn-restaurar-mapa';
+        btn.textContent = 'Reiniciar / Réinitialiser';
+        btn.style.margin = '10px 0';
+        filtros.prepend(btn);
+
+        btn.addEventListener('click', () => {
+            // Quitar todas las capas excepto limitesLayer
+            Object.values({
+                mercadosCluster, centrosCluster, otrosCentrosCluster, productosAgroCluster,
+                turismoCluster, restaurantesCluster, hotelesCluster, campingsCluster,
+                alberguesCluster, refugiosCluster, fortalezasCluster, monumentosCluster,
+                monumentosReligiososCluster, restosArqueologicosCluster, balneariosCluster,
+                museosCluster, arbolesCluster, miradoresCluster, glaciaresClusters,
+                zonasBanosClusters, piscinasClusters, productoresClusters, comerciosClusters
+            }).forEach(capa => {
+                if (map.hasLayer(capa)) map.removeLayer(capa);
+            });
+            // Añadir solo limitesLayer si no está
+            if (!map.hasLayer(limitesLayer)) map.addLayer(limitesLayer);
+            // Centrar el mapa en los límites
+            if (limitesLayer) map.fitBounds(limitesLayer.getBounds());
+            // Actualizar leyenda y filtros
+            actualizarLeyenda();
+            actualizarFiltrosAcordeon();
+
+            // Desmarcar todos los checkboxes del sidebar
+            document.querySelectorAll('.sidebar-checkboxes input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+
+            // Si tienes un checkbox para límites, márcalo aquí (si existe)
+            // document.getElementById('cb-limites')?.checked = true;
+
+            // Sincronizar checkboxes
+            if (typeof sincronizarCheckboxes === 'function') sincronizarCheckboxes();
+        });
+    }
+});
 // ================= INICIALIZACIÓN =================
 async function initMap(){
     await cargarLimites();
@@ -1440,7 +1525,8 @@ async function initMap(){
         cargarGeoJSON('data/equipamiento/piscinas.geojson', piscinasClusters, piscinasMarkers, piscinasIcon, updatePopupPiscinas),
         cargarGeoJSON('data/productores/productores_64.geojson', productoresClusters, productoresMarkers, productorIcon, updatePopupProductores),
         cargarGeoJSON('data/productores/comercios_64.geojson', comerciosClusters, comerciosMarkers, comerciosIcon, updatePopupComercios),
-        cargarGeoJSON('data/productos_agro.geojson', productosAgroCluster, productosMarkers, null, updatePopupProductosAgro) // productos agroalimentarios: icono se decide en pointToLayer
+        cargarProductosAgro()
+
     ]);
     map.fitBounds(limitesLayer.getBounds());
     actualizarLeyenda();
@@ -1449,3 +1535,4 @@ async function initMap(){
     actualizarLeyenda();
 }
 initMap();
+
