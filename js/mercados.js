@@ -763,19 +763,34 @@ function filtrarMarcadores(){
     });
 }
 
-function filtrarProductosAgro(){
-    const tipoProducto = document.getElementById('filtro-tipo-producto').value;
-    const comercializacion = document.getElementById('filtro-comercializacion-producto').value;
-    const temporada = document.getElementById('filtro-temporada-producto').value;
+function filtrarProductosAgro() {
+    const tipoProducto = normalizaTexto(document.getElementById('filtro-tipo-producto').value);
+    const comercializacion = normalizaTexto(document.getElementById('filtro-comercializacion-producto').value);
+    const temporada = normalizaTexto(document.getElementById('filtro-temporada-producto').value);
 
     productosAgroCluster.clearLayers();
 
-    productosMarkers.forEach(({marker, props})=>{
-        const temporadaMatch = !temporada || (Array.isArray(props.meses_temporada) ? props.meses_temporada.includes(temporada) : (props.meses_temporada || "").split(",").includes(temporada));
-        if((!tipoProducto || props.tipo_producto === tipoProducto) &&
-           (!comercializacion || props.comercializacion === comercializacion) &&
-           temporadaMatch) {
-               productosAgroCluster.addLayer(marker);
+    productosMarkers.forEach(({ marker, props }) => {
+        // Normaliza los datos del marcador
+        const tipoNorm = normalizaTexto(props.tipo_producto);
+        const comercialNorm = normalizaTexto(props.comercializacion);
+
+        // Temporada puede ser array o string
+        let temporadaNorm = [];
+        if (Array.isArray(props.meses_temporada)) {
+            temporadaNorm = props.meses_temporada.map(m => normalizaTexto(m));
+        } else if (typeof props.meses_temporada === "string") {
+            temporadaNorm = props.meses_temporada.split(",").map(m => normalizaTexto(m));
+        }
+
+        const temporadaMatch = !temporada || temporadaNorm.includes(temporada);
+
+        if (
+            (!tipoProducto || tipoNorm === tipoProducto) &&
+            (!comercializacion || comercialNorm === comercializacion) &&
+            temporadaMatch
+        ) {
+            productosAgroCluster.addLayer(marker);
         }
     });
 }
