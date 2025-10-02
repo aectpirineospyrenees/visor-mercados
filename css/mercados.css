@@ -269,6 +269,60 @@
             font-size: 0.9em;
         }
 
+        .boolean-grid, .productores-boolean-grid, .comercios-boolean-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, auto);
+            gap: 6px 8px;
+            margin-top: 6px;
+            justify-items: center;
+            align-items: center;
+        }
+
+        .boolean-tag {
+            background: #eee;
+            color: #888;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 13px;
+            text-align: center;
+            min-width: 80px;
+            max-width: 140px;
+            transition: background 0.2s, color 0.2s;
+            font-weight: 500;
+            box-sizing: border-box;
+        }
+
+        .boolean-tag.activo {
+            background: #43b581;      /* verde intenso y moderno */
+            color: #fff;              /* texto blanco para contraste */
+            font-weight: bold;
+            box-shadow: 0 1px 4px rgba(67,181,129,0.10);
+        }
+
+        .popup-leyenda-boolean {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            text-align: left;
+        }
+        /* Centra las etiquetas booleanas en el popup */
+        .boolean-grid,
+        .productores-boolean-grid,
+        .comercios-boolean-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, auto);
+            gap: 6px 8px;
+            margin-top: 6px;
+            justify-items: center;   /* centra horizontalmente cada etiqueta */
+            align-items: center;     /* centra verticalmente cada etiqueta */
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            /* Añade esto para centrar el grid en el popup */
+            place-items: center;
+        }
         /* RESTAURANTES - versión moderna gourmet */
         .popup-restaurantes {
             background: #fff8f0; /* crema cálido */
@@ -753,4 +807,18 @@
     transform: translateY(-1px);
 }
 
-
+/* Icono dentro del boton de filtrado de filtros */
+.btn-limpiar-filtros {
+    background: #f1a3a3;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 13px;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-limpiar-filtros:hover {
+    background: #e87676;
+}

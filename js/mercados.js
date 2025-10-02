@@ -439,17 +439,39 @@ function updatePopupRestaurantes(layer, props){
         num_plazas_bar: "Nº plazas bar / Nbr de places au bar",
         num_plazas_mesas: "Nº plazas mesas / Nbr de places aux tables",
         num_plazas_terraza: "Nº plazas terraza / Nbr de places en terrasse",
+        horarios: "Horarios / Horaires"
     };
 
-    for(let key of Object.keys(titles)){
-        if(props[key]){
-            html += `<div class="popup-row"><b>${titles[key]}:</b> <span>${props[key]}</span></div>`;
+    // Solo recorremos las claves definidas en titles
+    for (let key of Object.keys(titles)) {
+        const value = props[key];
+        if (value !== undefined && value !== null && value !== '') {
+            const label = titles[key];
+
+            if (key === 'horarios') {
+                let items = Array.isArray(value) ? value : value.split(',').map(s => s.trim());
+                html += `<div class="popup-row"><b>${label}:</b><ul>`;
+                items.forEach(item => html += `<li>${item}</li>`);
+                html += `</ul></div>`;
+            } else {
+                html += `<div class="popup-row"><b>${label}:</b> <span>${value}</span></div>`;
+            }
         }
     }
 
     html += "</div>";
-    layer.bindPopup(html,{className:'popup-restaurantes', minWidth:250, maxWidth:400});
+
+    // Scroll interno si el contenido es muy largo
+    layer.bindPopup(html, {
+        className: 'popup-restaurantes', 
+        minWidth: 250, 
+        maxWidth: 400, 
+        maxHeight: 400
+    });
 }
+
+
+
 function updatePopupPatrimonioCultural(layer, props){
     let html = `<div class="popup-mercados" style="background:#E6FCFE;padding:10px;border-radius:8px;">
                     <h3>${props.Nom || props.nombre || 'Sin nombre'}</h3>`;
@@ -496,7 +518,7 @@ function updatePopupPiscinas(layer, props){
 }
 
 function updatePopupProductores(layer, props){
-    let html = `<div class="popup-productores"><h3>${props.nombre_productor||'Sin nombre'}</h3>`;
+    let html = `<div class="popup-productores"><h3>${props.nombre_productor || 'Sin nombre'}</h3>`;
     const titles = {
         direccion:"Dirección / Adresse", 
         tipo_productor: "Tipo de productor / Type de producteur",
@@ -504,12 +526,87 @@ function updatePopupProductores(layer, props){
         telefonos: "Teléfono / Téléphone",
         urls:"URL de acceso / URL d'accès", 
         emails: "E-mail",
-        tienda: "Tienda / Boutique",
         horario:"Horario de visita / Horaires de visite", 
         tarifas:"Tarifas de visita / Tarifs des visites",
         idiomas_hablados:"Idiomas hablados / Langues parlées", 
-        descripcion:"Descripción de la explotación / Description de l'exploitation",
-        agricultura_ecologica: "Agricultura Ecológica"
+        descripcion:"Descripción de la explotación / Description de l'exploitation"
+    };
+
+    const skipKeys = ["row_number", "nombre", "nombre_productor", "animales_aceptados",
+        "tienda", "agricultura_ecologica", "restaurante", "venta_mayor", "tienda_online", "venta_centro_produccion"];
+
+    for(let key in props){
+        if(!props.hasOwnProperty(key)) continue;
+        if(skipKeys.includes(key)) continue;
+        if(key.toLowerCase().includes("coord") || key.toLowerCase().includes("id")) continue;
+        if(props[key] === null || props[key] === undefined || props[key] === '') continue;
+
+        if(key === "productos"){
+            let items = Array.isArray(props[key]) ? props[key] : props[key].split(',').map(s => s.trim());
+            html += `<div class="popup-row"><b>${titles[key]||key}:</b>
+                        <div class="productos-grid">`;
+            items.forEach(item => {
+                html += `<div class="producto-item">${item}</div>`;
+            });
+            html += `</div></div>`;
+        } else {
+            html += `<div class="popup-row"><b>${titles[key]||key}:</b> <span>${props[key]}</span></div>`;
+        }
+    }
+
+    // Campos booleanos: siempre mostrar la sección para aplicar estilos
+    const booleanFields = [
+        { key: "tienda", label: "Tienda / Boutique" },
+        { key: "agricultura_ecologica", label: "Agricultura ecológica / Agriculture biologique" },
+        { key: "restaurante", label: "Restaurante / Restaurant" },
+        { key: "venta_mayor", label: "Venta mayorista / Vente en gros" },
+        { key: "tienda_online", label: "Tienda online / Boutique en ligne" },
+        { key: "venta_centro_produccion", label: "Venta en centro de producción / Vente dans le centre de production" }
+    ];
+
+    html += `<div class="popup-row"><b>Servicios / Services</b>
+        <div class="boolean-grid productores-boolean-grid">`;
+    booleanFields.forEach(({key, label}) => {
+        const valor = props[key] === true;
+        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
+    });
+    html += `</div>
+        <div class="popup-leyenda-boolean">🟩: Disponible / disponible<br>⬜: No disponible / Non disponible</div>
+    </div>`;
+
+    html += "</div>";
+
+    layer.bindPopup(html, {
+        className: 'popup-productores',
+        minWidth: 300,
+        maxWidth: 500,
+        maxHeight: 400
+    });
+}
+
+
+function updatePopupComercios(layer, props){
+    let html = `<div class="popup-comercios"><h3>${props.nombre_productor || 'Sin nombre'}</h3>`;
+    const titles = {
+        direccion:"Dirección / Adresse", 
+        codigo_postal:"Código postal / Code postal",
+        tipo_productor: "Tipo de comercio / Type de boutique",
+        productos:"Tipo de producto / Type de produit", 
+        telefono: "Teléfono / Téléphone",
+        url:"URL de acceso / URL d'accès", 
+        url_venta_on_line:"URL tienda online / URL boutique en ligne",
+        persona_contacto: "Persona de contacto / Personne de contact",
+        email: "E-mail",
+        tienda: "Tienda / Boutique",
+        horario:"Horario / Horaires", 
+        tarifas:"Tarifas / Tarifs",
+        idiomas_hablados:"Idiomas hablados / Langues parlées", 
+        descripcion:"Descripción / Description ",
+        agricultura_ecologica: "Agricultura Ecológica /Agriculture Ecologique",
+        restaurante: "Restaurante",
+        venta_mayor: "Venta mayorista",
+        tienda_online: "Tienda online",
+        venta_centro_produccion: "Venta en centro de producción"
     };
 
     const skipKeys = ["row_number", "nombre", "nombre_productor", "animales_aceptados"];
@@ -518,8 +615,9 @@ function updatePopupProductores(layer, props){
         if(!props.hasOwnProperty(key)) continue;
         if(skipKeys.includes(key)) continue;
         if(key.toLowerCase().includes("coord") || key.toLowerCase().includes("id")) continue;
+        if(props[key] === null || props[key] === undefined || props[key] === '') continue; // <-- ignorar valores nulos o vacíos
 
-        if(key === "productos" && props[key]){
+        if(key === "productos"){
             let items = Array.isArray(props[key]) ? props[key] : props[key].split(',').map(s => s.trim());
             html += `<div class="popup-row"><b>${titles[key]||key}:</b>
                         <div class="productos-grid">`;
@@ -532,59 +630,31 @@ function updatePopupProductores(layer, props){
         }
     }
 
-    html+="</div>";
-    layer.bindPopup(html,{
-        className:'popup-productores', 
-        minWidth:300, 
-        maxWidth:500, 
-        maxHeight:400 // limita altura total del popup
+    // Campos booleanos
+    const booleanFields = [
+        { key: "animales_aceptados", label: "Animales aceptados / Animaux acceptés" },
+        { key: "agricultura_ecologica", label: "Agricultura ecológica / Agriculture biologique" },
+    ];
+
+    html += `<div class="popup-row"><b>Servicios / Services:</b>
+        <div class="boolean-grid comercios-boolean-grid">`;
+    booleanFields.forEach(({key, label}) => {
+        const valor = props[key] === true;
+        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
     });
-}
-
-function updatePopupComercios(layer, props){
-    let html = `<div class="popup-comercios"><h3>${props.nombre_productor||'Sin nombre'}</h3>`;
-    const titles = {
-        direccion:"Dirección / Adresse", 
-        tipo_productor: "Tipo de comercio / Type de boutique",
-        productos:"Tipo de producto / Type de produit", 
-        telefonos: "Teléfono / Téléphone",
-        urls:"URL de acceso / URL d'accès", 
-        emails: "E-mail",
-        tienda: "Tienda / Boutique",
-        horario:"Horario / Horaires", 
-        tarifas:"Tarifas / Tarifs",
-        idiomas_hablados:"Idiomas hablados / Langues parlées", 
-        descripcion:"Descripción / Description ",
-    };
-
-    const skipKeys = ["row_number", "nombre", "nombre_productor", "animales_aceptados", "agricultura_ecologica"];
-
-    for(let key in props){
-        if(!props.hasOwnProperty(key)) continue;
-        if(skipKeys.includes(key)) continue;
-        if(key.toLowerCase().includes("coord") || key.toLowerCase().includes("id")) continue;
-
-        if(key === "productos" && props[key]){
-            let items = Array.isArray(props[key]) ? props[key] : props[key].split(',').map(s => s.trim());
-            html += `<div class="popup-row"><b>${titles[key]||key}:</b>
-                        <div class="productos-grid">`;
-            items.forEach(item => {
-                html += `<div class="producto-item">${item}</div>`;
-            });
-            html += `</div></div>`;
-        } else {
-            html+=`<div class="popup-row"><b>${titles[key]||key}:</b> <span>${props[key]}</span></div>`;
-        }
-    }
+    html += `</div>
+    <div class="popup-leyenda-boolean">🟩 Disponible / Disponible<br>⬜ No disponible / Non disponible</div>
+    </div>`;
 
     html+="</div>";
     layer.bindPopup(html,{
         className:'popup-comercios', 
         minWidth:300, 
         maxWidth:500, 
-        maxHeight:400 // limita altura total del popup
+        maxHeight:400
     });
 }
+
 
 
 // ================= FILTROS DINÁMICOS =================
@@ -688,7 +758,16 @@ function initFiltersProductosAgro() {
 }
 
 function initFiltersProductores() {
-    const filtroIds = ['filtro-productos-productor', 'filtro-tipo-productor'];
+    const filtroIds = [
+        'filtro-productos-productor',
+        'filtro-tipo-productor',
+        'filtro-tienda-productor',
+        'filtro-agroeco-productor',
+        'filtro-restautante-productor',
+        'filtro-venta-mayor-productor',
+        'filtro-tienda-online-productor',
+        'filtro-venta-centro-produccion-productor'
+    ];
     const keys = ['productos', 'tipo_productor'];
 
     keys.forEach((key, i) => {
@@ -709,14 +788,13 @@ function initFiltersProductores() {
             filtro.appendChild(o);
         });
     });
-    
 
-    // Asociar evento de cambio
+    // Asociar evento de cambio a todos los filtros
     filtroIds.forEach(id => document.getElementById(id).addEventListener('change', filtrarProductores));
 }
 
 function initFiltersComercios() {
-    const filtroIds = ['filtro-productos-comercios', 'filtro-tipo-comercios'];
+    const filtroIds = ['filtro-productos-comercios', 'filtro-tipo-comercios', 'filtro-animales-comercios', 'filtro-agroeco-comercios'];
     const keys = ['productos', 'tipo_productor'];
 
     keys.forEach((key, i) => {
@@ -741,6 +819,34 @@ function initFiltersComercios() {
 
     // Asociar evento de cambio
     filtroIds.forEach(id => document.getElementById(id).addEventListener('change', filtrarComercios));
+}
+
+function initFiltersRestaurantes() {
+    const filtroIds = ['filtro-tipo-restaurante', 'filtro-etiqueta-restaurante'];
+    const keys = ['tipo_establecimiento', 'etiqueta_calidad'];
+
+    keys.forEach((key, i) => {
+        const filtro = document.getElementById(filtroIds[i]);
+        let valores = [];
+
+        restaurantesMarkers.forEach(m => {
+            if(Array.isArray(m.props[key])) valores.push(...m.props[key]);
+        });
+
+        // Normalizamos y eliminamos duplicados
+        valores = [...new Set(valores.map(v => normalizaTexto(v)))].sort();
+
+        valores.forEach(v => {
+            const o = document.createElement('option');
+            o.value = v;
+            o.textContent = v.charAt(0).toUpperCase() + v.slice(1);
+            filtro.appendChild(o);
+        });
+    });
+    
+
+    // Asociar evento de cambio
+    filtroIds.forEach(id => document.getElementById(id).addEventListener('change', fitlrarRestaurantes));
 }
 
 function filtrarMarcadores(){
@@ -812,6 +918,12 @@ function filtrarCentros(){
 function filtrarProductores(){
     const productosFiltro = normalizaTexto(document.getElementById('filtro-productos-productor').value);
     const tipoFiltro = normalizaTexto(document.getElementById('filtro-tipo-productor').value);
+    const tiendaFiltro = document.getElementById('filtro-tienda-productor').value;
+    const agroecoFiltro = document.getElementById('filtro-agroeco-productor').value;
+    const restauranteFiltro = document.getElementById('filtro-restautante-productor').value;
+    const ventaMayorFiltro = document.getElementById('filtro-venta-mayor-productor').value;
+    const tiendaOnlineFiltro = document.getElementById('filtro-tienda-online-productor').value;
+    const ventaCentroProduccionFiltro = document.getElementById('filtro-venta-centro-produccion-productor').value;
 
     productoresClusters.clearLayers();
 
@@ -822,12 +934,19 @@ function filtrarProductores(){
         const productosMatch = !productosFiltro || productos.includes(productosFiltro);
         const tipoMatch = !tipoFiltro || tipos.includes(tipoFiltro);
 
-        if(productosMatch && tipoMatch){
+        // Filtrado por booleanos
+        const tiendaMatch = tiendaFiltro === "" || (!!props.tienda === (tiendaFiltro === "true"));
+        const agroecoMatch = agroecoFiltro === "" || (!!props.agricultura_ecologica === (agroecoFiltro === "true"));
+        const restauranteMatch = restauranteFiltro === "" || (!!props.restaurante === (restauranteFiltro === "true"));
+        const ventaMayorMatch = ventaMayorFiltro === "" || (!!props.venta_mayor === (ventaMayorFiltro === "true"));
+        const tiendaOnlineMatch = tiendaOnlineFiltro === "" || (!!props.tienda_online === (tiendaOnlineFiltro === "true"));
+        const ventaCentroProduccionMatch = ventaCentroProduccionFiltro === "" || (!!props.venta_centro_produccion === (ventaCentroProduccionFiltro === "true"));
+
+        if(productosMatch && tipoMatch && tiendaMatch && agroecoMatch && restauranteMatch && ventaMayorMatch && tiendaOnlineMatch && ventaCentroProduccionMatch){
             productoresClusters.addLayer(marker);
         }
     });
 }
-
 function filtrarComercios(){
     const comerciosFiltro = normalizaTexto(document.getElementById('filtro-productos-comercios').value);
     const tipoFiltro = normalizaTexto(document.getElementById('filtro-tipo-comercios').value);
@@ -841,8 +960,37 @@ function filtrarComercios(){
         const productosMatch = !comerciosFiltro || comercios.includes(comerciosFiltro);
         const tipoMatch = !tipoFiltro || tipos.includes(tipoFiltro);
 
+        // Filtrado por booleanos
+        const animalesMatch = (() => {
+            const val = document.getElementById('filtro-animales-comercios').value;
+            return val === "" || (!!props.animales_aceptados === (val === "true"));
+        })();
+        const agroecoMatch = (() => {
+            const val = document.getElementById('filtro-agroeco-comercios').value;
+            return val === "" || (!!props.agricultura_ecologica === (val === "true"));
+        })();
+
+        if(animalesMatch && agroecoMatch && productosMatch && tipoMatch){
+        //  
+
         if(productosMatch && tipoMatch){
             comerciosClusters.addLayer(marker);
+        }
+    }});
+}
+
+function fitlrarRestaurantes(){
+    const tipoFiltro = normalizaTexto(document.getElementById('filtro-tipo-restaurante').value);
+    const etiquetaFiltro = normalizaTexto(document.getElementById('filtro-etiqueta-restaurante').value);
+    restaurantesCluster.clearLayers();
+
+    restaurantesMarkers.forEach(({marker, props})=>{
+        const tipos = (props.tipo_establecimiento || []).map(v => normalizaTexto(v));
+        const etiquetas = (props.etiqueta_calidad || []).map(v => normalizaTexto(v));
+        const tipoMatch = !tipoFiltro || tipos.includes(tipoFiltro);
+        const etiquetaMatch = !etiquetaFiltro || etiquetas.includes(etiquetaFiltro);
+        if(tipoMatch && etiquetaMatch){
+            restaurantesCluster.addLayer(marker);
         }
     });
 }
@@ -856,7 +1004,6 @@ const FiltrosControl = L.Control.extend({
         const container = L.DomUtil.create('div', 'filtros-mapa-control');
         container.innerHTML = `
             <div class="filtro-capa">
-                
                 <button class="toggle-filtros" data-capa="mercados">MERCADOS/MARCHÉS</button>
                 <div class="contenedor-filtros" data-capa="mercados" style="display:none;">
                     <label>Tipo/Type:</label>
@@ -869,6 +1016,7 @@ const FiltrosControl = L.Control.extend({
                     <select id="filtro-dia"><option value="">Todos/Tous</option></select>
                     <label>Horario apertura/Horaires:</label>
                     <select id="filtro-apertura"><option value="">Todos/Tous</option></select>
+                    <button class="btn-limpiar-filtros" data-capa="mercados" type="button">Limpiar filtros / Nettoyer les filtres</button>
                 </div>
 
                 <button class="toggle-filtros" data-capa="escuelas">ESCUELAS DE FORMACIÓN/ÉCOLES</button>
@@ -877,6 +1025,16 @@ const FiltrosControl = L.Control.extend({
                     <select id="filtro-tipo-centro"><option value="">Todos/Tous</option></select>
                     <label>Estudios ofertados/Études proposées:</label>
                     <select id="filtro-tipo-oferta"><option value="">Todos/Tous</option></select>
+                    <button class="btn-limpiar-filtros" data-capa="escuelas" type="button">Limpiar filtros / Nettoyer les filtres</button>
+                </div>
+
+                <button class="toggle-filtros" data-capa="restaurantes">RESTAURANTES / RESTAURANTS</button>
+                <div class="contenedor-filtros" data-capa="restaurantes" style="display:none;">
+                    <label>Tipo de restaurante / Type de restaurant:</label>
+                    <select id="filtro-tipo-restaurante"><option value="">Todos/Tous</option></select>
+                    <label>Etiquetas de calidad / Étiquettes de qualité:</label>
+                    <select id="filtro-etiqueta-restaurante"><option value="">Todos/Tous</option></select>
+                    <button class="btn-limpiar-filtros" data-capa="restaurantes" type="button">Limpiar filtros / Nettoyer les filtres</button>
                 </div>
 
                 <button class="toggle-filtros" data-capa="productos">PRODUCTOS AGROALIMENTARIOS / PRODUITS AGROALIMENTAIRES</button>
@@ -887,6 +1045,7 @@ const FiltrosControl = L.Control.extend({
                     <select id="filtro-comercializacion-producto"><option value="">Todos/Tous</option></select>
                     <label>Temporada/Saison:</label>
                     <select id="filtro-temporada-producto"><option value="">Todos/Tous</option></select>
+                    <button class="btn-limpiar-filtros" data-capa="productos" type="button">Limpiar filtros / Nettoyer les filtres</button>
                 </div>
 
                 <button class="toggle-filtros" data-capa="productores">PRODUCTORES / PRODUCTEURS </button>
@@ -895,6 +1054,43 @@ const FiltrosControl = L.Control.extend({
                     <select id="filtro-productos-productor"><option value="">Todos/Tous</option></select>
                     <label>Tipo de productor / Type de producteur:</label>
                     <select id="filtro-tipo-productor"><option value="">Todos/Tous</option></select>
+                    <label>Tienda / Boutique:</label>
+                    <select id="filtro-tienda-productor">
+                        <option value="">Todos/Tous</option>
+                        <option value="true">Sí/Oui</option>
+                        <option value="false">No/Non</option>
+                    </select>
+                    <label>Agricultura ecológica / Agriculture biologique:</label>
+                    <select id="filtro-agroeco-productor">
+                        <option value="">Todos/Tous</option>
+                        <option value="true">Sí/Oui</option>
+                        <option value="false">No/Non</option>
+                    </select>
+                    <label>Restaurante / Restaurant:</label>
+                    <select id="filtro-restautante-productor">
+                        <option value="">Todos/Tous</option>
+                        <option value="true">Sí/Oui</option>
+                        <option value="false">No/Non</option>
+                    </select>
+                    <label>Venta mayorista / Vente en gros:</label>
+                    <select id="filtro-venta-mayor-productor">
+                        <option value="">Todos/Tous</option>
+                        <option value="true">Sí/Oui</option>
+                        <option value="false">No/Non</option>
+                    </select>
+                    <label>Tienda online / Boutique en ligne:</label>
+                    <select id="filtro-tienda-online-productor">
+                        <option value="">Todos/Tous</option>
+                        <option value="true">Sí/Oui</option>
+                        <option value="false">No/Non</option>
+                    </select>
+                    <label>Venta en centro de producción / Vente au centre de production:</label>
+                    <select id="filtro-venta-centro-produccion-productor">
+                        <option value="">Todos/Tous</option>
+                        <option value="true">Sí/Oui</option>
+                        <option value="false">No/Non</option>
+                    </select>
+                    <button class="btn-limpiar-filtros" data-capa="productores" type="button">Limpiar filtros / Nettoyer les filtres</button>
                 </div>
 
                 <button class="toggle-filtros" data-capa="comercios">TIENDAS / BOUTIQUES </button>
@@ -903,6 +1099,19 @@ const FiltrosControl = L.Control.extend({
                     <select id="filtro-productos-comercios"><option value="">Todos/Tous</option></select>
                     <label>Tipo de tienda / Type de Boutique:</label>
                     <select id="filtro-tipo-comercios"><option value="">Todos/Tous</option></select>
+                    <label>Animales aceptados / Animaux acceptés:</label>
+                    <select id="filtro-animales-comercios">
+                        <option value="">Todos/Tous</option>
+                        <option value="true">Sí/Oui</option>
+                        <option value="false">No/Non</option>
+                    </select> 
+                    <label>Agricultura ecológica / Agriculture biologique:</label>
+                    <select id="filtro-agroeco-comercios">
+                        <option value="">Todos/Tous</option>
+                        <option value="true">Sí/Oui</option>
+                        <option value="false">No/Non</option>
+                    </select>
+                    <button class="btn-limpiar-filtros" data-capa="comercios" type="button">Limpiar filtros / Nettoyer les filtres</button>
                 </div>
             </div>
         `;
@@ -933,7 +1142,24 @@ function initAcordeonFiltros(){
     });
 }
 
-
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.btn-limpiar-filtros').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const capa = btn.dataset.capa;
+            const contenedor = btn.closest('.contenedor-filtros');
+            contenedor.querySelectorAll('select').forEach(sel => {
+                sel.value = "";
+            });
+            // Ejecuta el filtrado correspondiente
+            if (capa === "mercados") filtrarMarcadores();
+            else if (capa === "escuelas") filtrarCentros();
+            else if (capa === "productos") filtrarProductosAgro();
+            else if (capa === "productores") filtrarProductores();
+            else if (capa === "comercios") filtrarComercios();
+            else if (capa === "restaurantes") fitlrarRestaurantes();
+        });
+    });
+});
 
 // ================= ACTUALIZACIÓN DINÁMICA DE FILTROS =================
 // Actualizamos acordeón para mostrar solo capas activas
@@ -947,6 +1173,7 @@ function actualizarFiltrosAcordeon() {
         else if(capa === 'productos') capaActiva = map.hasLayer(productosAgroCluster);
         else if (capa === 'productores') capaActiva = map.hasLayer(productoresClusters);
         else if (capa === 'comercios') capaActiva = map.hasLayer(comerciosClusters);
+        else if (capa === 'restaurantes') capaActiva = map.hasLayer(restaurantesCluster);
         const contenedor = btn.nextElementSibling;
 
         if(capaActiva){
@@ -958,6 +1185,7 @@ function actualizarFiltrosAcordeon() {
             else if(capa === 'productos' && document.getElementById('filtro-tipo-producto').options.length <= 1) initFiltersProductosAgro();
             else if(capa === 'productores' && document.getElementById('filtro-productos-productor').options.length <= 1) initFiltersProductores();
             else if(capa === 'comercios' && document.getElementById('filtro-productos-comercios').options.length <= 1) initFiltersComercios();
+            else if(capa === 'restaurantes' && document.getElementById('filtro-tipo-restaurante').options.length <= 1) initFiltersRestaurantes();
 
         } else {
             btn.style.display = 'none';        // Ocultar botón
@@ -969,11 +1197,11 @@ function actualizarFiltrosAcordeon() {
 
 
 // Modificar los eventos de checkboxes para llamar a actualizarFiltrosAcordeon()
-['mercados','escuelas','otros','productos', 'productores', 'comercios'].forEach(tipo=>{
+['mercados','escuelas','otros','productos', 'productores', 'comercios', 'restaurantes'].forEach(tipo=>{
     const checkbox = document.getElementById('cb-'+tipo);
     if(checkbox){
         checkbox.addEventListener('change', e=>{
-            const capaMap = {'mercados':mercadosCluster,'escuelas':centrosCluster,'otros':otrosCentrosCluster,'productos':productosAgroCluster, 'productores': productoresClusters, 'comercios': comerciosClusters};
+            const capaMap = {'mercados':mercadosCluster,'escuelas':centrosCluster,'otros':otrosCentrosCluster,'productos':productosAgroCluster, 'productores': productoresClusters, 'comercios': comerciosClusters, 'restaurantes': restaurantesCluster};
             if(e.target.checked) map.addLayer(capaMap[tipo]); else map.removeLayer(capaMap[tipo]);
             actualizarLeyenda();
             actualizarFiltrosAcordeon();
