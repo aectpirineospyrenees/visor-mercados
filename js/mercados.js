@@ -1547,14 +1547,14 @@ window.addEventListener('load', function(){
             fuente: 'Tourisme 64'},
 
         'productores': 
-            { es: "Información correspondiente únicamente al departamento Pyrénées-Atlantiques", 
-            fr: "Informations concernant uniquement le département des Pyrénées-Atlantiques", 
-            fuent: "Tourisme 64" },
+            { es: "Información del departamento Pyrénées-Atlantiques, Provincia de Huesca y Comarca de las Cinco Villas", 
+            fr: "Informations du département des Pyrénées-Atlantiques, de la province de Huesca et de la région des Cinco Villas.", 
+            fuente: "Tourisme 64 / Pon Aragón en tu mesa" },
 
         'comercios': 
-            { es: "Información correspondiente únicamente al departamento Pyrénées-Atlantiques", 
-            fr: "Informations concernant uniquement le département des Pyrénées-Atlantiques", 
-            fuente: "Tourisme 64" },
+            { es: "Información del departamento Pyrénées-Atlantiques, Provincia de Huesca y Comarca de las Cinco Villas", 
+            fr: "Informations du département des Pyrénées-Atlantiques, de la province de Huesca et de la région des Cinco Villas.", 
+            fuente: "Tourisme 64 / Pon Aragón en tu mesa" },
 
         'zonasbano': 
         { es: "Información correspondiente únicamente a la provincia de Huesca y comarca de las Cinco Villas", 
