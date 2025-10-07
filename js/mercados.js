@@ -2077,7 +2077,7 @@ async function initMap(){
         cargarGeoJSON('data/equipamiento/piscinas.geojson', piscinasClusters, piscinasMarkers, piscinasIcon, updatePopupPiscinas),
         cargarGeoJSON('data/productores/productores_64.geojson', productoresClusters, productoresMarkers, productorIcon, updatePopupProductores),
         cargarGeoJSON('data/productores/comercios_64.geojson', comerciosClusters, comerciosMarkers, comerciosIcon, updatePopupComercios),
-        cargarGeoJSON('data/turismo_activo/ski_Huesca_64.geojson', skiClusters, skiMarkers, skiIcon, updatePopupSki),
+        cargarGeoJSON('data/turismo_activo/ski_huesca_64.geojson', skiClusters, skiMarkers, skiIcon, updatePopupSki),
         cargarProductosAgro()
 
     ]);
