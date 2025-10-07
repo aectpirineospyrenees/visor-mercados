@@ -49,7 +49,7 @@ const zonaBanoIcon = crearIcono("icons/zona_bano.svg");
 const piscinasIcon = crearIcono("icons/piscina.svg");
 const productorIcon = crearIcono ("icons/productor.svg");
 const comerciosIcon = crearIcono ("icons/tienda.svg");
-
+const skiIcon = crearIcono ("icons/ski.svg");
 const DEFAULT_ICON_AGRO = iconsProductosAgro["Legumbres"] || marketIconMercados;
 
 function normalizaTexto(s){
@@ -102,7 +102,7 @@ let zonasBanosMarkers = [];
 let piscinasMarkers = [];
 let productoresMarkers = [];
 let comerciosMarkers = [];
-
+let skiMarkers = [];
 const ordenDias = ["Lunes/Lundi","Martes/Mardi","Miércoles/Mercredi","Jueves/Jeudi","Viernes/Vendredi","Sábado/Samedi","Domingo/Dimanche"];
 const ordenSemanas = ["Primera semana del mes/Première semaine du mois","Segunda semana del mes/Deuxième semaine du mois","Tercera semana del mes/Troisième semaine du mois","Cuarta semana del mes/Quatrième semaine du mois","Todas las semanas/Toutes les semaines"];
 
@@ -233,7 +233,7 @@ const zonasBanosClusters           = crearCluster("icons/zona_bano.svg");
 const piscinasClusters             = crearCluster("icons/piscina.svg");
 const productoresClusters          = crearCluster("icons/productor.svg");
 const comerciosClusters            = crearCluster("icons/tienda.svg");
-
+const skiClusters                  = crearCluster("icons/ski.svg");
 
 // ================= CARGA GEOJSON =================
 async function cargarLimites(){
@@ -285,23 +285,6 @@ async function cargarGeoJSON(url, cluster, markersArray, icon, popupFn) {
     }
 }
 
-async function cargarProductosAgro(){
-    try{
-        const data = await (await fetch('data/productos_agro.geojson')).json();
-        L.geoJSON(data,{
-            pointToLayer:(feature, latlng)=>{
-                const tipo = feature?.properties?.tipo_producto;
-                const icono = getIconoProductoAgro(tipo);
-                const marker = L.marker(latlng,{icon:icono});
-                productosAgroCluster.addLayer(marker);
-                productosMarkers.push({marker, props:feature.properties});
-                return marker;
-            },
-            onEachFeature:(feature, layer)=>updatePopupProductosAgro(layer, feature.properties)
-        });
-        // NO agregar al mapa por defecto
-    }catch(e){console.error(e);}
-}
 
 // ================= POPUPS =================
 
@@ -399,28 +382,91 @@ function updatePopupOficinasTurismo(layer, props){
     layer.bindPopup(html,{className:'popup-mercados',minWidth:250,maxWidth:600});
 }
 
-function updatePopupAlojamientos(layer, props){
-    let html = `<div class="popup-mercados" style="background:#fef3e0;padding:10px;border-radius:8px;">
-                    <h3>${props.Nom || props.nombre || 'Sin nombre'}</h3>`;
+function updatePopupAlojamientos(layer, props) {
+    let html = `
+    <div class="popup-productores" style="background:#fef3e0;padding:10px;border-radius:8px;">
+        <h3 style="color:#8B4513; margin-bottom:8px;">${props.nom || props.nombre || 'Sin nombre'}</h3>`;
+
+    // Campos que quieres mostrar en el popup
+    const fieldsToShow = ["type", "adresse", "emails", "websites", "phones", "horarios", "tarifas"];
+
+    const booleanFields = [
+        { key: "permetanimaux", label: "Permite animales / Animaux acceptés" },
+        { key: "accesible", label: "Accesible / Accessible" }
+    ];
 
     const titles = {
         type: "Tipo / Type",
-        Email: "E-mail",
-        Website: "Sitio Web/Site Web",
-        Phone: "Teléfono/Phone",
-        Adresse2: "Dirección/Adresse",
-        Commune: "Municipio / Commune",
-        PermetAnim: "Permite Animales / Permet animaux",
+        emails: "E-mail",
+        websites: "Sitio Web / Site Web",
+        phones: "Teléfono / Phone",
+        adresse: "Dirección / Adresse",
+        horarios: "Horarios / Horaires",
+        tarifas: "Tarifas / Tarifs",
     };
 
-    for(let key of Object.keys(titles)){
-        if(props[key]){
-            html += `<div class="popup-row"><b>${titles[key]}:</b> <span>${props[key]}</span></div>`;
+    function formatValue(value) {
+        if (!value) return "—";
+
+        let obj = value;
+        if (typeof value === "string") {
+            try {
+                obj = JSON.parse(value);
+            } catch {
+                return value;
+            }
         }
+
+        if (typeof obj === "object") {
+            const itemsSet = new Set();
+
+            function extractValues(v) {
+                if (!v || v === "NULL") return;
+                if (Array.isArray(v)) {
+                    v.forEach(sub => extractValues(sub));
+                } else if (typeof v === "object") {
+                    Object.values(v).forEach(sub => extractValues(sub));
+                } else {
+                    itemsSet.add(v);
+                }
+            }
+
+            extractValues(obj);
+
+            if (itemsSet.size === 0) return "—";
+
+            return `<ul style="margin:0; padding-left:20px;">${[...itemsSet].map(i => `<li>${i}</li>`).join("")}</ul>`;
+        }
+
+        return value;
     }
 
+    // Mostrar solo los campos especificados
+    fieldsToShow.forEach(key => {
+        if (props[key]) {
+            html += `<div class="popup-row"><b>${titles[key] || key}:</b> ${formatValue(props[key])}</div>`;
+        }
+    });
+
+    // Sección de booleanos
+    html += `<div class="popup-row"><b>Servicios / Services</b>
+        <div class="boolean-grid productores-boolean-grid">`;
+    booleanFields.forEach(({key, label}) => {
+        const valor = props[key] === true;
+        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
+    });
+    html += `</div>
+        <div class="popup-leyenda-boolean">🟩: Disponible / Oui<br>⬜: No disponible / Non</div>
+    </div>`;
+
     html += "</div>";
-    layer.bindPopup(html,{className:'popup-mercados', minWidth:250, maxWidth:400});
+
+    layer.bindPopup(html, {
+        className: "popup-productores",
+        minWidth: 400,
+        maxWidth: 500,
+        maxHeight: 500
+    });
 }
 
 function updatePopupRestaurantes(layer, props){
@@ -428,19 +474,25 @@ function updatePopupRestaurantes(layer, props){
                     <h3>${props.Nom || props.nombre_establecimiento || 'Sin nombre'}</h3>`;
 
     const titles = {
-        direccion_establecimiento: "Dirección/Adresse",
+        direccion_establecimiento: "Dirección / Adresse",
         tipo_establecimiento: "Tipo / Type",
         etiqueta_calidad: "Etiquetas de calidad / Labels de qualité",
         descripcion_establecimiento: "Descripción establecimiento / Description de l'établissement",
         idiomas: "Idiomas hablados / Langues parlées",
         formas_pago: "Formas de pago / Moyens de paiement",
-        animales_bienvenidos: "Animales bienvenidos / Animaux bienvenus",
-        num_plazas_totales: "Nº plazas totales / Nbr de places totales",
+        horarios: "Horarios / Horaires",
+             num_plazas_totales: "Nº plazas totales / Nbr de places totales",
         num_plazas_bar: "Nº plazas bar / Nbr de places au bar",
         num_plazas_mesas: "Nº plazas mesas / Nbr de places aux tables",
-        num_plazas_terraza: "Nº plazas terraza / Nbr de places en terrasse",
-        horarios: "Horarios / Horaires"
+        num_plazas_terraza: "Nº plazas terraza / Nbr de places en terrasse"
     };
+
+    const numericKeys = [
+        "num_plazas_totales",
+        "num_plazas_bar",
+        "num_plazas_mesas",
+        "num_plazas_terraza"
+    ];
 
     // Solo recorremos las claves definidas en titles
     for (let key of Object.keys(titles)) {
@@ -448,26 +500,141 @@ function updatePopupRestaurantes(layer, props){
         if (value !== undefined && value !== null && value !== '') {
             const label = titles[key];
 
+            // Horarios en lista
             if (key === 'horarios') {
                 let items = Array.isArray(value) ? value : value.split(',').map(s => s.trim());
                 html += `<div class="popup-row"><b>${label}:</b><ul>`;
                 items.forEach(item => html += `<li>${item}</li>`);
                 html += `</ul></div>`;
+
+            // Campos numéricos → tarjetas visuales
+            } else if (numericKeys.includes(key)) {
+                html += `
+                    <div class="popup-number-card">
+                        <div class="number-value">${value}</div>
+                        <div class="number-label">${label}</div>
+                    </div>`;
+
+            // Campos normales → texto
             } else {
                 html += `<div class="popup-row"><b>${label}:</b> <span>${value}</span></div>`;
             }
         }
     }
 
+    const booleanFields = [
+        { key: "animales_bienvenidos", label: "Animales bienvenidos / Animaux bienvenus" }
+    ];
+    html += `<div class="popup-row">
+        <div class="boolean-grid productores-boolean-grid">`;
+    booleanFields.forEach(({key, label}) => {
+        const valor = props[key] === true;
+        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
+    });
+    html += `</div>
+        <div class="popup-leyenda-boolean">🟩: Disponible / disponible<br>⬜: No disponible / Non disponible</div
+        </div>`;
     html += "</div>";
 
-    // Scroll interno si el contenido es muy largo
     layer.bindPopup(html, {
         className: 'popup-restaurantes', 
-        minWidth: 250, 
+        minWidth: 500, 
         maxWidth: 400, 
         maxHeight: 400
     });
+}
+
+
+function updatePopupBalnearios(layer, props){
+    let html = `<div class="popup-productores" style="background:#E6FCFE;padding:10px;border-radius:8px;">
+                    <h3>${props.Nom || props.Nombre || 'Sin nombre'}</h3>`;
+
+    const titles = {
+        tipo: "Tipo / Type",
+        direccion_completa: "Dirección / Adresse",
+        Email: "E-mail",
+        Web: "Sitio Web / Site Web",
+        Teléfono: "Teléfono / Phone",
+        Descripción: "Descripción / Description",
+        horarios: "Horarios de apertura / Horaires d'ouverture",
+        Servicios: "Servicios / Services",
+        descripcion_tarifa: "Tarifas / Tarifs",
+        Fotos: "Fotos / Photos"
+    };
+
+    for(let key of Object.keys(titles)){
+        if(props[key]){
+            let displayValue = props[key];
+
+            // Web como enlace
+            if(key === "Web"){
+                displayValue = `<a href="${props[key]}" target="_blank" rel="noopener noreferrer">${props[key]}</a>`;
+            }
+
+            // Fotos — carrusel
+            if(key === "Fotos"){
+                const fotosArray = props[key].split(",").map(f => f.trim()).filter(f => f !== "");
+                if(fotosArray.length > 0){
+                    const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
+
+                    // Generamos contenedor con primera imagen visible
+                    displayValue = `
+                        <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'; showSlide('${fotosId}',0);">
+                            Ver fotos (${fotosArray.length})
+                        </button>
+                        <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
+                            <div class="popup-fotos-content">
+                                <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
+                                <div class="carousel-container">
+                                    ${fotosArray.map((url, i) => `<img class="carousel-slide" src="${url}" style="display:none">`).join('')}
+                                    <button class="prev-slide" onclick="plusSlide('${fotosId}', -1)">&#10094;</button>
+                                    <button class="next-slide" onclick="plusSlide('${fotosId}', 1)">&#10095;</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            html += `<div class="popup-row"><b>${titles[key]}:</b> <span>${displayValue}</span></div>`;
+        }
+    }
+
+    const booleanFieldsTienda = [
+        { key: "accesibilidad", label: "Accesibilidad adaptada / Accessibilité adaptée" },
+    ];
+
+    html += `<div class="popup-row">
+                <div class="boolean-grid productores-boolean-grid">`;
+    booleanFieldsTienda.forEach(({key, label}) => {
+        const valor = props[key] === true;
+        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
+    });
+    html += `</div></div>`;
+
+    html += `<div class="popup-leyenda-boolean">🟩: Disponible / disponible<br>⬜: No disponible / Non disponible</div>`;
+
+    layer.bindPopup(html, {className:'popup-productores', minWidth:250, maxWidth:400});
+}
+
+// Funciones para el carrusel
+function showSlide(carouselId, index){
+    const container = document.getElementById(carouselId);
+    if(!container) return;
+    const slides = container.querySelectorAll(".carousel-slide");
+    slides.forEach((slide,i)=> slide.style.display = i===index ? "block" : "none");
+    container.dataset.currentSlide = index;
+}
+
+function plusSlide(carouselId, n){
+    const container = document.getElementById(carouselId);
+    if(!container) return;
+    const slides = container.querySelectorAll(".carousel-slide");
+    let current = parseInt(container.dataset.currentSlide || 0);
+    let next = current + n;
+    if(next < 0) next = slides.length-1;
+    if(next >= slides.length) next = 0;
+    showSlide(carouselId, next);
 }
 
 
@@ -497,7 +664,7 @@ function updatePopupPatrimonioCultural(layer, props){
 }
 
 function updatePopupPiscinas(layer, props){
-    let html = `<div class="popup-mercados" style="background:#fef3e0;padding:10px;border-radius:8px;">
+    let html = `<div class="popup-productores" style="background:#fef3e0;padding:10px;border-radius:8px;">
                     <h3>${props.Nom || props.nombre || 'Sin nombre'}</h3>`;
 
     const titles = {
@@ -514,7 +681,7 @@ function updatePopupPiscinas(layer, props){
     }
 
     html += "</div>";
-    layer.bindPopup(html,{className:'popup-mercados', minWidth:250, maxWidth:400});
+    layer.bindPopup(html,{className:'popup-productores', minWidth:250, maxWidth:400});
 }
 
 function updatePopupProductores(layer, props){
@@ -524,13 +691,16 @@ function updatePopupProductores(layer, props){
         tipo_productor: "Tipo de productor / Type de producteur",
         productos:"Tipo de producto / Type de produit", 
         telefonos: "Teléfono / Téléphone",
-        urls:"URL de acceso / URL d'accès", 
         emails: "E-mail",
+        urls:"URL de acceso / URL d'accès", 
+        persona_contacto: "Persona de contacto / Personne de contact",
+        url_venta_on_line:"URL tienda online / URL boutique en ligne",
         horario:"Horario de visita / Horaires de visite", 
         tarifas:"Tarifas de visita / Tarifs des visites",
         idiomas_hablados:"Idiomas hablados / Langues parlées", 
         descripcion:"Descripción de la explotación / Description de l'exploitation"
     };
+
 
     const skipKeys = ["row_number", "nombre", "nombre_productor", "animales_aceptados",
         "tienda", "agricultura_ecologica", "restaurante", "venta_mayor", "tienda_online", "venta_centro_produccion"];
@@ -549,24 +719,39 @@ function updatePopupProductores(layer, props){
                 html += `<div class="producto-item">${item}</div>`;
             });
             html += `</div></div>`;
+        
         } else {
             html += `<div class="popup-row"><b>${titles[key]||key}:</b> <span>${props[key]}</span></div>`;
         }
     }
 
-    // Campos booleanos: siempre mostrar la sección para aplicar estilos
-    const booleanFields = [
-        { key: "tienda", label: "Tienda / Boutique" },
-        { key: "agricultura_ecologica", label: "Agricultura ecológica / Agriculture biologique" },
-        { key: "restaurante", label: "Restaurante / Restaurant" },
+    const booleanFieldsTienda = [
+
         { key: "venta_mayor", label: "Venta mayorista / Vente en gros" },
         { key: "tienda_online", label: "Tienda online / Boutique en ligne" },
-        { key: "venta_centro_produccion", label: "Venta en centro de producción / Vente dans le centre de production" }
+        { key: "venta_centro_produccion", label: "Venta en centro de producción / Vente dans le centre de production" },
+        { key: "tienda", label: "Tienda / Boutique" }
+    ];
+
+    html += `<div class="popup-row"><b>Punto de venta / Point de vente</b>
+        <div class="boolean-grid productores-boolean-grid">`;
+    booleanFieldsTienda.forEach(({key, label}) => {
+        const valor = props[key] === true;
+        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
+    });
+    html += `</div>
+        <div class="popup-leyenda-boolean">🟩: Disponible / disponible<br>⬜: No disponible / Non disponible</div>
+    </div>`;
+
+
+    const booleanFieldsServicios = [
+        { key: "agricultura_ecologica", label: "Agricultura ecológica / Agriculture biologique" },
+        { key: "restaurante", label: "Restaurante / Restaurant" },
     ];
 
     html += `<div class="popup-row"><b>Servicios / Services</b>
         <div class="boolean-grid productores-boolean-grid">`;
-    booleanFields.forEach(({key, label}) => {
+    booleanFieldsServicios.forEach(({key, label}) => {
         const valor = props[key] === true;
         html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
     });
@@ -580,7 +765,7 @@ function updatePopupProductores(layer, props){
         className: 'popup-productores',
         minWidth: 300,
         maxWidth: 500,
-        maxHeight: 400
+        maxHeight: 500
     });
 }
 
@@ -654,6 +839,113 @@ function updatePopupComercios(layer, props){
         maxHeight:400
     });
 }
+
+function updatePopupSki(layer, props){
+    const name = props.Nombre || 'Sin nombre';
+    let html = `<div class="popup-ski"><h3>${name}</h3>`;
+    const titles = {
+        direccion: "Dirección / Adresse",
+        Tipo: "Tipo de estación / Type de station",
+        subtipo: "Subitpo de estación / Sous-type de station",
+        telefono: "Teléfono / Téléphone",
+        Email: "E-mail",
+        Web: "Web",
+        descricpion: "Descripción / Description",
+        h_min: "Altitud mínima (m) / Altitude minimale (m)",
+        km_esqui: "Km esquiables (km) / Km skiables (km)",
+        p_verde: "Pistas verdes / Pistes vertes",
+        p_azul: "Pistas azules / Pistes bleues",
+        p_roja: "Pistas rojas / Pistes rouges",
+        p_negra: "Pistas negras / Pistes noires",
+        n_remontes: "Nº remontes / Nbr de remontées",
+        Fotos: "Fotos / Photos"
+    };
+
+     for (let key in titles) {
+        if (!props.hasOwnProperty(key)) continue;
+        let value = props[key];
+        if (!value || value === "" || value === null) continue; // No mostrar campos vacíos
+
+        // --- Tarjeta km esquiables ---
+        if (key === "km_esqui") {
+            html += `
+                <div style="
+                    margin:15px 0; 
+                    padding:12px; 
+                    background:linear-gradient(135deg, #a1c4fd, #c2e9fb); 
+                    border-radius:10px; 
+                    text-align:center; 
+                    box-shadow:0 3px 8px rgba(0,0,0,0.2);
+                ">
+                    <h4 style="margin:0 0 6px 0;">${titles[key]}</h4>
+                    <p style="margin:0; font-weight:700; font-size:18px;">${value} km</p>
+                </div>
+            `;
+            continue; // Salta la creación de la fila normal
+        }
+
+        let displayValue = value;
+
+        // Web como enlace
+        if (key === "Web") {
+            displayValue = `<a href="${value}" target="_blank" rel="noopener noreferrer">${value}</a>`;
+        }
+
+        // Pistas (etiquetas de colores)
+        if (["p_verde","p_azul","p_roja","p_negra"].includes(key)) {
+            displayValue = `<span class="ski-pista ${key}">${value} pistas</span>`;
+        }
+
+        // Fotos — botón para abrir popup anexo
+        if (key === "Fotos") {
+            const fotosArray = value.split(",").map(f => f.trim()).filter(f => f !== "");
+            if (fotosArray.length > 0) {
+                const fotosHTML = fotosArray.map(url => `<img src="${url}" alt="foto">`).join("");
+                const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
+                displayValue = `
+                    <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'">
+                        Ver fotos (${fotosArray.length})
+                    </button>
+                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
+                        <div class="popup-fotos-content">
+                            <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
+                            ${fotosHTML}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Altitud combinada como línea normal
+        if (key === "h_min") {
+            const hMin = props.h_min;
+            const hMax = props.h_max;
+            const desnivel = props.desnivel;
+
+            if (hMin || hMax || desnivel) {
+                displayValue = `
+                    ${hMin ? hMin + ' m' : '?'} – 
+                    ${hMax ? hMax + ' m' : '?'}
+                    ${desnivel ? ` (${desnivel} m de desnivel)` : ''}
+                `;
+                html += `<div class="popup-row"><b>Altitud / Dénivelé:</b><span>${displayValue}</span></div>`;
+                delete props.h_max;
+                delete props.desnivel;
+                continue;
+            } else continue;
+        }
+
+        // Agregar fila normal para los demás campos
+        html += `<div class="popup-row"><b>${titles[key]}:</b><span>${displayValue}</span></div>`;
+    }
+
+    html += "</div>";
+    layer.bindPopup(html, { className: 'popup-ski', minWidth: 400, maxWidth: 700, maxHeight: 500 });
+}
+
+
+
+
 
 
 
@@ -1310,7 +1602,6 @@ window.addEventListener('load', function(){
                         <div class="accordion-content">
                             <div class="sidebar-checkboxes">
                                 <label><input type="checkbox" id="cb-oficinas-turismo"> <img src="icons/turismo.svg" width="20"> Oficinas Turismo / Offices de tourisme</label>
-                                <label><input type="checkbox" id="cb-piscinas"> <img src="icons/piscina.svg" width="20"> Piscinas / Piscines</label>
                             </div>
                         </div>
                     </div>
@@ -1364,6 +1655,7 @@ window.addEventListener('load', function(){
                         <div class="accordion-content">
                             <div class="sidebar-checkboxes">
                                 <label><input type="checkbox" id="cb-balnearios" checked> <img src="icons/spa.svg" width="20"> Balnearios</label>
+                                <label><input type="checkbox" id="cb-piscinas"> <img src="icons/piscina.svg" width="20"> Piscinas / Piscines</label>
                             </div>
                         </div>
                     </div>
@@ -1415,7 +1707,20 @@ window.addEventListener('load', function(){
         id:'turismoaventura',
         tab:'<i class="fas fa-hiking"></i>',
         title:"Turismo de aventura/Tourisme d'aventure",
-        pane:``
+        pane:`
+            <div class="accordion">
+                <!-- Grupo 2 -->
+                    <div class="accordion-item">
+                        <button class="accordion-header">
+                            Deportes invernales / Sports d'hiver
+                            <span class="arrow">▶</span>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="sidebar-checkboxes">
+                                    <label><input type="checkbox" id="cb-ski" checked> <img src="icons/ski.svg" width="20"> Estaciones de esquí / Stations de ski</label>
+                                </div>
+                            </div>
+                    </div>`
     });
 
     sidebar.addPanel({
@@ -1489,6 +1794,7 @@ window.addEventListener('load', function(){
         document.getElementById('cb-piscinas').checked = map.hasLayer(piscinasClusters);
         document.getElementById('cb-productores').checked = map.hasLayer(productoresClusters);
         document.getElementById('cb-comercios').checked = map.hasLayer(comerciosClusters);
+        document.getElementById('cb-ski').checked = map.hasLayer(skiClusters);
     }
 
     sincronizarCheckboxes();
@@ -1517,7 +1823,8 @@ window.addEventListener('load', function(){
     'zonasbano': zonasBanosClusters,
     'piscinas': piscinasClusters,
     'productores': productoresClusters,
-    'comercios': comerciosClusters
+    'comercios': comerciosClusters,
+    'ski': skiClusters
     };
 
     // ================= EVENTOS CHECKBOXES =================
@@ -1537,7 +1844,7 @@ window.addEventListener('load', function(){
             fr: "Informations concernant uniquement la province de Huesca et la région des Cinco Villas.", 
             fuente: 'IGN España'},
 
-        'albergues': { es: "Información correspondiente únicamente al Bearn (Pyrénées Atlantiques), Huesca y comarca de las Cinco Villas", 
+        'albergues': { es: "Información del departamento Pyrénées-Atlantiques, Provincia de Huesca y Comarca de las Cinco Villas", 
             fr: "Informations concernant uniquement le Béarn (Pyrénées Atlantiques), Huesca et la région des Cinco Villas.", 
             fuente: 'IGN España y Tourisme 64' },
 
@@ -1614,10 +1921,15 @@ window.addEventListener('load', function(){
         // Agrega aquí los identificadores y mensajes para cualquier otra capa
 
         'oficinas-turismo':
-            {fuente: "IGN España - France"}
+            {fuente: "IGN España - France"},
+
+        'ski':
+            {es: "Información correspondiente a Pirineos Atlánticos y provincia de Huesca", 
+            fr: "Informations concernant les Pyrénées-Atlantiques et la province de Huesca.", 
+            fuente: 'Tourisme 64 / Observatorio de Montaña (OMS)' }
     };
 
-    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios'].forEach(tipo => {
+    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski'].forEach(tipo => {
     const checkbox = document.getElementById('cb-' + tipo);
     if (checkbox) {
         checkbox.addEventListener('change', e => {
@@ -1692,6 +2004,7 @@ function actualizarLeyenda(){
     if(map.hasLayer(piscinasClusters)) html += `<img src="icons/piscina.svg" width="18"> Piscinas / Piscines <br>`;
     if(map.hasLayer(productoresClusters)) html += `<img src="icons/productor.svg" width="18"> Productores y artesanos / Producteurs et aritsans <br>`;
     if(map.hasLayer(comerciosClusters)) html += `<img src="icons/tienda.svg" width="18"> Tiendas y comercios / Boutiques et commerces <br>`;
+    if(map.hasLayer(skiClusters)) html += `<img src="icons/ski.svg" width="18"> Estaciones de esquí / Stations de ski <br>`;
     div.innerHTML = html;
 }
 
@@ -1733,10 +2046,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.sidebar-checkboxes input[type="checkbox"]').forEach(cb => {
                 cb.checked = false;
             });
-
-            // Si tienes un checkbox para límites, márcalo aquí (si existe)
-            // document.getElementById('cb-limites')?.checked = true;
-
             // Sincronizar checkboxes
             if (typeof sincronizarCheckboxes === 'function') sincronizarCheckboxes();
         });
@@ -1759,7 +2068,7 @@ async function initMap(){
         cargarGeoJSON('data/patrimonio_cultural/restos_arqueologicos.geojson', restosArqueologicosCluster, restosArqueologicosMarkers, restosArqueologicosIcon, updatePopupPatrimonioCultural),
         cargarGeoJSON('data/otros_centros.geojson', otrosCentrosCluster, null, marketIconOtrosCentros, popupSoloNombre),
         cargarGeoJSON('data/restaurantes/restaurantes.geojson', restaurantesCluster, restaurantesMarkers, restaurantesIcon, updatePopupRestaurantes),
-        cargarGeoJSON('data/equipamiento/balnearios_Huesca.geojson', balneariosCluster, balneariosMarkers, balneariosIcon, popupSoloNombre),
+        cargarGeoJSON('data/equipamiento/balnearios_64_Huesca.geojson', balneariosCluster, balneariosMarkers, balneariosIcon, updatePopupBalnearios),
         cargarGeoJSON('data/equipamiento/museos.geojson', museosCluster, museosMarkers, museosIcon, popupSoloNombre),
         cargarGeoJSON('data/turismo_natural/arboles_emblematicos_huesca.geojson', arbolesCluster, arbolesMarkers, arbolesIcon, popupSoloNombre),
         cargarGeoJSON('data/turismo_natural/miradores.geojson', miradoresCluster, miradoresMarkers, miradoresIcon, popupSoloNombre),
@@ -1768,6 +2077,7 @@ async function initMap(){
         cargarGeoJSON('data/equipamiento/piscinas.geojson', piscinasClusters, piscinasMarkers, piscinasIcon, updatePopupPiscinas),
         cargarGeoJSON('data/productores/productores_64.geojson', productoresClusters, productoresMarkers, productorIcon, updatePopupProductores),
         cargarGeoJSON('data/productores/comercios_64.geojson', comerciosClusters, comerciosMarkers, comerciosIcon, updatePopupComercios),
+        cargarGeoJSON('data/turismo_activo/ski_Huesca_64.geojson', skiClusters, skiMarkers, skiIcon, updatePopupSki),
         cargarProductosAgro()
 
     ]);

@@ -279,25 +279,28 @@
             align-items: center;
         }
 
+        /* Etiquetas booleanas */
         .boolean-tag {
             background: #eee;
-            color: #888;
-            border-radius: 6px;
-            padding: 4px 8px;
+            color: #666;
+            border-radius: 8px;
+            padding: 6px 10px;
             font-size: 13px;
             text-align: center;
-            min-width: 80px;
-            max-width: 140px;
-            transition: background 0.2s, color 0.2s;
             font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            width: 100%;                /* se adapta al tamaño de su celda */
+            max-width: 180px;           /* no se alarga demasiado */
             box-sizing: border-box;
         }
 
+        /* Estado activo (disponible) */
         .boolean-tag.activo {
-            background: #43b581;      /* verde intenso y moderno */
-            color: #fff;              /* texto blanco para contraste */
-            font-weight: bold;
-            box-shadow: 0 1px 4px rgba(67,181,129,0.10);
+            background: #43b581;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(67,181,129,0.25);
         }
 
         .popup-leyenda-boolean {
@@ -311,17 +314,15 @@
         .productores-boolean-grid,
         .comercios-boolean-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(2, auto);
-            gap: 6px 8px;
-            margin-top: 6px;
-            justify-items: center;   /* centra horizontalmente cada etiqueta */
-            align-items: center;     /* centra verticalmente cada etiqueta */
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* se adapta al espacio */
+            gap: 8px 10px;
+            margin-top: 8px;
+            justify-content: center;   /* centra todo el bloque */
+            align-items: center;
+            justify-items: center;     /* centra cada etiqueta */
             width: 100%;
             margin-left: auto;
             margin-right: auto;
-            /* Añade esto para centrar el grid en el popup */
-            place-items: center;
         }
         /* RESTAURANTES - versión moderna gourmet */
         .popup-restaurantes {
@@ -366,6 +367,46 @@
             display: block;
             color: #4a2f1a;
         }
+
+            /* Filas normales */
+            .popup-row {
+            margin-bottom: 8px;
+            }
+
+            /* --- Tarjetas numéricas --- */
+            .popup-number-card {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 2px solid #f0b35b;
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin: 6px 6px 6px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            min-width: 90px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .popup-number-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+            }
+
+            .popup-number-card .number-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #d17a00;
+            line-height: 1.2;
+            }
+
+            .popup-number-card .number-label {
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            line-height: 1.1;
+            }
 
         
 
@@ -456,7 +497,253 @@
                 color: #34495e;
             }
 
-    
+            /* SKI - estilo suave, centrado, azul-nieve */
+            .popup-ski {
+                background: rgba(235, 245, 255, 0.95);
+                border-radius: 16px;
+                padding: 18px 22px;
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+                font-family: 'Segoe UI', Tahoma, sans-serif;
+                color: #1e2e3e;
+                text-align: center;
+                max-width: 700px;
+                min-width: 250px;
+            }
+
+            /* Título */
+            .popup-ski h3 {
+                margin-bottom: 14px;
+                font-size: 20px;
+                font-weight: 700;
+                color: #3a7bc8;
+            }
+
+            /* Fila de información */
+            .popup-ski .popup-row {
+                margin-bottom: 10px;
+            }
+
+            .popup-ski .popup-row b {
+                display: block;
+                font-weight: 600;
+                margin-bottom: 4px;
+                color: #2b4a63;
+            }
+
+            .popup-ski .popup-row span {
+                display: block;
+            }
+
+            /* Enlaces */
+            .popup-ski a {
+                color: #3a7bc8;
+                text-decoration: none;
+                font-weight: 500;
+            }
+            .popup-ski a:hover {
+                text-decoration: underline;
+            }
+
+            /* Fotos */
+            .popup-ski img {
+                max-width: 100px;
+                margin: 3px;
+                border-radius: 6px;
+                transition: transform 0.2s ease;
+            }
+            .popup-ski img:hover {
+                transform: scale(1.05);
+            }
+
+            /* Tarjeta de km esquiables */
+            .popup-ski .ski-card {
+                background: linear-gradient(135deg, #d8ecff, #edf6ff);
+                border-radius: 10px;
+                padding: 12px 16px;
+                display: inline-block;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+                text-align: center;
+                margin-top: 6px;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+            .popup-ski .ski-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+            }
+
+            .popup-ski .ski-card h4 {
+                font-size: 14px;
+                color: #2b4a63;
+                margin-bottom: 4px;
+            }
+            .popup-ski .ski-card p {
+                font-size: 20px;
+                color: #3a7bc8;
+                font-weight: 700;
+                margin: 0;
+            }
+
+            /* Pistas (etiquetas suaves) */
+            .popup-ski .ski-pista {
+                display: inline-block;
+                padding: 4px 8px;
+                border-radius: 6px;
+                color: #fff;
+                margin: 2px 4px;
+                font-weight: 600;
+                font-size: 13px;
+                opacity: 0.9;
+            }
+            .popup-ski .p_verde { background-color: #a7dba7; } 
+            .popup-ski .p_azul { background-color: #a5ccff; }  
+            .popup-ski .p_roja { background-color: #f7a3a3; }  
+            .popup-ski .p_negra { background-color: #5a5a5a; } 
+
+            /* Botón ver fotos */
+            .popup-ski .btn-fotos {
+                background: #3a7bc8;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 6px 12px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: background 0.2s ease;
+            }
+            .popup-ski .btn-fotos:hover {
+                background: #2e6bb5;
+            }
+
+            /* Popup de fotos */
+            .popup-fotos-overlay {
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(20, 30, 40, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+            .popup-fotos-content {
+                background: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 90%;
+                max-height: 80%;
+                overflow-y: auto;
+                text-align: center;
+                position: relative;
+            }
+            .popup-fotos-content img {
+                max-width: 200px;
+                margin: 5px;
+                border-radius: 8px;
+                transition: transform 0.2s ease;
+            }
+            .popup-fotos-content img:hover {
+                transform: scale(1.05);
+            }
+            .close-fotos {
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                font-size: 28px;
+                color: #333;
+                cursor: pointer;
+            }
+            .close-fotos:hover {
+                color: #000;
+            }
+
+            /* Contenedor de fotos para balnearios/productores */
+            .popup-productores .popup-fotos-overlay {
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(20, 30, 40, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+
+            .popup-productores .popup-fotos-content {
+                background: #fff;
+                padding: 30px; /* más espacio interior */
+                border-radius: 12px;
+                max-width: 95%;    /* aumenta ancho máximo */
+                max-height: 85%;   /* aumenta altura máxima */
+                overflow-y: auto;
+                text-align: center;
+                position: relative;
+            }
+
+            /* Carousel dentro del popup */
+            .popup-productores .carousel-container {
+                position: relative;
+            }
+
+            .popup-productores .carousel-slide {
+                max-width: 90%;   /* más ancho */
+                max-height: 500px; /* más alto */
+                border-radius: 10px;
+                margin: auto;
+            }
+
+            /* Botones de navegación */
+            .popup-productores .prev-slide, 
+            .popup-productores .next-slide {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(0,0,0,0.3);
+                color: #fff;
+                border: none;
+                padding: 8px 14px; /* un poco más grande que antes */
+                cursor: pointer;
+                border-radius: 4px;
+                font-size: 22px; /* más grande */
+            }
+
+            .popup-productores .prev-slide { left: 15px; }
+            .popup-productores .next-slide { right: 15px; }
+
+            .popup-productores .prev-slide:hover, 
+            .popup-productores .next-slide:hover { background: rgba(0,0,0,0.6); }
+
+            /* Botón cerrar */
+            .popup-productores .close-fotos {
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                font-size: 28px;
+                color: #333;
+                cursor: pointer;
+            }
+            .popup-productores .close-fotos:hover { color: #000; }
+
+        /* Botón ver fotos en balnearios/productores (igual que ski) */
+        .popup-productores .btn-fotos {
+            background: #3a7bc8;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .popup-productores .btn-fotos:hover {
+            background: #2e6bb5;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+
 /*CONFIGURACIÓN DEL HEADER*/
     
     #filtros-mapa {
