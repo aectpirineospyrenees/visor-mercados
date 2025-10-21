@@ -2158,13 +2158,13 @@ window.addEventListener('load', function(){
         pane: `
             <div class = "div-acordeones"></div>
             <h4>Red de distribución de productos agroalimentarios del Pirineo Central y sus Somontanos / Réseau de distribution des produits agroalimentaires des Pyrénées centrales et leurs Piémonts </h4>
-            <p> <b>Español</b>: <p>Este conjunto de capas muestra una ruta de posible distribución de productos agroalimentarios locales a través de diferentes localidades claves. Estas localidad han sido escogidas debido a su importancia territorial, su ubicación estratégica y/o la densidad de productores censados cercanos</p></p>
+            <p> <b>Español</b>: <p>Este conjunto de capas muestra una ruta de posible distribución de productos agroalimentarios locales a través de diferentes localidades claves. Estas localidades han sido escogidas debido a su importancia territorial, su ubicación estratégica y/o la densidad de productores censados cercanos</p></p>
             <p> <b>Français</b>: <p>Ce groupe de couches montre un itinéraire de distribution possible des produits agroalimentaires locaux à travers différentes localités clés. Ces localités ont été choisies en raison de leur importance territoriale, de leur emplacement stratégique et/ou de la densité des producteurs recensés à proximité.</p></p>
             <div class="panel-contenido">
                 <!-- Botones fuera del grupo -->
                 <div class="botones-control-capas">
-                    <button id="activar-todas-capas" class="btn-activar-todo">Activar Mapa</button>
-                    <button id="desactivar-todas-capas" class="btn-desactivar-todo">Desactivar Mapa</button>
+                    <button id="activar-todas-capas" class="btn-activar-todo">Activar Mapa / Activer la carte</button>
+                    <button id="desactivar-todas-capas" class="btn-desactivar-todo">Desactivar Mapa / Désactiver la carte</button>
                 </div>
 
                 <!-- Grupo de capas -->
@@ -2399,8 +2399,7 @@ window.addEventListener('load', function(){
         'empresas-nieve':
             {es: "Información correspondiente a Pirineos Atlánticos",
             fr: "Informations concernant les Pyrénées-Atlantiques et la province de Huesca.",
-            fuente: 'Tourisme 64' }
-
+            fuente: 'Tourisme 64' },
     };
 
     ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad'].forEach(tipo => {
@@ -2530,7 +2529,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 monumentosReligiososCluster, restosArqueologicosCluster, balneariosCluster,
                 museosCluster, arbolesCluster, miradoresCluster, glaciaresClusters,
                 zonasBanosClusters, piscinasClusters, productoresClusters, comerciosClusters, skiClusters,
-                empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters
+                empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters, buffersInfluenciaLayer
             }).forEach(capa => {
                 if (map.hasLayer(capa)) map.removeLayer(capa);
             });
