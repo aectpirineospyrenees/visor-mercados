@@ -1454,10 +1454,6 @@ html, body {
 
 /*=========CONFIGURACIÓN DEL SIDEBAR ========*/
 /* ================= SIDEBAR ================= */
-#sidebar {
-    width: 10000px; /* Cambia este valor al ancho deseado */
-    max-width: 500px; /* Opcional: establece un ancho máximo */
-}
 
 #sidebar h3 {
     font-size: 1.2rem; /* Ajusta el tamaño de la fuente */
@@ -1618,6 +1614,7 @@ html, body {
   margin: 6px 0;
   font-size: 13px;
 }
+
 
 /* ================= LEYENDA ================= */
 .leYenda {

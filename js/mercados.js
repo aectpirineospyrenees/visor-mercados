@@ -2455,7 +2455,7 @@ window.addEventListener('load', function(){
     sidebar.addPanel({
         id: 'turismoaventura',
         tab: '<i class="fas fa-hiking"></i>',
-        title: "Turismo de aventura / Tourisme d'aventure",
+        title: "Turismo activo/ Tourisme actif",
         pane: `
             <div class="accordion">
                 <!-- Deportes invernales -->
