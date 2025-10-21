@@ -54,6 +54,10 @@ const skiIcon = crearIcono ("icons/ski.svg");
 const empresasNieveIcon = crearIcono ("icons/empresas_nieve.svg")
 const productoresProximidadIcon = crearIcono("icons/productor.svg");
 const nucleosClaveIcon = crearIcono("icons/marker.svg");
+const puntosEscaladaIcon = crearIcono("icons/escalada.svg");
+const empresasEscaladasIcon = crearIcono("icons/empresas_escalada.svg");
+const viaFerrataIcon = crearIcono("icons/via_ferrata.svg");
+const viaFerrataEmpresasIcon = crearIcono("icons/empresas_escalada.svg");
 const DEFAULT_ICON_AGRO = iconsProductosAgro["Legumbres"] || marketIconMercados;
 
 function normalizaTexto(s){
@@ -112,6 +116,10 @@ let skiMarkers = [];
 let empresasNieveMarkers = [];
 let productoresProximidadMarkers = [];
 let nucleosclaveMarkers = [];
+let puntosEscaladaMarkers = [];
+let empresasEscaladaMarkers = [];
+let viaFerrataMarkers = [];
+let empresasViaFerrataMarkers = [];
 const ordenDias = ["Lunes/Lundi","Martes/Mardi","Miércoles/Mercredi","Jueves/Jeudi","Viernes/Vendredi","Sábado/Samedi","Domingo/Dimanche"];
 const ordenSemanas = ["Primera semana del mes/Première semaine du mois","Segunda semana del mes/Deuxième semaine du mois","Tercera semana del mes/Troisième semaine du mois","Cuarta semana del mes/Quatrième semaine du mois","Todas las semanas/Toutes les semaines"];
 
@@ -261,6 +269,10 @@ const skiClusters                  = crearCluster("icons/ski.svg");
 const empresasNieveClusters         = crearCluster("icons/empresas_nieve.svg");
 const productoresProximidadClusters = crearCluster("icons/productor.svg");
 const nucleosClaveClusters          = crearCluster("icons/marker.svg");
+const puntosEscaladaClusters        = crearCluster("icons/escalada.svg");
+const empresasEscaladaClusters      = crearCluster("icons/empresas_escalada.svg");
+const viaFerrataClusters           = crearCluster("icons/via_ferrata.svg");
+const empresasViaFerrataClusters    = crearCluster("icons/empresas_escalada.svg");
 // ================= CARGA GEOJSON =================
 async function cargarLimites(){
     try{
@@ -850,45 +862,26 @@ function updatePopupPiscinas(layer, props){
     layer.bindPopup(html,{className:'popup-productores', minWidth:250, maxWidth:400});
 }
 
-function updatePopupProductores(layer, props){
+function updatePopupProductores(layer, props) {
     let html = `<div class="popup-productores"><h3>${makeClickable(props.nombre_productor) || 'Sin nombre'}</h3>`;
+    
+    // Campos que se mostrarán en el popup
     const titles = {
-        direccion:"Dirección / Adresse", 
+        direccion: "Dirección / Adresse",
         tipo_productor: "Tipo de productor / Type de producteur",
-        productos:"Tipo de producto / Type de produit", 
+        productos: "Tipo de producto / Type de produit",
         telefonos: "Teléfono / Téléphone",
         emails: "E-mail",
-        urls:"URL de acceso / URL d'accès", 
+        urls: "URL de acceso / URL d'accès",
         persona_contacto: "Persona de contacto / Personne de contact",
-        url_venta_on_line:"URL tienda online / URL boutique en ligne",
-        horario:"Horario de visita / Horaires de visite", 
-        tarifas:"Tarifas de visita / Tarifs des visites",
-        idiomas_hablados:"Idiomas hablados / Langues parlées", 
-        descripcion:"Descripción de la explotación / Description de l'exploitation"
+        url_venta_on_line: "URL tienda online / URL boutique en ligne",
+        horario: "Horario de visita / Horaires de visite",
+        tarifas: "Tarifas de visita / Tarifs des visites",
+        idiomas_hablados: "Idiomas hablados / Langues parlées",
+        descripcion: "Descripción de la explotación / Description de l'exploitation"
     };
 
-    const skipKeys = ["row_number", "nombre", "nombre_productor", "animales_aceptados",
-        "tienda", "agricultura_ecologica", "restaurante", "venta_mayor", "tienda_online", "venta_centro_produccion"];
-
-    for(let key in props){
-        if(!props.hasOwnProperty(key)) continue;
-        if(skipKeys.includes(key)) continue;
-        if(key.toLowerCase().includes("coord") || key.toLowerCase().includes("id")) continue;
-        if(props[key] === null || props[key] === undefined || props[key] === '') continue;
-
-        if(key === "productos"){
-            let items = Array.isArray(props[key]) ? props[key] : props[key].split(',').map(s => s.trim());
-            html += `<div class="popup-row"><b>${titles[key]||key}:</b>
-                        <div class="productos-grid">`;
-            items.forEach(item => {
-                html += `<div class="producto-item">${makeClickable(item)}</div>`;
-            });
-            html += `</div></div>`;
-        } else {
-            html += `<div class="popup-row"><b>${titles[key]||key}:</b> <span>${makeClickable(props[key])}</span></div>`;
-        }
-    }
-
+    // Campos booleanos que se mostrarán en una sección separada
     const booleanFieldsTienda = [
         { key: "venta_mayor", label: "Venta mayorista / Vente en gros" },
         { key: "tienda_online", label: "Tienda online / Boutique en ligne" },
@@ -896,9 +889,36 @@ function updatePopupProductores(layer, props){
         { key: "tienda", label: "Tienda / Boutique" }
     ];
 
+    const booleanFieldsServicios = [
+        { key: "agricultura_ecologica", label: "Agricultura ecológica / Agriculture biologique" },
+        { key: "restaurante", label: "Restaurante / Restaurant" }
+    ];
+
+    // Mostrar solo los campos definidos en `titles`
+    for (let key in titles) {
+        if (!props.hasOwnProperty(key)) continue; // Verificar que la propiedad existe
+        const value = props[key];
+        if (value === null || value === undefined || value === '') continue; // Ignorar valores vacíos
+
+        if (key === "productos") {
+            // Mostrar productos como lista
+            let items = Array.isArray(value) ? value : value.split(',').map(s => s.trim());
+            html += `<div class="popup-row"><b>${titles[key]}:</b>
+                        <div class="productos-grid">`;
+            items.forEach(item => {
+                html += `<div class="producto-item">${makeClickable(item)}</div>`;
+            });
+            html += `</div></div>`;
+        } else {
+            // Mostrar campos normales
+            html += `<div class="popup-row"><b>${titles[key]}:</b> <span>${makeClickable(value)}</span></div>`;
+        }
+    }
+
+    // Sección para los campos booleanos de "Punto de venta"
     html += `<div class="popup-row"><b>Punto de venta / Point de vente</b>
         <div class="boolean-grid productores-boolean-grid">`;
-    booleanFieldsTienda.forEach(({key, label}) => {
+    booleanFieldsTienda.forEach(({ key, label }) => {
         const valor = props[key] === true;
         html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
     });
@@ -906,14 +926,10 @@ function updatePopupProductores(layer, props){
         <div class="popup-leyenda-boolean">🟩: Disponible / disponible<br>⬜: No disponible / Non disponible</div>
     </div>`;
 
-    const booleanFieldsServicios = [
-        { key: "agricultura_ecologica", label: "Agricultura ecológica / Agriculture biologique" },
-        { key: "restaurante", label: "Restaurante / Restaurant" },
-    ];
-
+    // Sección para los campos booleanos de "Servicios"
     html += `<div class="popup-row"><b>Servicios / Services</b>
         <div class="boolean-grid productores-boolean-grid">`;
-    booleanFieldsServicios.forEach(({key, label}) => {
+    booleanFieldsServicios.forEach(({ key, label }) => {
         const valor = props[key] === true;
         html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
     });
@@ -1196,8 +1212,312 @@ function updatePopupEmpresasNieve(layer, props) {
     });
 }
 
+function updatePopupEscalada(layer, props) {
+    // Función para capitalizar la primera letra de una cadena
+    function capitalizarPrimeraLetra(texto) {
+        if (!texto) return 'Sin nombre';
+        return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+    }
 
+    // Normalizar el nombre
+    const nombre = capitalizarPrimeraLetra(props.nombre);
 
+    let html = `<div class="popup-escalada"><h3>${makeClickable(nombre)}</h3>`;
+
+    // Campos que se mostrarán en el popup
+    const titles = {
+        deportiva: "Tipo de zona / Type de zone",
+        num_vias: "Número de vías / Nombre de voies",
+        altura_maxima: "Altura máxima (m) / Hauteur maximale (m)",
+        descripcion: "Descripción / Description",
+        servicios: "Servicios / Services"
+    };
+
+    // Mostrar tarjetas para h_max y h_media
+    if (props.h_max || props.h_media) {
+        html += `
+            <div class="popup-row">
+                <div class="popup-number-card" style="background: #f5e8d8; border: 2px solid #d4b89f;">
+                    <div class="number-value">${props.h_max || '—'} m</div>
+                    <div class="number-label">Altura máxima</div>
+                </div>
+                <div class="popup-number-card" style="background: #f5e8d8; border: 2px solid #d4b89f;">
+                    <div class="number-value">${props.h_media || '—'} m</div>
+                    <div class="number-label">Altura media</div>
+                </div>
+            </div>`;
+    }
+
+    // Mostrar tarjetas para grado_max y grado_min
+    if (props.grado_max || props.grado_min) {
+        html += `
+            <div class="popup-row">
+                <div class="popup-number-card" style="background: #f5e8d8; border: 2px solid #d4b89f;">
+                    <div class="number-value">${props.grado_max || '—'}</div>
+                    <div class="number-label">Grado máximo</div>
+                </div>
+                <div class="popup-number-card" style="background: #f5e8d8; border: 2px solid #d4b89f;">
+                    <div class="number-value">${props.grado_min || '—'}</div>
+                    <div class="number-label">Grado mínimo</div>
+                </div>
+            </div>`;
+    }
+
+    // Ajustar el campo deportiva
+    const tipoZona = props.deportiva === "SI" ? "Deportivo" : "Otros";
+    html += `
+        <div class="popup-row">
+            <b>${titles.deportiva}:</b>
+            <span>${tipoZona}</span>
+        </div>`;
+
+    // Iterar sobre los campos definidos en `titles`
+    for (let key in titles) {
+        if (!props.hasOwnProperty(key) || key === "deportiva") continue; // Saltar el campo deportiva (ya procesado)
+        let value = props[key];
+        if (!value || value === "" || value === null) continue; // Ignorar valores vacíos
+
+        html += `<div class="popup-row"><b>${titles[key]}:</b><span>${makeClickable(value)}</span></div>`;
+    }
+
+    html += "</div>";
+    layer.bindPopup(html, { className: 'popup-escalada', minWidth: 400, maxWidth: 700, maxHeight: 500 });
+}
+
+function updatePopupEmpresasEscalada(layer, props) {
+    let html = `<div class="popup-empresas-escalada"><h3>${makeClickable(props.nombre) || 'Sin nombre'}</h3>`;
+    
+    const titles = {
+        etiquetas: "Etiquetas / Labels",
+        actividad: "Tipo de actividad / Type d'activité",
+        direccion: "Dirección / Adresse",
+        telefono: "Teléfono / Téléphone",
+        email: "E-mail",
+        web: "Web",
+        redes_sociales: "Redes sociales / Réseaux sociaux",
+        descripcion: "Descripción / Description",
+        servicios: "Servicios / Services",
+        modo_pago: "Modo de pago / Mode de paiement",
+        equipamiento: "Equipamiento / Équipement",
+        accesibilidad: "Accesibilidad / Accessibilité",
+        animales_bienvenidos: "Animales bienvenidos / Animaux bienvenus",
+        accesibilidad_info: "Info accesibilidad / Info accessibilité",
+        fotos: "Fotos / Photos"
+    };
+
+    for (let key in titles) {
+        if (!props.hasOwnProperty(key)) continue;
+        let value = props[key];
+        if (!value || value === "" || value === null) continue;
+
+        let displayValue = makeClickable(value);
+
+        // Redes sociales con íconos
+        if (key === "redes_sociales") {
+            const redesArray = value.split(",").map(r => r.trim()).filter(r => r !== "");
+            if (redesArray.length > 0) {
+                displayValue = `
+                    <div class="redes-sociales-contenedor">
+                        ${redesArray.map(red => {
+                            const [nombre, url] = red.split(/:(.+)/).map(s => s.trim());
+                            if (!url) return ""; // Si no hay URL, omitir
+                            const validUrl = url.startsWith("http") ? url : `https://${url}`; // Asegurar prefijo http/https
+                            const icono = getIconoRedSocial(nombre);
+                            return `
+                                <a href="${validUrl}" target="_blank" rel="noopener noreferrer" class="red-social">
+                                    <i class="${icono}" title="${nombre}"></i>
+                                </a>
+                            `;
+                        }).join("")}
+                    </div>
+                `;
+            }
+        }
+
+        // Fotos (carrusel)
+        if (key === "fotos") {
+            const fotosArray = value.split(",").map(f => f.trim()).filter(f => f !== "");
+            if (fotosArray.length > 0) {
+                const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
+                displayValue = `
+                    <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'">
+                        Ver fotos (${fotosArray.length})
+                    </button>
+                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
+                        <div class="popup-fotos-content">
+                            <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
+                            ${fotosArray.map(url => `<img src="${url}" alt="foto">`).join("")}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        html += `<div class="popup-row"><b>${titles[key]}:</b><span>${displayValue}</span></div>`;
+    }
+
+    // Campos booleanos
+    const booleanFields = [
+        { key: "animales_bienvenidos", label: "Animales bienvenidos / Animaux bienvenus" },
+        { key: "accesibilidad", label: "Accesibilidad / Accessibilité" }
+    ];
+
+    html += `<div class="popup-row"><b>Servicios / Services:</b>
+        <div class="boolean-grid comercios-boolean-grid">`;
+    booleanFields.forEach(({ key, label }) => {
+        const valor = props[key] === true;
+        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
+    });
+    html += `</div>
+        <div class="popup-leyenda-boolean">🟩: Disponible / Oui<br>⬜: No disponible / Non</div>
+    </div>`;
+
+    html += "</div>";
+
+    layer.bindPopup(html, {
+        className: 'popup-empresas-escalada',
+        minWidth: 400,
+        maxWidth: 700,
+        maxHeight: 500
+    });
+}
+
+function updatePopupViasFerratas(layer, props) {
+    // Función para capitalizar la primera letra de una cadena
+    function capitalizarPrimeraLetra(texto) {
+        if (!texto) return 'Sin nombre';
+        return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+    }
+
+    // Normalizar el nombre
+    const nombre = capitalizarPrimeraLetra(props.nombre);
+
+    let html = `<div class="popup-vias-ferratas"><h3>${makeClickable(nombre)}</h3>`;
+
+    // Mostrar tarjetas para tiempos de acceso, recorrido y regreso
+    if (props.tpo_acceso || props.tpo_recorr || props.tpo_regres) {
+        html += `
+            <div class="popup-row">
+                <div class="popup-number-card">
+                    <div class="number-value">${props.tpo_acceso || '—'}</div>
+                    <div class="number-label">Tiempo acceso</div>
+                </div>
+                <div class="popup-number-card">
+                    <div class="number-value">${props.tpo_recorr || '—'}</div>
+                    <div class="number-label">Tiempo recorrido</div>
+                </div>
+                <div class="popup-number-card">
+                    <div class="number-value">${props.tpo_regres || '—'}</div>
+                    <div class="number-label">Tiempo regreso</div>
+                </div>
+            </div>`;
+    }
+
+    // Mostrar tarjetas para longitud equipada y desnivel
+    if (props.long_equip || props.desnivel) {
+        html += `
+            <div class="popup-row">
+                <div class="popup-number-card">
+                    <div class="number-value">${props.long_equip || '—'} m</div>
+                    <div class="number-label">Longitud equipada</div>
+                </div>
+                <div class="popup-number-card">
+                    <div class="number-value">${props.desnivel || '—'} m</div>
+                    <div class="number-label">Desnivel</div>
+                </div>
+            </div>`;
+    }
+
+    // Mostrar el campo Z
+    if (props.z) {
+        html += `
+            <div class="popup-row">
+                <div class="popup-number-card">
+                    <div class="number-value">${props.z || '—'} m</div>
+                    <div class="number-label">Altura (Z)</div>
+                </div>
+            </div>`;
+    }
+
+    // Mostrar descripción
+    if (props.descripcion) {
+        html += `
+            <div class="popup-row">
+                <b>Descripción / Description:</b>
+                <span>${makeClickable(props.descripcion)}</span>
+            </div>`;
+    }
+
+    // Mostrar email
+    if (props.email) {
+        html += `
+            <div class="popup-row">
+                <b>Email:</b>
+                <span>${makeClickable(props.email)}</span>
+            </div>`;
+    }
+
+    // Mostrar fotos (carrusel)
+    if (props.fotos) {
+        const fotosArray = props.fotos.split(",").map(f => f.trim()).filter(f => f !== "");
+        if (fotosArray.length > 0) {
+            const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
+            html += `
+                <div class="popup-row">
+                    <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'">
+                        Ver fotos (${fotosArray.length})
+                    </button>
+                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
+                        <div class="popup-fotos-content">
+                            <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
+                            ${fotosArray.map(url => `<img src="${url}" alt="foto">`).join("")}
+                        </div>
+                    </div>
+                </div>`;
+        }
+    }
+
+    // Mostrar husler como tarjeta al final
+    if (props.husler) {
+        let huslerLabel = '';
+        let huslerColor = '';
+
+        switch (props.husler) {
+            case 'K1':
+            case 'K2':
+                huslerLabel = 'Fácil / Facile';
+                huslerColor = '#43b581'; // Verde
+                break;
+            case 'K3':
+                huslerLabel = 'Medio / Moyen';
+                huslerColor = '#f1c40f'; // Amarillo
+                break;
+            case 'K4':
+            case 'K5':
+                huslerLabel = 'Difícil / Difficile';
+                huslerColor = '#e74c3c'; // Rojo
+                break;
+            case 'K6':
+                huslerLabel = 'Extremo / Extrême';
+                huslerColor = '#8e44ad'; // Morado oscuro
+                break;
+            default:
+                huslerLabel = 'Desconocido / Inconnu';
+                huslerColor = '#bdc3c7'; // Gris
+        }
+
+        html += `
+            <div class="popup-row">
+                <div class="popup-number-card" style="background: ${huslerColor}; color: white; border: none;">
+                    <div class="number-value">${props.husler}</div>
+                    <div class="number-label">${huslerLabel}</div>
+                </div>
+            </div>`;
+    }
+
+    html += "</div>";
+    layer.bindPopup(html, { className: 'popup-vias-ferratas', minWidth: 400, maxWidth: 700, maxHeight: 500 });
+}
 
 // ================= FILTROS DINÁMICOS =================
 
@@ -1350,7 +1670,8 @@ function initFiltersProductoresProximidad() {
             const rangos = [
                 { value: '0-10000', label: '0 - 10 km' },
                 { value: '10001-30000', label: '11 - 30 km' },
-                { value: '31000-50000', label: '31 - 50 km' }
+                { value: '31000-50000', label: '31 - 50 km' },
+                { value: '50001-', label: 'Más de 50 km / Plus de 50 km' } // Nuevo rango
             ];
 
             rangos.forEach(rango => {
@@ -1595,6 +1916,7 @@ function filtrarProductoresProximidad() {
         const distanciaMatch = (() => {
             if (!distanciaFiltro) return true;
             const [min, max] = distanciaFiltro.split('-').map(Number);
+            if (!max) return distancia >= min; // Manejar el caso de "50001-"
             return distancia >= min && distancia <= max;
         })();
 
@@ -1605,7 +1927,6 @@ function filtrarProductoresProximidad() {
         }
     });
 }
-
 
 function filtrarComercios(){
     const comerciosFiltro = normalizaTexto(document.getElementById('filtro-productos-comercios').value);
@@ -2130,27 +2451,47 @@ window.addEventListener('load', function(){
     });
 
 
+    
     sidebar.addPanel({
-        id:'turismoaventura',
-        tab:'<i class="fas fa-hiking"></i>',
-        title:"Turismo de aventura/Tourisme d'aventure",
-        pane:`
+        id: 'turismoaventura',
+        tab: '<i class="fas fa-hiking"></i>',
+        title: "Turismo de aventura / Tourisme d'aventure",
+        pane: `
             <div class="accordion">
-                <!-- Grupo 2 -->
-                    <div class="accordion-item">
-                        <button class="accordion-header">
-                            Deportes invernales / Sports d'hiver
-                            <span class="arrow">▶</span>
-                            </button>
-                            <div class="accordion-content">
-                                <div class="sidebar-checkboxes">
-                                    <label><input type="checkbox" id="cb-ski" checked> <img src="icons/ski.svg" width="20"> Estaciones de esquí / Stations de ski</label>
-                                    <label><input type="checkbox" id="cb-empresas-nieve" checked> <img src="icons/empresas_nieve.svg" width="20"> Empresas de turismo de invierno / Entreprises de tourisme d'hiver</label>
-                                </div>
-                            </div>
-                    </div>`
+                <!-- Deportes invernales -->
+                <div class="accordion-item">
+                    <button class="accordion-header">
+                        Deportes invernales / Sports d'hiver
+                        <span class="arrow">▶</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="sidebar-checkboxes">
+                            <label><input type="checkbox" id="cb-ski" checked> <img src="icons/ski.svg" width="20"> Estaciones de esquí / Stations de ski</label>
+                            <label><input type="checkbox" id="cb-empresas-nieve" checked> <img src="icons/empresas_nieve.svg" width="20"> Empresas de turismo de invierno / Entreprises de tourisme d'hiver</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="div-acordeones"></div>
+            <!-- Escalada y Vías ferratas -->
+            <div class="accordion">
+                <div class="accordion-item">
+                    <button class="accordion-header">
+                        Escalada y Vías ferratas / Escalade et via ferrata
+                        <span class="arrow">▶</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="sidebar-checkboxes">
+                            <label><input type="checkbox" id="cb-puntos-escalada" checked> <img src="icons/escalada.svg" width="20"> Rutas de escalada / Itinéraires d'escalade</label>
+                            <label><input type="checkbox" id="cb-empresas-escalada" checked> <img src="icons/empresas_escalada.svg" width="20"> Empresas de escalada / Entreprises d'escalade</label>
+                            <label><input type="checkbox" id="cb-vias-ferratas" checked> <img src="icons/via_ferrata.svg" width="20"> Vías ferratas / Via ferrata</label>
+                            <label><input type="checkbox" id="cb-empresas-via-ferrata" checked> <img src="icons/empresas_escalada.svg" width="20"> Empresas de Vías Ferratas / Entreprises de Via Ferrata</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `
     });
-
     sidebar.addPanel({
         id: 'distribucion-logistica',
         tab: '<i class="fas fa-truck-moving"></i>', // Icono moderno de camión de reparto
@@ -2261,6 +2602,10 @@ window.addEventListener('load', function(){
         document.getElementById('cb-comercios').checked = map.hasLayer(comerciosClusters);
         document.getElementById('cb-ski').checked = map.hasLayer(skiClusters);
         document.getElementById('cb-empresas-nieve').checked = map.hasLayer(empresasNieveClusters);
+        document.getElementById('cb-puntos-escalada').checked = map.hasLayer(puntosEscaladaClusters);
+        document.getElementById('cb-empresas-escalada').checked = map.hasLayer(empresasEscaladaClusters);
+        document.getElementById('cb-vias-ferratas').checked = map.hasLayer(viaFerrataClusters);
+        document.getElementById('cb-empresas-via-ferrata').checked = map.hasLayer(empresasViaFerrataClusters);
     }
 
     sincronizarCheckboxes();
@@ -2292,7 +2637,11 @@ window.addEventListener('load', function(){
     'comercios': comerciosClusters,
     'ski': skiClusters,
     'empresas-nieve': empresasNieveClusters,
-    'productores-proximidad': productoresProximidadClusters
+    'productores-proximidad': productoresProximidadClusters,
+    'puntos-escalada': puntosEscaladaClusters,
+    'empresas-escalada': empresasEscaladaClusters,
+    'vias-ferratas': viaFerrataClusters,
+    'empresas-via-ferrata': empresasViaFerrataClusters
     };
 
     // ================= EVENTOS CHECKBOXES =================
@@ -2400,9 +2749,24 @@ window.addEventListener('load', function(){
             {es: "Información correspondiente a Pirineos Atlánticos",
             fr: "Informations concernant les Pyrénées-Atlantiques et la province de Huesca.",
             fuente: 'Tourisme 64' },
+        
+        'puntos-escalada':
+            {fuente: 'IGN France / Observatorio de Montaña (OMS)'},
+
+        'empresas-escalada':
+            {es: "Información correspondiente a Pirineos Atlánticos",
+            fr: "Informations concernant les Pyrénées-Atlantiques.",
+            fuente: 'Tourisme 64' },
+        'vias-ferratas':
+            {fuente: 'IGN France / Observatorio de Montaña (OMS) / Open Street Map (OSM)'},
+
+        'empresas-via-ferrata':
+            {es: "Información correspondiente a Pirineos Atlánticos",
+            fr: "Informations concernant les Pyrénées-Atlantiques.",
+            fuente: 'Tourisme 64' }
     };
 
-    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad'].forEach(tipo => {
+    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad', 'puntos-escalada', 'empresas-escalada', 'vias-ferratas', 'empresas-via-ferrata'].forEach(tipo => {
     const checkbox = document.getElementById('cb-' + tipo);
     if (checkbox) {
         checkbox.addEventListener('change', e => {
@@ -2481,7 +2845,10 @@ function actualizarLeyenda(){
     if(map.hasLayer(empresasNieveClusters)) html += `<img src="icons/empresas_nieve.svg" width="18"> Empresas de turismo de invierno / Entreprises de tourisme d'hiver <br>`;
     if(map.hasLayer(productoresProximidadClusters)) html += `<img src="icons/productor.svg" width="18"> Productores de proximidad / Producteurs de proximité <br>`;
     if(map.hasLayer(nucleosClaveClusters)) html += `<img src="icons/marker.svg" width="18"> Núcleos Clave / Noyaux Clés <br>`;
-
+    if(map.hasLayer(puntosEscaladaClusters)) html += `<img src="icons/escalada.svg" width="18"> Puntos de escalada / Points d'escalade <br>`;
+    if(map.hasLayer(empresasEscaladaClusters)) html += `<img src="icons/empresas_escalada.svg" width="18"> Empresas de escalada / Entreprises d'escalade <br>`;
+    if(map.hasLayer(viaFerrataClusters)) html += `<img src="icons/via_ferrata.svg" width="18"> Vías ferratas / Via ferrata <br>`;
+    if(map.hasLayer(empresasViaFerrataClusters)) html += `<img src="icons/empresas_escalada.svg" width="18"> Empresas de Vías Ferratas / Entreprises de Via Ferrata <br>`;
      if (map.hasLayer(carreterasLayer)) {
         html += `
             <div style="display: flex; align-items: center; margin-bottom: 5px;">
@@ -2529,7 +2896,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 monumentosReligiososCluster, restosArqueologicosCluster, balneariosCluster,
                 museosCluster, arbolesCluster, miradoresCluster, glaciaresClusters,
                 zonasBanosClusters, piscinasClusters, productoresClusters, comerciosClusters, skiClusters,
-                empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters, buffersInfluenciaLayer
+                empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters, buffersInfluenciaLayer, puntosEscaladaClusters, empresasEscaladaClusters, viaFerrataClusters, empresasViaFerrataClusters
             }).forEach(capa => {
                 if (map.hasLayer(capa)) map.removeLayer(capa);
             });
@@ -2589,6 +2956,10 @@ async function initMap(){
         cargarGeoJSON('data/turismo_activo/empresas_nieve_64.geojson', empresasNieveClusters, empresasNieveMarkers, empresasNieveIcon, updatePopupEmpresasNieve),
         cargarGeoJSON('data/productores/productores_proximidad.geojson', productoresProximidadClusters, productoresProximidadMarkers, productorIcon, updatePopupProductores),
         cargarGeoJSON('data/distribucion_logistica/poblaciones_clave.geojson', nucleosClaveClusters, nucleosclaveMarkers, nucleosClaveIcon, popupSoloNombre),
+        cargarGeoJSON('data/turismo_activo/puntos_escalada.geojson', puntosEscaladaClusters, puntosEscaladaMarkers, puntosEscaladaIcon, updatePopupEscalada),
+        cargarGeoJSON('data/turismo_activo/escalada_empresas_64.geojson', empresasEscaladaClusters, empresasEscaladaMarkers, empresasEscaladasIcon, updatePopupEmpresasEscalada),
+        cargarGeoJSON('data/turismo_activo/vias_ferratas.geojson', viaFerrataClusters, viaFerrataMarkers, viaFerrataIcon, updatePopupViasFerratas),
+        cargarGeoJSON('data/turismo_activo/vias_ferratas_empresas.geojson', empresasViaFerrataClusters, empresasViaFerrataMarkers, empresasEscaladasIcon, updatePopupEmpresasEscalada),
         cargarCarreteras(),
         cargarProductosAgro(),
 

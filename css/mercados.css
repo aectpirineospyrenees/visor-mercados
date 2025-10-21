@@ -973,6 +973,344 @@ html, body {
                         color: #000; /* Cambia a negro al pasar el cursor */
                     }
 
+                    /* ESCALADA - estilo con marrones claros pasteles */
+            .popup-escalada {
+                background: rgba(245, 240, 230, 0.95); /* marrón claro pastel translúcido */
+                border-radius: 16px;
+                padding: 18px 22px;
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+                font-family: 'Segoe UI', Tahoma, sans-serif;
+                color: #4a3b2f; /* marrón oscuro para texto */
+                text-align: center;
+                max-width: 700px;
+                min-width: 250px;
+            }
+
+            /* Título */
+            .popup-escalada h3 {
+                margin-bottom: 14px;
+                font-size: 20px;
+                font-weight: 700;
+                color: #6b4f3f; /* marrón medio */
+            }
+
+            /* Fila de información */
+            .popup-escalada .popup-row {
+                margin-bottom: 10px;
+            }
+
+            .popup-escalada .popup-row b {
+                display: block;
+                font-weight: 600;
+                margin-bottom: 4px;
+                color: #5a4738; /* marrón intermedio */
+            }
+
+            .popup-escalada .popup-row span {
+                display: block;
+            }
+
+            /* Enlaces */
+            .popup-escalada a {
+                color: #6b4f3f;
+                text-decoration: none;
+                font-weight: 500;
+            }
+            .popup-escalada a:hover {
+                text-decoration: underline;
+            }
+
+            /* Tarjetas para popup de escalada */
+            .popup-escalada .popup-number-card {
+                display: inline-flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background: #f5e8d8; /* Fondo marrón claro pastel */
+                border: 2px solid #d4b89f; /* Borde marrón intermedio */
+                border-radius: 12px;
+                padding: 8px 12px;
+                margin: 6px 6px 6px 0;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+                min-width: 90px;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .popup-escalada .popup-number-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+            }
+
+            .popup-escalada .popup-number-card .number-value {
+                font-size: 1.3em;
+                font-weight: bold;
+                color: #6b4f3f; /* Marrón oscuro */
+                line-height: 1.2;
+            }
+
+            .popup-escalada .popup-number-card .number-label {
+                font-size: 0.8em;
+                color: #5a4738; /* Marrón intermedio */
+                text-align: center;
+                line-height: 1.1;
+            }
+
+            /* EMPRESAS ESCALADA - estilo inspirado en Ski con tonos marrones */
+            .popup-empresas-escalada {
+                background: rgba(245, 240, 230, 0.95); /* marrón claro pastel translúcido */
+                border-radius: 16px;
+                padding: 18px 22px;
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+                font-family: 'Segoe UI', Tahoma, sans-serif;
+                color: #4a3b2f; /* marrón oscuro para texto */
+                text-align: center;
+                max-width: 700px;
+                min-width: 250px;
+            }
+
+            /* Título */
+            .popup-empresas-escalada h3 {
+                margin-bottom: 14px;
+                font-size: 20px;
+                font-weight: 700;
+                color: #6b4f3f; /* marrón medio */
+            }
+
+            /* Fila de información */
+            .popup-empresas-escalada .popup-row {
+                margin-bottom: 10px;
+            }
+
+            .popup-empresas-escalada .popup-row b {
+                display: block;
+                font-weight: 600;
+                margin-bottom: 4px;
+                color: #5a4738; /* marrón intermedio */
+            }
+
+            .popup-empresas-escalada .popup-row span {
+                display: block;
+            }
+
+            /* Enlaces */
+            .popup-empresas-escalada a {
+                color: #6b4f3f;
+                text-decoration: none;
+                font-weight: 500;
+            }
+            .popup-empresas-escalada a:hover {
+                text-decoration: underline;
+            }
+
+            /* Fotos */
+            .popup-empresas-escalada img {
+                max-width: 100px;
+                margin: 3px;
+                border-radius: 6px;
+                transition: transform 0.2s ease;
+            }
+            .popup-empresas-escalada img:hover {
+                transform: scale(1.05);
+            }
+
+            /* Botón ver fotos */
+            .popup-empresas-escalada .btn-fotos {
+                background: #6b4f3f;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 6px 12px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: background 0.2s ease;
+            }
+            .popup-empresas-escalada .btn-fotos:hover {
+                background: #5a4738;
+            }
+
+            /* Popup de fotos */
+            .popup-empresas-escalada .popup-fotos-overlay {
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(40, 30, 20, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+            .popup-empresas-escalada .popup-fotos-content {
+                background: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 90%;
+                max-height: 80%;
+                overflow-y: auto;
+                text-align: center;
+                position: relative;
+            }
+            .popup-empresas-escalada .popup-fotos-content img {
+                max-width: 200px;
+                margin: 5px;
+                border-radius: 8px;
+                transition: transform 0.2s ease;
+            }
+            .popup-empresas-escalada .popup-fotos-content img:hover {
+                transform: scale(1.05);
+            }
+            .popup-empresas-escalada .close-fotos {
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                font-size: 28px;
+                color: #333;
+                cursor: pointer;
+            }
+            .popup-empresas-escalada .close-fotos:hover {
+                color: #000;
+            }
+
+            /* Booleanos */
+            .popup-empresas-escalada .boolean-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 8px 10px;
+                margin-top: 8px;
+                justify-content: center;
+                align-items: center;
+                justify-items: center;
+                width: 100%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .popup-empresas-escalada .boolean-tag {
+                background: #eee;
+                color: #666;
+                border-radius: 8px;
+                padding: 6px 10px;
+                font-size: 13px;
+                text-align: center;
+                font-weight: 500;
+                transition: background 0.2s ease, color 0.2s ease;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                width: 100%;
+                max-width: 180px;
+                box-sizing: border-box;
+            }
+
+            .popup-empresas-escalada .boolean-tag.activo {
+                background: #43b581;
+                color: #fff;
+                font-weight: 600;
+                box-shadow: 0 2px 6px rgba(67,181,129,0.25);
+            }
+
+            .popup-empresas-escalada .popup-leyenda-boolean {
+                font-size: 12px;
+                color: #666;
+                margin-top: 8px;
+                text-align: left;
+            }
+
+            /* Redes sociales */
+            .popup-empresas-escalada .redes-sociales-contenedor {
+                display: flex;
+                gap: 8px;
+                justify-content: center;
+                margin-top: 8px;
+            }
+
+            .popup-empresas-escalada .red-social i {
+                font-size: 30px;
+                color: #555;
+                transition: transform 0.2s ease, color 0.2s ease;
+            }
+
+            .popup-empresas-escalada .red-social i.fa-facebook { color: #1877F2; }
+            .popup-empresas-escalada .red-social i.fa-instagram { color: #E4405F; }
+            .popup-empresas-escalada .red-social i.fa-twitter { color: #1DA1F2; }
+            .popup-empresas-escalada .red-social i.fa-linkedin { color: #0077B5; }
+            .popup-empresas-escalada .red-social i.fa-youtube { color: #FF0000; }
+            .popup-empresas-escalada .red-social i.fa-tiktok { color: #000000; }
+            .popup-empresas-escalada .red-social i.fa-map-marker-alt { color: #EA4335; }
+
+            .popup-empresas-escalada .red-social i:hover {
+                transform: scale(1.1);
+                color: #000;
+            }
+
+            /* Popup Vías Ferratas */
+            .popup-vias-ferratas {
+                background: rgba(245, 240, 230, 0.95); /* marrón claro pastel translúcido */
+                border-radius: 16px;
+                padding: 18px 22px;
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+                font-family: 'Segoe UI', Tahoma, sans-serif;
+                color: #4a3b2f; /* marrón oscuro para texto */
+                text-align: center;
+                max-width: 700px;
+                min-width: 250px;
+            }
+
+            .popup-vias-ferratas h3 {
+                margin-bottom: 14px;
+                font-size: 20px;
+                font-weight: 700;
+                color: #6b4f3f; /* marrón medio */
+            }
+
+            .popup-vias-ferratas .popup-number-card {
+                display: inline-flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background: #f5e8d8; /* Fondo marrón claro pastel */
+                border: 2px solid #d4b89f; /* Borde marrón intermedio */
+                border-radius: 12px;
+                padding: 8px 12px;
+                margin: 6px 6px 6px 0;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+                min-width: 90px;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .popup-vias-ferratas .popup-number-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+            }
+
+            .popup-vias-ferratas .popup-number-card .number-value {
+                font-size: 1.3em;
+                font-weight: bold;
+                color: #6b4f3f; /* Marrón oscuro */
+                line-height: 1.2;
+            }
+
+            .popup-vias-ferratas .popup-number-card .number-label {
+                font-size: 0.8em;
+                color: #5a4738; /* Marrón intermedio */
+                text-align: center;
+                line-height: 1.1;
+            }
+            /* Botón ver fotos */
+            .btn-fotos {
+                background: #6b4f3f;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 6px 12px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .btn-fotos:hover {
+                background: #6b4f3f; /* Azul más oscuro */
+                transform: translateY(-1px);
+                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            }
     /*CONFIGURACION DEL HEADER*/
 
     #filtros-mapa {
