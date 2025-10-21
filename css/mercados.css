@@ -1480,6 +1480,20 @@ html, body {
     line-height: 1.4; /* Mejora la legibilidad */
     text-align: left; /* Centra el texto */
 }
+
+#sidebar h5 {
+    font-size: 0.8rem; /* Ajusta el tamaño de la fuente */
+    color: #333; /* Color del texto */
+    border-bottom: 1px solid #eee; /* Línea debajo del título */
+    padding-bottom: 4px;
+    white-space: normal; /* Permite que el texto se divida en varias líneas */
+    overflow: visible; /* Asegura que el contenido no se corte */
+    text-overflow: clip; /* Evita que se muestren puntos suspensivos */
+    word-wrap: break-word; /* Permite dividir palabras largas si es necesario */
+    line-height: 1.4; /* Mejora la legibilidad */
+    text-align: center; /* Centra el texto */
+    margin-top: 10px;
+}
 .sidebar-checkboxes {
     display: flex;
     flex-direction: column;

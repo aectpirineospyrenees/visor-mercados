@@ -2290,8 +2290,8 @@ window.addEventListener('load', function(){
                     </button>
                     <div class="accordion-content">
                         <div class="sidebar-checkboxes">
-                            <label><input type="checkbox" id="cb-productores" checked> <img src="icons/productor.svg" width="20"> Productores y artesanos / Producteurs et artisans </label><br>
-                            <label><input type="checkbox" id="cb-comercios" checked> <img src="icons/tienda.svg" width="20"> Tiendas y comercios / Boutiques et commerces </label><br>
+                            <label><input type="checkbox" id="cb-productores" checked> <img src="icons/productor.svg" width="20"> Productores y artesanos / Producteurs et artisans </label>
+                            <label><input type="checkbox" id="cb-comercios" checked> <img src="icons/tienda.svg" width="20"> Tiendas y comercios / Boutiques et commerces </label>
                             <label><input type="checkbox" id="cb-productos" checked> <img src="icons/frutas.svg" width="20"> Patrimonio Agroalimentario / Patrimoine agroalimentaire</label>
 
                         </div>
@@ -2308,8 +2308,8 @@ window.addEventListener('load', function(){
                     </button>
                     <div class="accordion-content">
                         <div class="sidebar-checkboxes">
-                            <label><input type="checkbox" id="cb-mercados" checked> <img src="icons/market.svg" width="20"> Mercados / Marchés</label><br>
-                            <label><input type="checkbox" id="cb-escuelas" checked> <img src="icons/escuelas_formacion.svg" width="20"> Escuelas / Écoles </label><br>
+                            <label><input type="checkbox" id="cb-mercados" checked> <img src="icons/market.svg" width="20"> Mercados / Marchés</label>
+                            <label><input type="checkbox" id="cb-escuelas" checked> <img src="icons/escuelas_formacion.svg" width="20"> Escuelas / Écoles </label>
                             <label><input type="checkbox" id="cb-otros" checked> <img src="icons/otros_centros.svg" width="20"> Otros Centros / Autre Centres</label>
                         </div>
                     </div>
@@ -2363,9 +2363,9 @@ window.addEventListener('load', function(){
                         </button>
                         <div class="accordion-content">
                             <div class="sidebar-checkboxes">
-                                <label><input type="checkbox" id="cb-fortalezas"> <img src="icons/castillo.svg" width="20"> Fortalezas y castillos / Forteresses et châteaux</label><br>
-                                <label><input type="checkbox" id="cb-monumentos"> <img src="icons/monumento.svg" width="20"> Monumentos / Monuments </label><br>
-                                <label><input type="checkbox" id="cb-monumentos-religiosos"> <img src="icons/monumentos_religiosos.svg" width="20"> Monumentos religiosos / Monuments religieux</label><br>
+                                <label><input type="checkbox" id="cb-fortalezas"> <img src="icons/castillo.svg" width="20"> Fortalezas y castillos / Forteresses et châteaux</label>
+                                <label><input type="checkbox" id="cb-monumentos"> <img src="icons/monumento.svg" width="20"> Monumentos / Monuments </label>
+                                <label><input type="checkbox" id="cb-monumentos-religiosos"> <img src="icons/monumentos_religiosos.svg" width="20"> Monumentos religiosos / Monuments religieux</label>
                                 <label><input type="checkbox" id="cb-restos-arqueologicos"> <img src="icons/restos_arqueologicos.svg" width="20"> Restos arqueológicos / Vestiges archéologiques</label>
                                 <label><input type="checkbox" id="cb-museos" checked> <img src="icons/museo.svg" width="20"> Museos / Musées</label>
                             </div>
@@ -2482,9 +2482,11 @@ window.addEventListener('load', function(){
                     </button>
                     <div class="accordion-content">
                         <div class="sidebar-checkboxes">
+                            <h5> Puntos de escalada y vías ferratas / Points d'escalade et via ferrata </h5>
                             <label><input type="checkbox" id="cb-puntos-escalada" checked> <img src="icons/escalada.svg" width="20"> Puntos de escalada / Points d'escalade</label>
-                            <label><input type="checkbox" id="cb-empresas-escalada" checked> <img src="icons/empresas_escalada.svg" width="20"> Empresas de escalada / Entreprises d'escalade</label>
                             <label><input type="checkbox" id="cb-vias-ferratas" checked> <img src="icons/via_ferrata.svg" width="20"> Vías ferratas / Via ferrata</label>
+                            <h5> Empresas de escalada y vías ferratas / Entreprises d'escalade et via ferrata </h5>
+                            <label><input type="checkbox" id="cb-empresas-escalada" checked> <img src="icons/empresas_escalada.svg" width="20"> Empresas de escalada / Entreprises d'escalade</label>
                             <label><input type="checkbox" id="cb-empresas-via-ferrata" checked> <img src="icons/empresas_escalada.svg" width="20"> Empresas de Vías Ferratas / Entreprises de Via Ferrata</label>
                         </div>
                     </div>
