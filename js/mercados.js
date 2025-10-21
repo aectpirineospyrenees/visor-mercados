@@ -2482,7 +2482,7 @@ window.addEventListener('load', function(){
                     </button>
                     <div class="accordion-content">
                         <div class="sidebar-checkboxes">
-                            <label><input type="checkbox" id="cb-puntos-escalada" checked> <img src="icons/escalada.svg" width="20"> Rutas de escalada / Itinéraires d'escalade</label>
+                            <label><input type="checkbox" id="cb-puntos-escalada" checked> <img src="icons/escalada.svg" width="20"> Puntos de escalada / Points d'escalade</label>
                             <label><input type="checkbox" id="cb-empresas-escalada" checked> <img src="icons/empresas_escalada.svg" width="20"> Empresas de escalada / Entreprises d'escalade</label>
                             <label><input type="checkbox" id="cb-vias-ferratas" checked> <img src="icons/via_ferrata.svg" width="20"> Vías ferratas / Via ferrata</label>
                             <label><input type="checkbox" id="cb-empresas-via-ferrata" checked> <img src="icons/empresas_escalada.svg" width="20"> Empresas de Vías Ferratas / Entreprises de Via Ferrata</label>
