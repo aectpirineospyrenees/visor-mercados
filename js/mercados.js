@@ -1348,9 +1348,9 @@ function initFiltersProductoresProximidad() {
         if (key === 'distance') {
             // Añadir rangos de distancia manualmente
             const rangos = [
-                { value: '0-10000', label: '0 - 10,000 m' },
-                { value: '10001-30000', label: '10,001 - 30,000 m' },
-                { value: '31000-50000', label: '31,000 - 50,000 m' }
+                { value: '0-10000', label: '0 - 10 km' },
+                { value: '10001-30000', label: '11 - 30 km' },
+                { value: '31000-50000', label: '31 - 50 km' }
             ];
 
             rangos.forEach(rango => {
@@ -2495,7 +2495,7 @@ function actualizarLeyenda(){
     
     if (map.hasLayer(buffersInfluenciaLayer)) {
         html += `
-            <strong>Buffers de influencia:</strong><br>
+            <strong>Áreas de influencia / Zones d'influence: </strong><br>
             <span style="display:inline-block;width:18px;height:18px;background:#dfa6b4;margin-right:5px;"></span> 10 km<br>
             <span style="display:inline-block;width:18px;height:18px;background:#b9d564;margin-right:5px;"></span> 30 km<br>
             <span style="display:inline-block;width:18px;height:18px;background:#b2f7f1;margin-right:5px;"></span> 50 km<br>
