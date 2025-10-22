@@ -22,12 +22,13 @@ html, body {
     height: 30px;
 }
 /*Configuración de los pop-ups y los filtros*/
-        /* --- Popup Mercados (igual que tienes) --- */
+                /* --- Popup Mercados (igual que tienes) --- */
+                /* Popup Mercados */
         .popup-mercados {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
             padding: 16px 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             font-family: 'Segoe UI', Tahoma, sans-serif;
             color: #333;
             line-height: 1.4;
@@ -35,6 +36,7 @@ html, body {
             max-width: 600px;
             min-width: 250px;
             word-wrap: break-word;
+            text-align: center; /* Centra todo el contenido */
         }
 
         .popup-mercados h3 {
@@ -45,21 +47,106 @@ html, body {
             color: #2c3e50;
         }
 
+        /* Cada fila: etiqueta encima, contenido debajo */
         .popup-mercados .popup-row {
             display: flex;
-            margin-bottom: 4px;
-            flex-wrap: nowrap;
+            flex-direction: column; /* Cambia la dirección a columna */
+            align-items: center; /* Centra horizontalmente */
+            margin-bottom: 8px;
         }
 
         .popup-mercados .popup-row b {
-            flex: 0 0 auto;
-            margin-right: 6px;
-            white-space: nowrap;
+            font-weight: 700;
+            margin-bottom: 4px; /* Espaciado entre etiqueta y contenido */
+            color: #333;
         }
 
         .popup-mercados .popup-row span {
-            flex: 1 1 auto;
             word-wrap: break-word;
+            text-align: center; /* Centra el contenido */
+        }
+
+       /* Tarjetas en la misma fila */
+        .tarjetas-fila {
+            display: flex;
+            justify-content: space-between; /* Espaciado uniforme entre tarjetas */
+            align-items: center; /* Alinea verticalmente las tarjetas */
+            gap: 10px; /* Espaciado entre tarjetas */
+            margin-bottom: 10px;
+        }
+
+        /* Estilo de las tarjetas */
+        .popup-number-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px solid #d3d3d3; /* Borde más sutil */
+            border-radius: 8px;
+            padding: 6px 10px; /* Reduce el padding */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            min-width: 90px;
+            max-width: 120px; /* Limita el ancho máximo */
+            text-align: center;
+            font-size: 12px; /* Tamaño de texto igual al resto */
+            color: #333;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Valor dentro de la tarjeta */
+        .popup-number-card .number-value {
+            font-size: 1em; /* Ajusta el tamaño del texto */
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        /* Etiqueta dentro de la tarjeta */
+        .popup-number-card .number-label {
+            font-size: 0.9em; /* Tamaño más pequeño para la etiqueta */
+            color: #666;
+            text-align: center;
+        }
+
+        /* Estilo para los días de la semana */
+        .dias-semana {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+            margin-top: 8px;
+            flex-wrap: wrap; /* Permite que los días se ajusten si no caben */
+        }
+
+        .dias-semana {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+            margin-top: 8px;
+            flex-wrap: wrap; /* Permite que los días se ajusten si no caben */
+        }
+
+        .dia-semana {
+            background: #eee;
+            color: #666;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 13px;
+            text-align: center;
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            flex: 1 1 100px; /* Todas las cajas tendrán el mismo ancho */
+            max-width: 100px; /* Ancho máximo */
+            min-width: 100px; /* Ancho mínimo */
+            box-sizing: border-box; /* Incluye padding en el ancho */
+        }
+
+        .dia-semana.activo {
+            background: #43b581; /* Verde para el día activo */
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(67, 181, 129, 0.25);
         }
 
         /* --- Popup Escuelas --- */
@@ -1336,7 +1423,7 @@ html, body {
     .header h1 {
         font-family: 'Montserrat', sans-serif; /* Fuente moderna */
         font-weight: 600;                       /* Negrita */
-        font-size: 3rem;                        /* Tamaño grande y legible */
+        font-size: 2.7rem;                        /* Tamaño grande y legible */
         letter-spacing: 1px;                    /* Espaciado entre letras */
         color: #333;                            /* Color moderno y neutro */
         margin: 0;                               /* Quita márgenes predeterminados */
@@ -1841,4 +1928,46 @@ html, body {
     transform: scale(1.1); /* Eliminamos will-change */
     color: #000;
     transition: transform 0.2s ease, color 0.2s ease; /* Usamos directamente transition */
+}
+
+/*=================ENLACES A INICIO DESDE SIDEBAR ==============*/
+.home-links {
+    display: flex;
+    flex-direction: column; /* Cambia a columna para que cada enlace esté en una línea distinta */
+    align-items: center; /* Centra los enlaces horizontalmente */
+    gap: 20px; /* Espaciado entre los enlaces */
+    margin-top: 20px;
+}
+
+.home-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.home-link i {
+    font-size: 32px;
+    margin-bottom: 8px;
+    color: #3a7bc8;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.home-link span {
+    text-align: center;
+}
+
+.home-link:hover {
+    transform: translateY(-2px);
+    color: #2e6bb5;
+}
+
+.home-link:hover i {
+    color: #2e6bb5;
+    transform: scale(1.1);
 }

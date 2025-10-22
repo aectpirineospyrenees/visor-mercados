@@ -182,17 +182,19 @@ function ordenarSegunLista(array, listaReferencia) {
 
     // Función para obtener el ícono de la red social
     function getIconoRedSocial(nombre) {
-        const iconos = {
-            "Facebook": "fab fa-facebook",
-            "Instagram": "fab fa-instagram",
-            "Twitter": "fab fa-twitter",
-            "LinkedIn": "fab fa-linkedin",
-            "YouTube": "fab fa-youtube",
-            "TikTok": "fab fa-tiktok",
-            "GoogleMyBusiness": "fas fa-map-marker-alt" // No hay un ícono específico, usamos un marcador
-        };
-        return iconos[nombre] || "fas fa-globe"; // Ícono genérico
-    }
+    const iconos = {
+        "Facebook": "fab fa-facebook",
+        "Instagram": "fab fa-instagram",
+        "Twitter": "fab fa-twitter", // Twitter (X)
+        "X": "fab fa-x-twitter",    // X (anteriormente Twitter)
+        "LinkedIn": "fab fa-linkedin",
+        "YouTube": "fab fa-youtube",
+        "TikTok": "fab fa-tiktok",
+        "Flickr": "fab fa-flickr",  // Flickr
+        "GoogleMyBusiness": "fas fa-map-marker-alt" // No hay un ícono específico, usamos un marcador
+    };
+    return iconos[nombre] || "fas fa-globe"; // Ícono genérico
+}
 
 
 // ================= CLUSTERS =================
@@ -488,18 +490,73 @@ function popupSoloNombre(layer, props, className = 'popup-mercados', minWidth = 
     );
 }
 
-function updatePopupMercados(layer, props){
-    let html = `<div class="popup-mercados"><h3>${props.nombre||'Sin nombre'}</h3>`;
-    const titles = {nombre_tipo:"Tipo/Type", nombre_frecuencia:"Frecuencia / Fréquence", nombre_semana:"Semana / Semaine", nombre_dia:"Día / Jour", nombre_apertura:"Franja Horaria / Plage horaire", direccion:"Dirección / Adresse", horario:"Horario / Horaires", num_postes:"Nº postes", municipios_communes:"Municipio / Commune", comarca:"Comarca", provincia_departement:"Provincia / Departement"};
-    for(let key in props){
-        if(!props.hasOwnProperty(key)) continue;
-        if(["row_number","nombre"].includes(key)) continue;
-        if(key.toLowerCase().includes("coord")||key.toLowerCase().includes("id_")) continue;
-        let val = makeClickable(props[key]);
-        html+=`<div class="popup-row"><b>${titles[key]||key}:</b> <span>${val}</span></div>`;
+function updatePopupMercados(layer, props) {
+    let html = `<div class="popup-mercados"><h3>${props.nombre || 'Sin nombre'}</h3>`;
+    const titles = {
+        nombre_tipo: "Tipo/Type",
+        nombre_frecuencia: "Frecuencia / Fréquence",
+        nombre_semana: "Semana / Semaine",
+        nombre_dia: "Día / Jour",
+        nombre_apertura: "Franja Horaria / Plage horaire",
+        direccion: "Dirección / Adresse",
+        horario: "Horario / Horaires",
+        num_postes: "Nº postes",
+        municipios_communes: "Municipio / Commune",
+        comarca: "Comarca",
+        provincia_departement: "Provincia / Departement"
+    };
+
+    // Tarjetas en la misma fila
+    html += `
+            <div class="tarjetas-fila">
+            <div class="popup-number-card">
+                <div class="number-value">${props.nombre_semana || '—'}</div>
+                <div class="number-label">Semana / Semaine</div>
+            </div>
+            <div class="popup-number-card">
+                <div class="number-value">${props.nombre_frecuencia || '—'}</div>
+                <div class="number-label">Frecuencia / Fréquence</div>
+            </div>
+            <div class="popup-number-card">
+                <div class="number-value">${props.nombre_apertura || '—'}</div>
+                <div class="number-label">Franja Horaria / Plage horaire</div>
+            </div>
+        </div>
+    `;
+
+    // Mostrar días de la semana con el día actual coloreado
+    if (props.nombre_dia) {
+        const diasSemana = [
+            "Lunes/Lundi",
+            "Martes/Mardi",
+            "Miércoles/Mercredi",
+            "Jueves/Jeudi",
+            "Viernes/Vendredi",
+            "Sábado/Samedi",
+            "Domingo/Dimanche"
+        ];
+
+        const diaActual = props.nombre_dia || ""; // Día actual
+        html += `<div class="popup-row"><b>${titles.nombre_dia}:</b><div class="dias-semana">`;
+        diasSemana.forEach(dia => {
+            const activo = dia === diaActual ? "activo" : "";
+            html += `<span class="dia-semana ${activo}">${dia}</span>`;
+        });
+        html += `</div></div>`;
     }
-    html+="</div>";
-    layer.bindPopup(html,{className:'popup-mercados',minWidth:250,maxWidth:600});
+
+    // Mostrar otros campos normalmente
+    for (let key in props) {
+        if (!props.hasOwnProperty(key)) continue;
+        if (["row_number", "nombre", "nombre_frecuencia", "nombre_semana", "nombre_apertura", "nombre_dia"].includes(key)) continue;
+        if (key.toLowerCase().includes("coord") || key.toLowerCase().includes("id_")) continue;
+
+        let val = makeClickable(props[key]);
+        html += `<div class="popup-row"><b>${titles[key] || key}:</b> <span>${val}</span></div>`;
+    }
+
+    html += "</div>";
+    layer.bindPopup(html, { className: 'popup-mercados', minWidth: 400, maxWidth: 600, maxHeight: 500 });
 }
 
 function updatePopupEscuelas(layer, props){
@@ -515,7 +572,7 @@ function updatePopupEscuelas(layer, props){
         }else html+=`<div class="popup-row"><b>${titles[key]||key}:</b> <span>${val}</span></div>`;
     }
     html+="</div>";
-    layer.bindPopup(html,{className:'popup-escuelas',minWidth:250,maxWidth:400});
+    layer.bindPopup(html,{className:'popup-escuelas',minWidth:250,maxWidth:400, maxHeight: 500});
 }
 
 function updatePopupProductosAgro(layer, props){
@@ -863,7 +920,7 @@ function updatePopupPiscinas(layer, props){
 }
 
 function updatePopupProductores(layer, props) {
-    let html = `<div class="popup-productores"><h3>${makeClickable(props.nombre_productor) || 'Sin nombre'}</h3>`;
+    let html = `<div class="popup-productores"><h3>${makeClickable(props.nombre) || 'Sin nombre'}</h3>`;
     
     // Campos que se mostrarán en el popup
     const titles = {
@@ -878,7 +935,7 @@ function updatePopupProductores(layer, props) {
         horario: "Horario de visita / Horaires de visite",
         tarifas: "Tarifas de visita / Tarifs des visites",
         idiomas_hablados: "Idiomas hablados / Langues parlées",
-        descripcion: "Descripción de la explotación / Description de l'exploitation"
+        descripcion: "Descripción de la explotación / Description de l'exploitation",
     };
 
     // Campos booleanos que se mostrarán en una sección separada
@@ -915,6 +972,31 @@ function updatePopupProductores(layer, props) {
         }
     }
 
+    // Redes sociales con íconos
+    if (props.redes_sociales) {
+        const redesArray = props.redes_sociales.split(",").map(r => r.trim()).filter(r => r !== "");
+        if (redesArray.length > 0) {
+            html += `
+                <div class="popup-row">
+                    <b>Redes sociales / Réseaux sociaux:</b>
+                    <div class="redes-sociales-contenedor">
+                        ${redesArray.map(red => {
+                            const [nombre, url] = red.split(/:(.+)/).map(s => s.trim());
+                            if (!url) return ""; // Si no hay URL, omitir
+                            const validUrl = url.startsWith("http") ? url : `https://${url}`; // Asegurar prefijo http/https
+                            const icono = getIconoRedSocial(nombre);
+                            return `
+                                <a href="${validUrl}" target="_blank" rel="noopener noreferrer" class="red-social">
+                                    <i class="${icono}" title="${nombre}"></i>
+                                </a>
+                            `;
+                        }).join("")}
+                    </div>
+                </div>`;
+        }
+    }
+
+
     // Sección para los campos booleanos de "Punto de venta"
     html += `<div class="popup-row"><b>Punto de venta / Point de vente</b>
         <div class="boolean-grid productores-boolean-grid">`;
@@ -937,8 +1019,29 @@ function updatePopupProductores(layer, props) {
         <div class="popup-leyenda-boolean">🟩: Disponible / disponible<br>⬜: No disponible / Non disponible</div>
     </div>`;
 
+    // Fotos (carrusel)
+    if (props.fotos) {
+        const fotosArray = props.fotos.split(",").map(f => f.trim()).filter(f => f !== "");
+        if (fotosArray.length > 0) {
+            const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
+            html += `
+                <div class="popup-row">
+                    <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'">
+                        Ver fotos (${fotosArray.length})
+                    </button>
+                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
+                        <div class="popup-fotos-content">
+                            <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
+                            ${fotosArray.map(url => `<img src="${url}" alt="foto">`).join("")}
+                        </div>
+                    </div>
+                </div>`;
+        }
+    }
+
     html += "</div>";
 
+    
     layer.bindPopup(html, {
         className: 'popup-productores',
         minWidth: 300,
@@ -2250,30 +2353,66 @@ function actualizarFiltrosAcordeon() {
 
 // ================= SIDEBAR =================
 window.addEventListener('load', function(){
-    const sidebar = L.control.sidebar({ container: "sidebar" }).addTo(map);
+    // Crear el control sidebar y hacerlo accesible globalmente
+    window.sidebar = L.control.sidebar({ container: "sidebar" }).addTo(map);
 
+    // -------------------------------
+    // PANEL HOME
+    // -------------------------------
     sidebar.addPanel({
         id: "home",
         tab: '<i class="fas fa-home"></i>',
         title: 'BIENVENIDO / BIENVENUE',
-        pane:`<h3>Sobre el GEOPORTAL:</h3>
-              <p>Este es un GEOPORTAL borrador en el que puede encontrarse toda la información recopilada del sector agroalimentario y turístico del territorio de la AECT:</p>
-              <ul>
+        pane: `
+            <h3>Sobre el GEOPORTAL:</h3>
+            <p>Este es un GEOPORTAL borrador en el que puede encontrarse toda la información recopilada del sector agroalimentario y turístico del territorio de la AECT:</p>
+            <ul>
                 <li> Departement des Pyrénées Atlantiques (France) </li>
                 <li> Departement des Hautes Pyrénées (France) </li> 
                 <li> Provincia de Huesca (España) </li>
                 <li> Comarca de las Cinco Villas (Provincia de Zaragoza-España)</li>
-              </ul>
+            </ul>
 
-              <h3>À propos du GEOPORTAIL :</h3>
-              <p>Ce GEOPORTAIL provisoire vous permet de trouver toutes les informations recueillies sur le secteur agroalimentaire et touristique du territoire du GECT.</p>
-              <ul>
+            <h3>À propos du GEOPORTAIL :</h3>
+            <p>Ce GEOPORTAIL provisoire vous permet de trouver toutes les informations recueillies sur le secteur agroalimentaire et touristique du territoire du GECT.</p>
+            <ul>
                 <li> Departement des Pyrénées Atlantiques (France) </li>
                 <li> Departement des Hautes Pyrénées (France) </li> 
                 <li> Provincia de Huesca (España) </li>
                 <li> Comarca de las Cinco Villas (Provincia de Zaragoza-España)</li>
-              </ul>
-              `
+            </ul>
+            <div class = "div-acordeones"></div>
+            <h3>Navegación / Navigation:</h3>
+            <p>Utilice los enlaces siguientes para navegar por los diferentes paneles de información disponibles en el geoportal.</p>
+            <p>Utilisez les liens suivants pour naviguer entre les différents panneaux d'information disponibles dans le géoportail.</p>
+            <!-- Enlaces a los paneles -->
+            <div class="home-links">
+                <a href="#" class="home-link" data-panel="agro">
+                    <i class="fas fa-seedling"></i>
+                    <span>Sector agroalimentario / Secteur agroalimentaire</span>
+                </a>
+                <a href="#" class="home-link" data-panel="turismo">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Turismo / Tourisme</span>
+                </a>
+                <a href="#" class="home-link" data-panel="turismonatural">
+                    <i class="fas fa-leaf"></i>
+                    <span>Turismo Natural / Tourisme Naturel</span>
+                </a>
+                <a href="#" class="home-link" data-panel="turismoaventura">
+                    <i class="fas fa-hiking"></i>
+                    <span>Turismo Activo / Tourisme Actif</span>
+                </a>
+                <a href="#" class="home-link" data-panel="distribucion-logistica">
+                    <i class="fas fa-truck-moving"></i>
+                    <span>Distribución y logística / Distribution et logistique</span>
+                </a>
+                <a href="#" class="home-link" data-panel="contacto">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contacto / Contact</span>
+                </a>
+            </div>
+        `
     });
 
     sidebar.addPanel({
@@ -2281,6 +2420,10 @@ window.addEventListener('load', function(){
         tab:'<i class="fas fa-seedling"></i>',
         title:'Agroalimentación',
         pane:`
+            <h3>Sector Agroalimentario y Escuelas de Formación / Secteur Agroalimentaire et Écoles de Formation</h3>
+            <p> <b>Español: </b> <p> En el marco del proyecto <a href= "https://for-alimenta.eu/">FOR-ALIMENTA </a> aquí se recoge la información disponible del territorio del sector agroalimentario y educativo relacionado. Puede activar o desactivar las diferentes capas mediante los checkboxes disponibles a continuación. </p>
+            <p> <b>Français: </b> <p> Dans le cadre du projet <a href= "https://for-alimenta.eu/">FOR-ALIMENTA </a> ce panneau recueille les informations disponibles sur le territoire du secteur agroalimentaire et éducatif connexe. Vous pouvez activer ou désactiver les différentes couches à l'aide des cases à cocher ci-dessous.</p> </p>
+            <div class = "div-acordeones"></div>
             <div class="accordion">
             <!-- Grupo 1 -->
                 <div class="accordion-item">
@@ -2290,9 +2433,14 @@ window.addEventListener('load', function(){
                     </button>
                     <div class="accordion-content">
                         <div class="sidebar-checkboxes">
-                            <label><input type="checkbox" id="cb-productores" checked> <img src="icons/productor.svg" width="20"> Productores y artesanos / Producteurs et artisans </label>
-                            <label><input type="checkbox" id="cb-comercios" checked> <img src="icons/tienda.svg" width="20"> Tiendas y comercios / Boutiques et commerces </label>
-                            <label><input type="checkbox" id="cb-productos" checked> <img src="icons/frutas.svg" width="20"> Patrimonio Agroalimentario / Patrimoine agroalimentaire</label>
+                            <h5> Productores y Productos Agroalimentarios / Producteurs et Produits Agroalimentaires </h5>
+                                <label><input type="checkbox" id="cb-productores" checked> <img src="icons/productor.svg" width="20"> Productores y artesanos / Producteurs et artisans </label>
+                                <label><input type="checkbox" id="cb-productos" checked> <img src="icons/frutas.svg" width="20"> Patrimonio Agroalimentario / Patrimoine agroalimentaire</label>
+                            <h5> Comercios y mercados / Commerces et marchés </h5>
+                                <label><input type="checkbox" id="cb-comercios" checked> <img src="icons/tienda.svg" width="20"> Tiendas y comercios / Boutiques et commerces </label>
+                                <label><input type="checkbox" id="cb-mercados" checked> <img src="icons/market.svg" width="20"> Mercados / Marchés</label>
+                            <h5> Restauración / Restauration </h5>
+                                <label><input type="checkbox" id="cb-restaurantes" checked> <img src="icons/restaurante.svg" width="20"> Restaurantes / Restaurants</label>
 
                         </div>
                     </div>
@@ -2303,34 +2451,17 @@ window.addEventListener('load', function(){
             <!-- Grupo 1 -->
                 <div class="accordion-item">
                     <button class="accordion-header">
-                        Mercados y Escuelas / Marchés et écoles
+                        Escuelas de formación agroalimentarias / Écoles de formation agroalimentaires
                         <span class="arrow">▶</span>
                     </button>
                     <div class="accordion-content">
                         <div class="sidebar-checkboxes">
-                            <label><input type="checkbox" id="cb-mercados" checked> <img src="icons/market.svg" width="20"> Mercados / Marchés</label>
                             <label><input type="checkbox" id="cb-escuelas" checked> <img src="icons/escuelas_formacion.svg" width="20"> Escuelas / Écoles </label>
                             <label><input type="checkbox" id="cb-otros" checked> <img src="icons/otros_centros.svg" width="20"> Otros Centros / Autre Centres</label>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class = "div-acordeones"></div>
-            <div class="accordion">
-                <!-- Grupo 3 -->
-                <div class="accordion-item">
-                    <button class="accordion-header">
-                        Restaurantes/Restaurants
-                        <span class="arrow">▶</span>
-                    </button>
-                    <div class="accordion-content">
-                        <div class="sidebar-checkboxes">
-                            <label><input type="checkbox" id="cb-restaurantes" checked> <img src="icons/restaurante.svg" width="20"> Restaurantes / Restaurants</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
         `
     });
 
@@ -2545,6 +2676,16 @@ window.addEventListener('load', function(){
         `
     });
 
+    document.addEventListener("click", function (e) {
+    const link = e.target.closest(".home-link");
+    if (link) {
+        e.preventDefault();
+        const panelId = link.dataset.panel;
+        if (window.sidebar && panelId) {
+            window.sidebar.open(panelId);
+        }
+    }
+    });
     
     
     document.querySelectorAll('.accordion-header').forEach(header=>{
