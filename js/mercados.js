@@ -84,8 +84,6 @@ function getIconoProductoAgro(tipo){
 }
 
 
-
-
 // ================= VARIABLES =================
 let buffersInfluenciaLayer;
 let limitesLayer;
@@ -180,21 +178,6 @@ function ordenarSegunLista(array, listaReferencia) {
             }, duracion);
         }
 
-    // Función para obtener el ícono de la red social
-    function getIconoRedSocial(nombre) {
-    const iconos = {
-        "Facebook": "fab fa-facebook",
-        "Instagram": "fab fa-instagram",
-        "Twitter": "fab fa-twitter", // Twitter (X)
-        "X": "fab fa-x-twitter",    // X (anteriormente Twitter)
-        "LinkedIn": "fab fa-linkedin",
-        "YouTube": "fab fa-youtube",
-        "TikTok": "fab fa-tiktok",
-        "Flickr": "fab fa-flickr",  // Flickr
-        "GoogleMyBusiness": "fas fa-map-marker-alt" // No hay un ícono específico, usamos un marcador
-    };
-    return iconos[nombre] || "fas fa-globe"; // Ícono genérico
-}
 
 
 // ================= CLUSTERS =================
@@ -466,30 +449,123 @@ async function inicializarCapasDistribucionLogistica() {
 
 
 // ================= POPUPS =================
+    //============== FUNCIONES GENÉRICAS PARA POPUPS ==============
+        
+        // Bind Popup genérico
+        function bindPopupGenerico(layer, htmlContent, className = 'popup-generico', minWidth = 250, maxWidth = 500, maxHeight = 400) {
+            layer.bindPopup(htmlContent, {
+                className: className,
+                minWidth: minWidth,
+                maxWidth: maxWidth,
+                maxHeight: maxHeight
+            });
+        }
+        // Función para hacer clicables URLs y emails
+        function makeClickable(value) {
+            if (typeof value !== "string") return value;
 
-// Función para hacer clicables URLs y emails
-function makeClickable(value) {
-    if (typeof value !== "string") return value;
+            // Detectar URLs
+            const urlPattern = /(https?:\/\/[^\s]+)/g;
+            value = value.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 
-    // Detectar URLs
-    const urlPattern = /(https?:\/\/[^\s]+)/g;
-    value = value.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+            // Detectar emails
+            const emailPattern = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
+            value = value.replace(emailPattern, '<a href="mailto:$1">$1</a>');
 
-    // Detectar emails
-    const emailPattern = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
-    value = value.replace(emailPattern, '<a href="mailto:$1">$1</a>');
+            return value;
+        }
 
-    return value;
-}
+        function popupSoloNombre(layer, props, className = 'popup-mercados', minWidth = 250, maxWidth = 400) {
+            const nombre = props.nombre || props.Nom || props.Name || 'Sin nombre';
+            layer.bindPopup(
+                `<div class="${className}"><h3>${nombre}</h3></div>`,
+                { className, minWidth, maxWidth }
+            );
+        }
 
-function popupSoloNombre(layer, props, className = 'popup-mercados', minWidth = 250, maxWidth = 400) {
-    const nombre = props.nombre || props.Nom || props.Name || 'Sin nombre';
-    layer.bindPopup(
-        `<div class="${className}"><h3>${nombre}</h3></div>`,
-        { className, minWidth, maxWidth }
-    );
-}
+        // Funciones para Boleanos y Fotos
+        function generarBooleanos(props, booleanFields, titulo) {
+            if (!booleanFields || booleanFields.length === 0) return '';
 
+            let html = `<div class="popup-row"><b>${titulo}</b><div class="boolean-grid productores-boolean-grid">`;
+
+            booleanFields.forEach(({ key, label }) => {
+                const valor = props[key] === true;
+                html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
+            });
+
+            html += `</div>
+                <div class="popup-leyenda-boolean">🟩: Disponible / Oui<br>⬜: No disponible / Non</div>
+            </div>`;
+
+            return html;
+        }
+
+        function generarCarruselFotos(props, key) {
+            if (!props[key]) return '';
+
+            const fotosArray = props[key].split(',').map(f => f.trim()).filter(f => f !== '');
+            if (fotosArray.length === 0) return '';
+
+            const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
+            let html = `
+                <div class="popup-row">
+                    <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'">
+                        Ver fotos (${fotosArray.length})
+                    </button>
+                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
+                        <div class="popup-fotos-content">
+                            <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
+                            ${fotosArray.map(url => `<img src="${url}" alt="foto">`).join('')}
+                        </div>
+                    </div>
+                </div>`;
+
+            return html;
+        }
+
+        // Funciones para las redes sociales
+
+        function getIconoRedSocial(redesSociales) {
+            if (!redesSociales) return '';
+
+            const iconos = {
+                "Facebook": "fab fa-facebook",
+                "Instagram": "fab fa-instagram",
+                "Twitter": "fab fa-twitter", // Twitter (X)
+                "X": "fab fa-x-twitter",    // X (anteriormente Twitter)
+                "LinkedIn": "fab fa-linkedin",
+                "YouTube": "fab fa-youtube",
+                "TikTok": "fab fa-tiktok",
+                "Flickr": "fab fa-flickr",  // Flickr
+                "GoogleMyBusiness": "fas fa-map-marker-alt" // No hay un ícono específico, usamos un marcador
+            };
+
+            // Procesar las redes sociales
+            const redesArray = redesSociales.split(",").map(r => r.trim()).filter(r => r !== "");
+            if (redesArray.length === 0) return '';
+
+            // Generar el HTML para las redes sociales
+            return `
+                <div class="popup-row">
+                    <b>Redes sociales / Réseaux sociaux:</b>
+                    <div class="redes-sociales-contenedor">
+                        ${redesArray.map(red => {
+                            const [nombre, url] = red.split(/:(.+)/).map(s => s.trim());
+                            if (!url) return ""; // Si no hay URL, omitir
+                            const validUrl = url.startsWith("http") ? url : `https://${url}`; // Asegurar prefijo http/https
+                            const icono = iconos[nombre] || "fas fa-globe"; // Ícono genérico si no se encuentra
+                            return `
+                                <a href="${validUrl}" target="_blank" rel="noopener noreferrer" class="red-social">
+                                    <i class="${icono}" title="${nombre}"></i>
+                                </a>
+                            `;
+                        }).join("")}
+                    </div>
+                </div>`;
+        }
+
+    //============= POPUPS ESPECÍFICOS =============
 function updatePopupMercados(layer, props) {
     let html = `<div class="popup-mercados"><h3>${props.nombre || 'Sin nombre'}</h3>`;
     const titles = {
@@ -559,20 +635,59 @@ function updatePopupMercados(layer, props) {
     layer.bindPopup(html, { className: 'popup-mercados', minWidth: 400, maxWidth: 600, maxHeight: 500 });
 }
 
-function updatePopupEscuelas(layer, props){
-    let html = `<div class="popup-escuelas"><h3>${props.nombre_centro||'Sin nombre'}</h3>`;
-    const titles = {nombre_tipo_centro:"Tipo", tipo_oferta:"Tipo estudios", oferta:"Oferta", email:"E-mail", telefono:"Teléfono", sitio_web:"Web", municipios_communes:"Municipio"};
-    for(let key in props){
-        if(!props.hasOwnProperty(key)) continue;
-        if(["row_number","nombre_centro"].includes(key)) continue;
-        if(key.toLowerCase().includes("coord")||key.toLowerCase().includes("id_")||key.toLowerCase().includes("fid")) continue;
-        let val = makeClickable(props[key]);
-        if(Array.isArray(val)){
-            html+=`<div class="popup-row"><b>${titles[key]||key}:</b><ul>${val.map(i=>`<li>${makeClickable(i)}</li>`).join('')}</ul></div>`;
-        }else html+=`<div class="popup-row"><b>${titles[key]||key}:</b> <span>${val}</span></div>`;
+function updatePopupEscuelas(layer, props) {
+    let html = `<div class="popup-escuelas">`;
+
+    // Título del centro
+    html += `<h3>${props.nombre_centro || 'Sin nombre'}</h3>`;
+
+    // Etiqueta para "Tipo de centro"
+    if (props.nombre_tipo_centro) {
+        html += `
+            <div class="etiquetas-contenedor">
+                <span class="etiqueta-centro">${props.nombre_tipo_centro}</span>
+            </div>`;
     }
-    html+="</div>";
-    layer.bindPopup(html,{className:'popup-escuelas',minWidth:250,maxWidth:400, maxHeight: 500});
+
+    // Etiquetas para "Tipo de oferta"
+    if (props.tipo_oferta) {
+        const ofertas = Array.isArray(props.tipo_oferta)
+            ? props.tipo_oferta
+            : props.tipo_oferta.split(',').map(o => o.trim());
+        html += `
+            <div class="etiquetas-contenedor">
+                ${ofertas.map(oferta => `
+                    <span class="etiqueta-oferta">${oferta}</span>
+                `).join('')}
+            </div>`;
+    }
+
+    // Resto de los campos
+    const titles = {
+        nombre_tipo_centro: "Tipo",
+        tipo_oferta: "Tipo estudios",
+        oferta: "Oferta",
+        email: "E-mail",
+        telefono: "Teléfono",
+        sitio_web: "Web",
+        municipios_communes: "Municipio"
+    };
+
+    for (let key in props) {
+        if (!props.hasOwnProperty(key)) continue;
+        if (["row_number", "nombre_centro", "nombre_tipo_centro", "tipo_oferta"].includes(key)) continue;
+        if (key.toLowerCase().includes("coord") || key.toLowerCase().includes("id_") || key.toLowerCase().includes("fid")) continue;
+
+        let val = makeClickable(props[key]);
+        if (Array.isArray(val)) {
+            html += `<div class="popup-row"><b>${titles[key] || key}:</b><ul>${val.map(i => `<li>${makeClickable(i)}</li>`).join('')}</ul></div>`;
+        } else {
+            html += `<div class="popup-row"><b>${titles[key] || key}:</b> <span>${val}</span></div>`;
+        }
+    }
+
+    html += "</div>";
+    layer.bindPopup(html, { className: 'popup-escuelas', minWidth: 250, maxWidth: 400, maxHeight: 500 });
 }
 
 function updatePopupProductosAgro(layer, props){
@@ -680,34 +795,37 @@ function updatePopupAlojamientos(layer, props) {
         return makeClickable(value);
     }
 
+    // Mostrar campos principales
     fieldsToShow.forEach(key => {
         if (props[key]) {
             html += `<div class="popup-row"><b>${titles[key] || key}:</b> ${formatValue(props[key])}</div>`;
+
+            // Insertar redes sociales justo después de los teléfonos
+            if (key === "phones" && props.redes_sociales) {
+                html += `<div class="popup-row redes-sociales"> ${getIconoRedSocial(props.redes_sociales)}</div>`;
+            }
         }
     });
 
-    html += `<div class="popup-row"><b>Servicios / Services</b>
-        <div class="boolean-grid productores-boolean-grid">`;
-    booleanFields.forEach(({key, label}) => {
-        const valor = props[key] === true;
-        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
-    });
-    html += `</div>
-        <div class="popup-leyenda-boolean">🟩: Disponible / Oui<br>⬜: No disponible / Non</div>
-    </div>`;
+    // Generar sección de booleanos
+    html += generarBooleanos(props, booleanFields, "Servicios / Services");
+
+    // Generar carrusel de fotos
+    html += generarCarruselFotos(props, "fotos");
 
     html += "</div>";
 
     layer.bindPopup(html, {
         className: "popup-productores",
-        minWidth: 400,
+        minWidth: 450,
         maxWidth: 500,
         maxHeight: 500
     });
 }
 
 
-function updatePopupRestaurantes(layer, props){
+
+function updatePopupRestaurantes(layer, props) {
     let html = `<div class="popup-restaurantes" style="background:#fef3e0;padding:10px;border-radius:8px;">
                     <h3>${makeClickable(props.Nom) || makeClickable(props.nombre_establecimiento) || 'Sin nombre'}</h3>`;
 
@@ -732,7 +850,7 @@ function updatePopupRestaurantes(layer, props){
         "num_plazas_terraza"
     ];
 
-    // Solo recorremos las claves definidas en titles
+    // Mostrar campos definidos en titles
     for (let key of Object.keys(titles)) {
         const value = props[key];
         if (value !== undefined && value !== null && value !== '') {
@@ -760,30 +878,23 @@ function updatePopupRestaurantes(layer, props){
         }
     }
 
+    // Generar sección de booleanos
     const booleanFields = [
         { key: "animales_bienvenidos", label: "Animales bienvenidos / Animaux bienvenus" }
     ];
-    html += `<div class="popup-row">
-        <div class="boolean-grid productores-boolean-grid">`;
-    booleanFields.forEach(({key, label}) => {
-        const valor = props[key] === true;
-        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
-    });
-    html += `</div>
-        <div class="popup-leyenda-boolean">🟩: Disponible / disponible<br>⬜: No disponible / Non disponible</div
-        </div>`;
+    html += generarBooleanos(props, booleanFields, "Servicios / Services");
+
+    // Generar carrusel de fotos
+    html += generarCarruselFotos(props, "fotos");
+
     html += "</div>";
 
-    layer.bindPopup(html, {
-        className: 'popup-restaurantes', 
-        minWidth: 500, 
-        maxWidth: 400, 
-        maxHeight: 400
-    });
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-restaurantes', 400, 500, 500);
 }
 
 
-function updatePopupBalnearios(layer, props){
+function updatePopupBalnearios(layer, props) {
     let html = `<div class="popup-productores" style="background:#E6FCFE;padding:10px;border-radius:8px;">
                     <h3>${makeClickable(props.Nom) || makeClickable(props.Nombre) || 'Sin nombre'}</h3>`;
 
@@ -797,59 +908,27 @@ function updatePopupBalnearios(layer, props){
         horarios: "Horarios de apertura / Horaires d'ouverture",
         Servicios: "Servicios / Services",
         descripcion_tarifa: "Tarifas / Tarifs",
-        Fotos: "Fotos / Photos"
     };
 
-    for(let key of Object.keys(titles)){
-        if(props[key]){
-            let displayValue = props[key];
-
-            // Web como enlace (ya no hace falta comprobar, usamos makeClickable)
-            displayValue = makeClickable(displayValue);
-
-            // Fotos — carrusel
-            if(key === "Fotos"){
-                const fotosArray = props[key].split(",").map(f => f.trim()).filter(f => f !== "");
-                if(fotosArray.length > 0){
-                    const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
-
-                    displayValue = `
-                        <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'; showSlide('${fotosId}',0);">
-                            Ver fotos (${fotosArray.length})
-                        </button>
-                        <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
-                            <div class="popup-fotos-content">
-                                <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
-                                <div class="carousel-container">
-                                    ${fotosArray.map((url, i) => `<img class="carousel-slide" src="${url}" style="display:none">`).join('')}
-                                    <button class="prev-slide" onclick="plusSlide('${fotosId}', -1)">&#10094;</button>
-                                    <button class="next-slide" onclick="plusSlide('${fotosId}', 1)">&#10095;</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-
-            html += `<div class="popup-row"><b>${titles[key]}:</b> <span>${displayValue}</span></div>`;
+    // Mostrar campos normales
+    for (let key of Object.keys(titles)) {
+        if (props[key]) {
+            html += `<div class="popup-row"><b>${titles[key]}:</b> ${makeClickable(props[key])}</div>`;
         }
     }
 
-    const booleanFieldsTienda = [
-        { key: "accesibilidad", label: "Accesibilidad adaptada / Accessibilité adaptée" },
+    // Generar sección de booleanos
+    const booleanFields = [
+        { key: "accesibilidad", label: "Accesibilidad adaptada / Accessibilité adaptée" }
     ];
+    html += generarBooleanos(props, booleanFields, "Accesibilidad / Accessibilité");
 
-    html += `<div class="popup-row">
-                <div class="boolean-grid productores-boolean-grid">`;
-    booleanFieldsTienda.forEach(({key, label}) => {
-        const valor = props[key] === true;
-        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
-    });
-    html += `</div></div>`;
+    // Generar carrusel de fotos
+    html += generarCarruselFotos(props, "Fotos");
 
-    html += `<div class="popup-leyenda-boolean">🟩: Disponible / disponible<br>⬜: No disponible / Non disponible</div>`;
+    html += "</div>";
 
-    layer.bindPopup(html, {className:'popup-productores', minWidth:250, maxWidth:400});
+    bindPopupGenerico(layer, html, 'popup-productores', 400, 500, 500);
 }
 
 // Funciones para el carrusel (sin cambios)
@@ -899,7 +978,7 @@ function updatePopupPatrimonioCultural(layer, props){
 }
 
 function updatePopupPiscinas(layer, props){
-    let html = `<div class="popup-productores" style="background:#fef3e0;padding:10px;border-radius:8px;">
+    let html = `<div class="popup-productores" style="background:#E6FCFE;padding:10px;border-radius:8px;">
                     <h3>${makeClickable(props.Nom) || makeClickable(props.nombre) || 'Sin nombre'}</h3>`;
 
     const titles = {
@@ -916,12 +995,12 @@ function updatePopupPiscinas(layer, props){
     }
 
     html += "</div>";
-    layer.bindPopup(html,{className:'popup-productores', minWidth:250, maxWidth:400});
+    bindPopupGenerico(layer, html, 'popup-productores', 300, 400, 400);
 }
 
 function updatePopupProductores(layer, props) {
     let html = `<div class="popup-productores"><h3>${makeClickable(props.nombre) || 'Sin nombre'}</h3>`;
-    
+
     // Campos que se mostrarán en el popup
     const titles = {
         direccion: "Dirección / Adresse",
@@ -937,19 +1016,6 @@ function updatePopupProductores(layer, props) {
         idiomas_hablados: "Idiomas hablados / Langues parlées",
         descripcion: "Descripción de la explotación / Description de l'exploitation",
     };
-
-    // Campos booleanos que se mostrarán en una sección separada
-    const booleanFieldsTienda = [
-        { key: "venta_mayor", label: "Venta mayorista / Vente en gros" },
-        { key: "tienda_online", label: "Tienda online / Boutique en ligne" },
-        { key: "venta_centro_produccion", label: "Venta en centro de producción / Vente dans le centre de production" },
-        { key: "tienda", label: "Tienda / Boutique" }
-    ];
-
-    const booleanFieldsServicios = [
-        { key: "agricultura_ecologica", label: "Agricultura ecológica / Agriculture biologique" },
-        { key: "restaurante", label: "Restaurante / Restaurant" }
-    ];
 
     // Mostrar solo los campos definidos en `titles`
     for (let key in titles) {
@@ -974,163 +1040,98 @@ function updatePopupProductores(layer, props) {
 
     // Redes sociales con íconos
     if (props.redes_sociales) {
-        const redesArray = props.redes_sociales.split(",").map(r => r.trim()).filter(r => r !== "");
-        if (redesArray.length > 0) {
-            html += `
-                <div class="popup-row">
-                    <b>Redes sociales / Réseaux sociaux:</b>
-                    <div class="redes-sociales-contenedor">
-                        ${redesArray.map(red => {
-                            const [nombre, url] = red.split(/:(.+)/).map(s => s.trim());
-                            if (!url) return ""; // Si no hay URL, omitir
-                            const validUrl = url.startsWith("http") ? url : `https://${url}`; // Asegurar prefijo http/https
-                            const icono = getIconoRedSocial(nombre);
-                            return `
-                                <a href="${validUrl}" target="_blank" rel="noopener noreferrer" class="red-social">
-                                    <i class="${icono}" title="${nombre}"></i>
-                                </a>
-                            `;
-                        }).join("")}
-                    </div>
-                </div>`;
-        }
+        html += getIconoRedSocial(props.redes_sociales);
     }
 
+    // Generar sección de booleanos para "Punto de venta"
+    const booleanFieldsTienda = [
+        { key: "venta_mayor", label: "Venta mayorista / Vente en gros" },
+        { key: "tienda_online", label: "Tienda online / Boutique en ligne" },
+        { key: "venta_centro_produccion", label: "Venta en centro de producción / Vente dans le centre de production" },
+        { key: "tienda", label: "Tienda / Boutique" }
+    ];
+    html += generarBooleanos(props, booleanFieldsTienda, "Punto de venta / Point de vente");
 
-    // Sección para los campos booleanos de "Punto de venta"
-    html += `<div class="popup-row"><b>Punto de venta / Point de vente</b>
-        <div class="boolean-grid productores-boolean-grid">`;
-    booleanFieldsTienda.forEach(({ key, label }) => {
-        const valor = props[key] === true;
-        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
-    });
-    html += `</div>
-        <div class="popup-leyenda-boolean">🟩: Disponible / disponible<br>⬜: No disponible / Non disponible</div>
-    </div>`;
+    // Generar sección de booleanos para "Servicios"
+    const booleanFieldsServicios = [
+        { key: "agricultura_ecologica", label: "Agricultura ecológica / Agriculture biologique" },
+        { key: "restaurante", label: "Restaurante / Restaurant" }
+    ];
+    html += generarBooleanos(props, booleanFieldsServicios, "Servicios / Services");
 
-    // Sección para los campos booleanos de "Servicios"
-    html += `<div class="popup-row"><b>Servicios / Services</b>
-        <div class="boolean-grid productores-boolean-grid">`;
-    booleanFieldsServicios.forEach(({ key, label }) => {
-        const valor = props[key] === true;
-        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
-    });
-    html += `</div>
-        <div class="popup-leyenda-boolean">🟩: Disponible / disponible<br>⬜: No disponible / Non disponible</div>
-    </div>`;
-
-    // Fotos (carrusel)
-    if (props.fotos) {
-        const fotosArray = props.fotos.split(",").map(f => f.trim()).filter(f => f !== "");
-        if (fotosArray.length > 0) {
-            const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
-            html += `
-                <div class="popup-row">
-                    <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'">
-                        Ver fotos (${fotosArray.length})
-                    </button>
-                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
-                        <div class="popup-fotos-content">
-                            <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
-                            ${fotosArray.map(url => `<img src="${url}" alt="foto">`).join("")}
-                        </div>
-                    </div>
-                </div>`;
-        }
-    }
+    // Generar carrusel de fotos
+    html += generarCarruselFotos(props, "fotos");
 
     html += "</div>";
 
-    
-    layer.bindPopup(html, {
-        className: 'popup-productores',
-        minWidth: 300,
-        maxWidth: 500,
-        maxHeight: 500
-    });
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-productores', 300, 500, 500);
 }
 
-function updatePopupComercios(layer, props){
+function updatePopupComercios(layer, props) {
     let html = `<div class="popup-comercios"><h3>${makeClickable(props.nombre_productor) || 'Sin nombre'}</h3>`;
+
     const titles = {
-        direccion:"Dirección / Adresse", 
-        codigo_postal:"Código postal / Code postal",
+        direccion: "Dirección / Adresse",
+        codigo_postal: "Código postal / Code postal",
         tipo_productor: "Tipo de comercio / Type de boutique",
-        productos:"Tipo de producto / Type de produit", 
+        productos: "Tipo de producto / Type de produit",
         telefono: "Teléfono / Téléphone",
-        url:"URL de acceso / URL d'accès", 
-        url_venta_on_line:"URL tienda online / URL boutique en ligne",
+        url: "URL de acceso / URL d'accès",
+        url_venta_on_line: "URL tienda online / URL boutique en ligne",
         persona_contacto: "Persona de contacto / Personne de contact",
         email: "E-mail",
         tienda: "Tienda / Boutique",
-        horario:"Horario / Horaires", 
-        tarifas:"Tarifas / Tarifs",
-        idiomas_hablados:"Idiomas hablados / Langues parlées", 
-        descripcion:"Descripción / Description ",
-        agricultura_ecologica: "Agricultura Ecológica /Agriculture Ecologique",
-        restaurante: "Restaurante",
-        venta_mayor: "Venta mayorista",
-        tienda_online: "Tienda online",
-        venta_centro_produccion: "Venta en centro de producción"
+        horario: "Horario / Horaires",
+        tarifas: "Tarifas / Tarifs",
+        idiomas_hablados: "Idiomas hablados / Langues parlées",
+        descripcion: "Descripción / Description",
     };
 
-    const skipKeys = ["row_number", "nombre", "nombre_productor", "animales_aceptados"];
+    // Mostrar campos definidos en `titles`
+    for (let key in titles) {
+        if (!props.hasOwnProperty(key)) continue;
+        const value = props[key];
+        if (value === null || value === undefined || value === '') continue;
 
-    for(let key in props){
-        if(!props.hasOwnProperty(key)) continue;
-        if(skipKeys.includes(key)) continue;
-        if(key.toLowerCase().includes("coord") || key.toLowerCase().includes("id")) continue;
-        if(props[key] === null || props[key] === undefined || props[key] === '') continue;
-
-        if(key === "productos"){
-            let items = Array.isArray(props[key]) ? props[key] : props[key].split(',').map(s => s.trim());
-            html += `<div class="popup-row"><b>${titles[key]||key}:</b>
+        if (key === "productos") {
+            // Mostrar productos como lista
+            let items = Array.isArray(value) ? value : value.split(',').map(s => s.trim());
+            html += `<div class="popup-row"><b>${titles[key]}:</b>
                         <div class="productos-grid">`;
             items.forEach(item => {
                 html += `<div class="producto-item">${makeClickable(item)}</div>`;
             });
             html += `</div></div>`;
         } else {
-            html+=`<div class="popup-row"><b>${titles[key]||key}:</b> <span>${makeClickable(props[key])}</span></div>`;
+            // Mostrar campos normales
+            html += `<div class="popup-row"><b>${titles[key]}:</b> <span>${makeClickable(value)}</span></div>`;
         }
     }
-
-    // Campos booleanos
+    
+    // Generar sección de booleanos
     const booleanFields = [
         { key: "animales_aceptados", label: "Animales aceptados / Animaux acceptés" },
         { key: "agricultura_ecologica", label: "Agricultura ecológica / Agriculture biologique" },
     ];
+    html += generarBooleanos(props, booleanFields, "Servicios / Services");
 
-    html += `<div class="popup-row"><b>Servicios / Services:</b>
-        <div class="boolean-grid comercios-boolean-grid">`;
-    booleanFields.forEach(({key, label}) => {
-        const valor = props[key] === true;
-        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
-    });
-    html += `</div>
-    <div class="popup-leyenda-boolean">🟩 Disponible / Disponible<br>⬜ No disponible / Non disponible</div>
-    </div>`;
-
-    html+="</div>";
-    layer.bindPopup(html,{
-        className:'popup-comercios', 
-        minWidth:300, 
-        maxWidth:500, 
-        maxHeight:400
-    });
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-comercios', 300, 500, 400);
 }
 
-function updatePopupSki(layer, props){
+function updatePopupSki(layer, props) {
     const name = props.Nombre || 'Sin nombre';
     let html = `<div class="popup-ski"><h3>${makeClickable(name)}</h3>`;
+
     const titles = {
         direccion: "Dirección / Adresse",
         Tipo: "Tipo de estación / Type de station",
-        subtipo: "Subitpo de estación / Sous-type de station",
+        subtipo: "Subtipo de estación / Sous-type de station",
         telefono: "Teléfono / Téléphone",
         Email: "E-mail",
         Web: "Web",
-        descricpion: "Descripción / Description",
+        descripcion: "Descripción / Description",
         h_min: "Altitud mínima (m) / Altitude minimale (m)",
         km_esqui: "Km esquiables (km) / Km skiables (km)",
         p_verde: "Pistas verdes / Pistes vertes",
@@ -1138,58 +1139,23 @@ function updatePopupSki(layer, props){
         p_roja: "Pistas rojas / Pistes rouges",
         p_negra: "Pistas negras / Pistes noires",
         n_remontes: "Nº remontes / Nbr de remontées",
-        Fotos: "Fotos / Photos"
     };
 
+    // Mostrar campos definidos en `titles`
     for (let key in titles) {
         if (!props.hasOwnProperty(key)) continue;
-        let value = props[key];
+        const value = props[key];
         if (!value || value === "" || value === null) continue;
-
-        if (key === "km_esqui") {
-            html += `
-                <div style="
-                    margin:15px 0; 
-                    padding:12px; 
-                    background:linear-gradient(135deg, #a1c4fd, #c2e9fb); 
-                    border-radius:10px; 
-                    text-align:center; 
-                    box-shadow:0 3px 8px rgba(0,0,0,0.2);
-                ">
-                    <h4 style="margin:0 0 6px 0;">${titles[key]}</h4>
-                    <p style="margin:0; font-weight:700; font-size:18px;">${value} km</p>
-                </div>
-            `;
-            continue;
-        }
 
         let displayValue = makeClickable(value);
 
+        // Campos específicos con formato especial
         if (key === "Web") {
             displayValue = `<a href="${value}" target="_blank" rel="noopener noreferrer">${value}</a>`;
         }
 
-        if (["p_verde","p_azul","p_roja","p_negra"].includes(key)) {
+        if (["p_verde", "p_azul", "p_roja", "p_negra"].includes(key)) {
             displayValue = `<span class="ski-pista ${key}">${value} Km</span>`;
-        }
-
-        if (key === "Fotos") {
-            const fotosArray = value.split(",").map(f => f.trim()).filter(f => f !== "");
-            if (fotosArray.length > 0) {
-                const fotosHTML = fotosArray.map(url => `<img src="${url}" alt="foto">`).join("");
-                const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
-                displayValue = `
-                    <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'">
-                        Ver fotos (${fotosArray.length})
-                    </button>
-                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
-                        <div class="popup-fotos-content">
-                            <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
-                            ${fotosHTML}
-                        </div>
-                    </div>
-                `;
-            }
         }
 
         if (key === "h_min") {
@@ -1204,8 +1170,6 @@ function updatePopupSki(layer, props){
                     ${desnivel ? ` (${desnivel} m de desnivel)` : ''}
                 `;
                 html += `<div class="popup-row"><b>Altitud / Dénivelé:</b><span>${displayValue}</span></div>`;
-                delete props.h_max;
-                delete props.desnivel;
                 continue;
             } else continue;
         }
@@ -1213,13 +1177,18 @@ function updatePopupSki(layer, props){
         html += `<div class="popup-row"><b>${titles[key]}:</b><span>${displayValue}</span></div>`;
     }
 
+    // Generar carrusel de fotos
+    html += generarCarruselFotos(props, "Fotos");
+
     html += "</div>";
-    layer.bindPopup(html, { className: 'popup-ski', minWidth: 400, maxWidth: 700, maxHeight: 500 });
+
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-ski', 400, 700, 500);
 }
 
 function updatePopupEmpresasNieve(layer, props) {
     let html = `<div class="popup-empresas-nieve"><h3>${makeClickable(props.nombre) || 'Sin nombre'}</h3>`;
-    
+
     const titles = {
         etiquetas: "Etiquetas / Labels",
         actividad: "Tipo de actividad / Type d'activité",
@@ -1227,92 +1196,41 @@ function updatePopupEmpresasNieve(layer, props) {
         telefono: "Teléfono / Téléphone",
         email: "E-mail",
         web: "Web",
-        redes_sociales: "Redes sociales / Réseaux sociaux",
         descripcion: "Descripción / Description",
         servicios: "Servicios / Services",
         modo_pago: "Modo de pago / Mode de paiement",
         equipamiento: "Equipamiento / Équipement",
-        accesibilidad: "Accesibilidad / Accessibilité",
-        animales_bienvenidos: "Animales bienvenidos / Animaux bienvenus",
         accesibilidad_info: "Info accesibilidad / Info accessibilité",
-        fotos: "Fotos / Photos"
     };
 
+    // Mostrar campos definidos en `titles`
     for (let key in titles) {
         if (!props.hasOwnProperty(key)) continue;
-        let value = props[key];
+        const value = props[key];
         if (!value || value === "" || value === null) continue;
 
-        let displayValue = makeClickable(value);
-
-        // Redes sociales con íconos
-        if (key === "redes_sociales") {
-            const redesArray = value.split(",").map(r => r.trim()).filter(r => r !== "");
-            if (redesArray.length > 0) {
-                displayValue = `
-                    <div class="redes-sociales-contenedor">
-                        ${redesArray.map(red => {
-                            const [nombre, url] = red.split(/:(.+)/).map(s => s.trim());
-                            if (!url) return ""; // Si no hay URL, omitir
-                            const validUrl = url.startsWith("http") ? url : `https://${url}`; // Asegurar prefijo http/https
-                            const icono = getIconoRedSocial(nombre);
-                            return `
-                                <a href="${validUrl}" target="_blank" rel="noopener noreferrer" class="red-social">
-                                    <i class="${icono}" title="${nombre}"></i>
-                                </a>
-                            `;
-                        }).join("")}
-                    </div>
-                `;
-            }
-        }
-
-        // Fotos (carrusel)
-        if (key === "fotos") {
-            const fotosArray = value.split(",").map(f => f.trim()).filter(f => f !== "");
-            if (fotosArray.length > 0) {
-                const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
-                displayValue = `
-                    <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'">
-                        Ver fotos (${fotosArray.length})
-                    </button>
-                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
-                        <div class="popup-fotos-content">
-                            <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
-                            ${fotosArray.map(url => `<img src="${url}" alt="foto">`).join("")}
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        html += `<div class="popup-row"><b>${titles[key]}:</b><span>${displayValue}</span></div>`;
+        html += `<div class="popup-row"><b>${titles[key]}:</b><span>${makeClickable(value)}</span></div>`;
     }
 
-    // Campos booleanos
+    // Redes sociales con íconos
+    if (props.redes_sociales) {
+        html += getIconoRedSocial(props.redes_sociales);
+    }
+
+    // Generar sección de booleanos
     const booleanFields = [
         { key: "animales_bienvenidos", label: "Animales bienvenidos / Animaux bienvenus" },
         { key: "accesibilidad", label: "Accesibilidad / Accessibilité" }
     ];
+    html += generarBooleanos(props, booleanFields, "Servicios / Services");
 
-    html += `<div class="popup-row"><b>Servicios / Services:</b>
-        <div class="boolean-grid comercios-boolean-grid">`;
-    booleanFields.forEach(({ key, label }) => {
-        const valor = props[key] === true;
-        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
-    });
-    html += `</div>
-        <div class="popup-leyenda-boolean">🟩: Disponible / Oui<br>⬜: No disponible / Non</div>
-    </div>`;
+    // Generar carrusel de fotos
+    html += generarCarruselFotos(props, "fotos");
 
     html += "</div>";
 
-    layer.bindPopup(html, {
-        className: 'popup-empresas-nieve',
-        minWidth: 400,
-        maxWidth: 700,
-        maxHeight: 500
-    });
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-empresas-nieve', 400, 700, 500);
 }
 
 function updatePopupEscalada(layer, props) {
@@ -1340,11 +1258,11 @@ function updatePopupEscalada(layer, props) {
     if (props.h_max || props.h_media) {
         html += `
             <div class="popup-row">
-                <div class="popup-number-card" style="background: #f5e8d8; border: 2px solid #d4b89f;">
+                <div class="popup-number-card">
                     <div class="number-value">${props.h_max || '—'} m</div>
                     <div class="number-label">Altura máxima</div>
                 </div>
-                <div class="popup-number-card" style="background: #f5e8d8; border: 2px solid #d4b89f;">
+                <div class="popup-number-card">
                     <div class="number-value">${props.h_media || '—'} m</div>
                     <div class="number-label">Altura media</div>
                 </div>
@@ -1355,11 +1273,11 @@ function updatePopupEscalada(layer, props) {
     if (props.grado_max || props.grado_min) {
         html += `
             <div class="popup-row">
-                <div class="popup-number-card" style="background: #f5e8d8; border: 2px solid #d4b89f;">
+                <div class="popup-number-card">
                     <div class="number-value">${props.grado_max || '—'}</div>
                     <div class="number-label">Grado máximo</div>
                 </div>
-                <div class="popup-number-card" style="background: #f5e8d8; border: 2px solid #d4b89f;">
+                <div class="popup-number-card">
                     <div class="number-value">${props.grado_min || '—'}</div>
                     <div class="number-label">Grado mínimo</div>
                 </div>
@@ -1383,13 +1301,25 @@ function updatePopupEscalada(layer, props) {
         html += `<div class="popup-row"><b>${titles[key]}:</b><span>${makeClickable(value)}</span></div>`;
     }
 
+    // Generar sección de booleanos
+    const booleanFields = [
+        { key: "accesibilidad", label: "Accesibilidad / Accessibilité" },
+        { key: "animales_bienvenidos", label: "Animales bienvenidos / Animaux bienvenus" }
+    ];
+    html += generarBooleanos(props, booleanFields, "Servicios / Services");
+
+    // Generar carrusel de fotos
+    html += generarCarruselFotos(props, "fotos");
+
     html += "</div>";
-    layer.bindPopup(html, { className: 'popup-escalada', minWidth: 400, maxWidth: 700, maxHeight: 500 });
+
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-escalada', 400, 700, 500);
 }
 
 function updatePopupEmpresasEscalada(layer, props) {
     let html = `<div class="popup-empresas-escalada"><h3>${makeClickable(props.nombre) || 'Sin nombre'}</h3>`;
-    
+
     const titles = {
         etiquetas: "Etiquetas / Labels",
         actividad: "Tipo de actividad / Type d'activité",
@@ -1397,92 +1327,41 @@ function updatePopupEmpresasEscalada(layer, props) {
         telefono: "Teléfono / Téléphone",
         email: "E-mail",
         web: "Web",
-        redes_sociales: "Redes sociales / Réseaux sociaux",
         descripcion: "Descripción / Description",
         servicios: "Servicios / Services",
         modo_pago: "Modo de pago / Mode de paiement",
         equipamiento: "Equipamiento / Équipement",
-        accesibilidad: "Accesibilidad / Accessibilité",
-        animales_bienvenidos: "Animales bienvenidos / Animaux bienvenus",
         accesibilidad_info: "Info accesibilidad / Info accessibilité",
-        fotos: "Fotos / Photos"
     };
 
+    // Mostrar campos definidos en `titles`
     for (let key in titles) {
         if (!props.hasOwnProperty(key)) continue;
-        let value = props[key];
+        const value = props[key];
         if (!value || value === "" || value === null) continue;
 
-        let displayValue = makeClickable(value);
-
-        // Redes sociales con íconos
-        if (key === "redes_sociales") {
-            const redesArray = value.split(",").map(r => r.trim()).filter(r => r !== "");
-            if (redesArray.length > 0) {
-                displayValue = `
-                    <div class="redes-sociales-contenedor">
-                        ${redesArray.map(red => {
-                            const [nombre, url] = red.split(/:(.+)/).map(s => s.trim());
-                            if (!url) return ""; // Si no hay URL, omitir
-                            const validUrl = url.startsWith("http") ? url : `https://${url}`; // Asegurar prefijo http/https
-                            const icono = getIconoRedSocial(nombre);
-                            return `
-                                <a href="${validUrl}" target="_blank" rel="noopener noreferrer" class="red-social">
-                                    <i class="${icono}" title="${nombre}"></i>
-                                </a>
-                            `;
-                        }).join("")}
-                    </div>
-                `;
-            }
-        }
-
-        // Fotos (carrusel)
-        if (key === "fotos") {
-            const fotosArray = value.split(",").map(f => f.trim()).filter(f => f !== "");
-            if (fotosArray.length > 0) {
-                const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
-                displayValue = `
-                    <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'">
-                        Ver fotos (${fotosArray.length})
-                    </button>
-                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
-                        <div class="popup-fotos-content">
-                            <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
-                            ${fotosArray.map(url => `<img src="${url}" alt="foto">`).join("")}
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        html += `<div class="popup-row"><b>${titles[key]}:</b><span>${displayValue}</span></div>`;
+        html += `<div class="popup-row"><b>${titles[key]}:</b><span>${makeClickable(value)}</span></div>`;
     }
 
-    // Campos booleanos
+    // Redes sociales con íconos
+    if (props.redes_sociales) {
+        html += getIconoRedSocial(props.redes_sociales);
+    }
+
+    // Generar sección de booleanos
     const booleanFields = [
         { key: "animales_bienvenidos", label: "Animales bienvenidos / Animaux bienvenus" },
         { key: "accesibilidad", label: "Accesibilidad / Accessibilité" }
     ];
+    html += generarBooleanos(props, booleanFields, "Servicios / Services");
 
-    html += `<div class="popup-row"><b>Servicios / Services:</b>
-        <div class="boolean-grid comercios-boolean-grid">`;
-    booleanFields.forEach(({ key, label }) => {
-        const valor = props[key] === true;
-        html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
-    });
-    html += `</div>
-        <div class="popup-leyenda-boolean">🟩: Disponible / Oui<br>⬜: No disponible / Non</div>
-    </div>`;
+    // Generar carrusel de fotos
+    html += generarCarruselFotos(props, "fotos");
 
     html += "</div>";
 
-    layer.bindPopup(html, {
-        className: 'popup-empresas-escalada',
-        minWidth: 400,
-        maxWidth: 700,
-        maxHeight: 500
-    });
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-empresas-escalada', 400, 700, 500);
 }
 
 function updatePopupViasFerratas(layer, props) {
@@ -1560,25 +1439,15 @@ function updatePopupViasFerratas(layer, props) {
             </div>`;
     }
 
-    // Mostrar fotos (carrusel)
-    if (props.fotos) {
-        const fotosArray = props.fotos.split(",").map(f => f.trim()).filter(f => f !== "");
-        if (fotosArray.length > 0) {
-            const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
-            html += `
-                <div class="popup-row">
-                    <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'">
-                        Ver fotos (${fotosArray.length})
-                    </button>
-                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
-                        <div class="popup-fotos-content">
-                            <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
-                            ${fotosArray.map(url => `<img src="${url}" alt="foto">`).join("")}
-                        </div>
-                    </div>
-                </div>`;
-        }
-    }
+    // Generar sección de booleanos
+    const booleanFields = [
+        { key: "accesibilidad", label: "Accesibilidad / Accessibilité" },
+        { key: "animales_bienvenidos", label: "Animales bienvenidos / Animaux bienvenus" }
+    ];
+    html += generarBooleanos(props, booleanFields, "Servicios / Services");
+
+    // Generar carrusel de fotos
+    html += generarCarruselFotos(props, "fotos");
 
     // Mostrar husler como tarjeta al final
     if (props.husler) {
@@ -1619,7 +1488,9 @@ function updatePopupViasFerratas(layer, props) {
     }
 
     html += "</div>";
-    layer.bindPopup(html, { className: 'popup-vias-ferratas', minWidth: 400, maxWidth: 700, maxHeight: 500 });
+
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-vias-ferratas', 400, 700, 500);
 }
 
 // ================= FILTROS DINÁMICOS =================

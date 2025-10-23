@@ -13,14 +13,6 @@ html, body {
     left: 0;
 }
 
-/*Separador entre los filtros y el mapa*/
-#separador {
-    height: 10px;
-}
-
-#separador-titulo-filtros {
-    height: 30px;
-}
 /*Configuración de los pop-ups y los filtros*/
                 /* --- Popup Mercados (igual que tienes) --- */
                 /* Popup Mercados */
@@ -118,14 +110,6 @@ html, body {
             flex-wrap: wrap; /* Permite que los días se ajusten si no caben */
         }
 
-        .dias-semana {
-            display: flex;
-            justify-content: space-between;
-            gap: 5px;
-            margin-top: 8px;
-            flex-wrap: wrap; /* Permite que los días se ajusten si no caben */
-        }
-
         .dia-semana {
             background: #eee;
             color: #666;
@@ -150,23 +134,70 @@ html, body {
         }
 
         /* --- Popup Escuelas --- */
+        /* Estilos específicos para el pop-up de escuelas */
         .popup-escuelas {
-            background: rgba(240, 248, 255, 0.95); /* ligero azul para diferenciar */
+            background: rgba(240, 248, 255, 0.95); /* Ligero azul para diferenciar */
             border-radius: 12px;
             padding: 16px 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             font-family: 'Segoe UI', Tahoma, sans-serif;
             color: #333;
-            text-align: center; /* centra todo */
+            text-align: center; /* Centra todo */
             max-width: 400px;
             min-width: 250px;
         }
 
         .popup-escuelas h3 {
             margin-bottom: 12px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
             color: #1a5276;
+        }
+
+        /* Contenedor de etiquetas específico para este pop-up */
+        .popup-escuelas .etiquetas-contenedor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        /* Estilo para las etiquetas de "Tipo de centro" */
+        .popup-escuelas .etiqueta-centro {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            background-color: #007bff; /* Azul */
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Estilo para las etiquetas de "Tipo de oferta" */
+        .popup-escuelas .etiqueta-oferta {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            background-color: #0056b3; /* Azul más oscuro */
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Efecto hover para las etiquetas */
+        .popup-escuelas .etiqueta-centro:hover,
+        .popup-escuelas .etiqueta-oferta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         /* Cada fila: etiqueta arriba, contenido debajo */
