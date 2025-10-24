@@ -3081,16 +3081,17 @@ const provider = new GeoSearch.OpenStreetMapProvider();
 const searchControl = new GeoSearch.GeoSearchControl({
     provider: provider,
     style: 'bar', // Estilo del buscador (puede ser 'bar' o 'button')
-    showMarker: true, // Mostrar un marcador en la ubicación encontrada
+    showMarker: false, // Mostrar un marcador en la ubicación encontrada
     marker: {
         draggable: false, // El marcador no será arrastrable
     },
     autoClose: true, // Cierra automáticamente los resultados después de seleccionar
-    retainZoomLevel: false, // Ajusta el nivel de zoom al buscar
+    retainZoomLevel: true, // Ajusta el nivel de zoom al buscar
     searchLabel: 'Buscar localidad...', // Texto del placeholder
     keepResult: true, // Mantiene el resultado visible en el buscador
+    autoComplete: true, // Habilitar autocompletado
+    autoCompleteDelay: 250, // Retraso en milisegundos para mostrar sugerencias
 });
-
 // Añadir el control de búsqueda al mapa
 map.addControl(searchControl);
 }
