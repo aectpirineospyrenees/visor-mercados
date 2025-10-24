@@ -5,8 +5,26 @@ var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
+// Importar el proveedor de OpenStreetMap para GeoSearch
+const { GeoSearchControl, OpenStreetMapProvider } = window.GeoSearch;
 
-// ================= ICONOS =================
+// Crear el proveedor de OpenStreetMap
+const provider = new OpenStreetMapProvider();
+
+// Crear el control de búsqueda
+const searchControl = new GeoSearchControl({
+    provider: provider,
+    style: 'bar', // Estilo del buscador (puede ser 'bar' o 'button')
+    autoComplete: true, // Activar autocompletado
+    autoCompleteDelay: 250, // Retraso en ms para el autocompletado
+    showMarker: true, // Mostrar marcador en el mapa
+    marker: {
+        draggable: false, // El marcador no será arrastrable
+    },
+    retainZoomLevel: false, // Ajustar el zoom al resultado
+    animateZoom: true, // Animar el zoom al resultado
+    keepResult: true, // Mantener el resultado visible
+});
 
 const iconsProductosAgro = {
     "Bulbos, rizomas y similares": L.icon({ iconUrl: 'icons/bulbos.svg', iconSize:[32,32], iconAnchor:[16,32], popupAnchor:[0,-32] }),
@@ -501,7 +519,7 @@ async function inicializarCapasDistribucionLogistica() {
             return html;
         }
 
-        function generarCarruselFotos(props, key) {
+        function generarCarruselFotos(props, key, botonColor = "#20586aff") { // Azul claro por defecto
             if (!props[key]) return '';
 
             const fotosArray = props[key].split(',').map(f => f.trim()).filter(f => f !== '');
@@ -510,21 +528,91 @@ async function inicializarCapasDistribucionLogistica() {
             const fotosId = `fotos-popup-${Math.random().toString(36).substring(2, 8)}`;
             let html = `
                 <div class="popup-row">
-                    <button class="btn-fotos" onclick="document.getElementById('${fotosId}').style.display='flex'">
-                        Ver fotos (${fotosArray.length})
+                    <button class="btn-fotos" style="background-color: ${botonColor}; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;" onclick="abrirPopupFotos('${fotosId}')">
+                        Ver fotos / Voir les photos (${fotosArray.length})
                     </button>
-                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none">
-                        <div class="popup-fotos-content">
-                            <span class="close-fotos" onclick="document.getElementById('${fotosId}').style.display='none'">&times;</span>
-                            ${fotosArray.map(url => `<img src="${url}" alt="foto">`).join('')}
+                    <div id="${fotosId}" class="popup-fotos-overlay" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center;">
+                        <div class="popup-fotos-content" style="position: relative; background: white; padding: 20px; border-radius: 8px; max-width: 90%; max-height: 90%; overflow: auto;">
+                            <span class="close-fotos" style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; color: #333;" onclick="cerrarPopupFotos('${fotosId}')">&times;</span>
+                            <div class="carousel-container" style="position: relative; text-align: center;">
+                                <div class="carousel-slides">
+                                    ${fotosArray.map((url, index) => `
+                                        <div class="carousel-slide" style="${index === 0 ? 'display: block;' : 'display: none;'}">
+                                            <img src="${url}" alt="Foto ${index + 1}" style="max-width: 100%; max-height: 80vh; border-radius: 8px;">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <button class="carousel-prev" style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 10px; cursor: pointer; border-radius: 50%;" onclick="plusSlide('${fotosId}', -1)">&#10094;</button>
+                                <button class="carousel-next" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 10px; cursor: pointer; border-radius: 50%;" onclick="plusSlide('${fotosId}', 1)">&#10095;</button>
+                                <div class="carousel-indicators" style="margin-top: 10px;">
+                                    ${fotosArray.map((_, index) => `
+                                        <span class="indicator" style="display: inline-block; width: 10px; height: 10px; margin: 0 5px; background: ${index === 0 ? '#007bff' : '#ccc'}; border-radius: 50%; cursor: pointer;" onclick="showSlide('${fotosId}', ${index})"></span>
+                                    `).join('')}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>`;
 
             return html;
         }
+        // Función para abrir el popup de fotos
+        function abrirPopupFotos(fotosId) {
+            const popup = document.getElementById(fotosId);
+            if (popup) {
+                popup.style.display = 'flex';
+            }
+        }
 
-        // Funciones para las redes sociales
+        // Función para cerrar el popup de fotos
+        function cerrarPopupFotos(fotosId) {
+            const popup = document.getElementById(fotosId);
+            if (popup) {
+                popup.style.display = 'none';
+            }
+        }
+
+        function showSlide(carouselId, index) {
+            const container = document.getElementById(carouselId);
+            if (!container) return;
+
+            const slides = container.querySelectorAll(".carousel-slide");
+            const indicators = container.querySelectorAll(".carousel-indicators .indicator"); // buscar correctamente
+
+            // Asegurarse de que el índice esté dentro del rango
+            if (index < 0) index = slides.length - 1;
+            if (index >= slides.length) index = 0;
+
+            // Mostrar solo la diapositiva activa
+            slides.forEach((slide, i) => {
+                slide.style.display = i === index ? "block" : "none";
+            });
+
+            // Actualizar los indicadores agregando/quitar la clase 'active'
+            indicators.forEach((indicator, i) => {
+                if (i === index) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+
+            // Guardar el índice actual en el dataset del contenedor
+            container.dataset.currentSlide = index;
+        }
+
+
+        function plusSlide(carouselId, n) {
+            const container = document.getElementById(carouselId);
+            if (!container) return;
+
+            const slides = container.querySelectorAll(".carousel-slide");
+            let current = parseInt(container.dataset.currentSlide || 0);
+            let next = current + n;
+
+            // Mostrar la diapositiva correspondiente
+            showSlide(carouselId, next);
+        }
 
         function getIconoRedSocial(redesSociales) {
             if (!redesSociales) return '';
@@ -2982,10 +3070,29 @@ async function initMap(){
     // Inicializar sidebar y acordeones
     await inicializarCapasDistribucionLogistica()
     map.fitBounds(limitesLayer.getBounds());
-    actualizarLeyenda();
     initAcordeonFiltros();
     actualizarFiltrosAcordeon();  
     actualizarLeyenda();
+    // Añadir el control de búsqueda al mapa
+    // Importar el proveedor de OpenStreetMap
+const provider = new GeoSearch.OpenStreetMapProvider();
+
+// Crear el control de búsqueda
+const searchControl = new GeoSearch.GeoSearchControl({
+    provider: provider,
+    style: 'bar', // Estilo del buscador (puede ser 'bar' o 'button')
+    showMarker: true, // Mostrar un marcador en la ubicación encontrada
+    marker: {
+        draggable: false, // El marcador no será arrastrable
+    },
+    autoClose: true, // Cierra automáticamente los resultados después de seleccionar
+    retainZoomLevel: false, // Ajusta el nivel de zoom al buscar
+    searchLabel: 'Buscar localidad...', // Texto del placeholder
+    keepResult: true, // Mantiene el resultado visible en el buscador
+});
+
+// Añadir el control de búsqueda al mapa
+map.addControl(searchControl);
 }
 initMap();
 

@@ -673,16 +673,6 @@ html, body {
                 text-decoration: underline;
             }
 
-            /* Fotos */
-            .popup-ski img {
-                max-width: 100px;
-                margin: 3px;
-                border-radius: 6px;
-                transition: transform 0.2s ease;
-            }
-            .popup-ski img:hover {
-                transform: scale(1.05);
-            }
 
             /* Tarjeta de km esquiables */
             .popup-ski .ski-card {
@@ -728,149 +718,6 @@ html, body {
             .popup-ski .p_roja { background-color: #f7a3a3; }  
             .popup-ski .p_negra { background-color: #5a5a5a; } 
 
-            /* Botón ver fotos */
-            .popup-ski .btn-fotos {
-                background: #3a7bc8;
-                color: #fff;
-                border: none;
-                border-radius: 6px;
-                padding: 6px 12px;
-                cursor: pointer;
-                font-weight: 600;
-                transition: background 0.2s ease;
-            }
-            .popup-ski .btn-fotos:hover {
-                background: #2e6bb5;
-            }
-
-            /* Popup de fotos */
-            .popup-fotos-overlay {
-                position: fixed;
-                top: 0; left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(20, 30, 40, 0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-            }
-            .popup-fotos-content {
-                background: #fff;
-                padding: 20px;
-                border-radius: 10px;
-                max-width: 90%;
-                max-height: 80%;
-                overflow-y: auto;
-                text-align: center;
-                position: relative;
-            }
-            .popup-fotos-content img {
-                max-width: 200px;
-                margin: 5px;
-                border-radius: 8px;
-                transition: transform 0.2s ease;
-            }
-            .popup-fotos-content img:hover {
-                transform: scale(1.05);
-            }
-            .close-fotos {
-                position: absolute;
-                top: 10px;
-                right: 15px;
-                font-size: 28px;
-                color: #333;
-                cursor: pointer;
-            }
-            .close-fotos:hover {
-                color: #000;
-            }
-
-            /* Contenedor de fotos para balnearios/productores */
-            .popup-productores .popup-fotos-overlay {
-                position: fixed;
-                top: 0; left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(20, 30, 40, 0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-            }
-
-            .popup-productores .popup-fotos-content {
-                background: #fff;
-                padding: 30px; /* más espacio interior */
-                border-radius: 12px;
-                max-width: 95%;    /* aumenta ancho máximo */
-                max-height: 85%;   /* aumenta altura máxima */
-                overflow-y: auto;
-                text-align: center;
-                position: relative;
-            }
-
-            /* Carousel dentro del popup */
-            .popup-productores .carousel-container {
-                position: relative;
-            }
-
-            .popup-productores .carousel-slide {
-                max-width: 90%;   /* más ancho */
-                max-height: 500px; /* más alto */
-                border-radius: 10px;
-                margin: auto;
-            }
-
-            /* Botones de navegación */
-            .popup-productores .prev-slide, 
-            .popup-productores .next-slide {
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                background: rgba(0,0,0,0.3);
-                color: #fff;
-                border: none;
-                padding: 8px 14px; /* un poco más grande que antes */
-                cursor: pointer;
-                border-radius: 4px;
-                font-size: 22px; /* más grande */
-            }
-
-            .popup-productores .prev-slide { left: 15px; }
-            .popup-productores .next-slide { right: 15px; }
-
-            .popup-productores .prev-slide:hover, 
-            .popup-productores .next-slide:hover { background: rgba(0,0,0,0.6); }
-
-            /* Botón cerrar */
-            .popup-productores .close-fotos {
-                position: absolute;
-                top: 10px;
-                right: 15px;
-                font-size: 28px;
-                color: #333;
-                cursor: pointer;
-            }
-            .popup-productores .close-fotos:hover { color: #000; }
-
-        /* Botón ver fotos en balnearios/productores (igual que ski) */
-        .popup-productores .btn-fotos {
-            background: #3a7bc8;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 6px 12px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .popup-productores .btn-fotos:hover {
-            background: #2e6bb5;
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-        }
 
         /* EMPRESAS NIEVE - estilo inspirado en Ski */
                 .popup-empresas-nieve {
@@ -919,74 +766,6 @@ html, body {
                     text-decoration: underline;
                 }
 
-                /* Fotos */
-                .popup-empresas-nieve img {
-                    max-width: 100px;
-                    margin: 3px;
-                    border-radius: 6px;
-                    transition: transform 0.2s ease;
-                }
-                .popup-empresas-nieve img:hover {
-                    transform: scale(1.05);
-                }
-
-                /* Botón ver fotos */
-                .popup-empresas-nieve .btn-fotos {
-                    background: #2a6fb0;
-                    color: #fff;
-                    border: none;
-                    border-radius: 6px;
-                    padding: 6px 12px;
-                    cursor: pointer;
-                    font-weight: 600;
-                    transition: background 0.2s ease;
-                }
-                .popup-empresas-nieve .btn-fotos:hover {
-                    background: #1e5a8c;
-                }
-
-                /* Popup de fotos */
-                .popup-empresas-nieve .popup-fotos-overlay {
-                    position: fixed;
-                    top: 0; left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(20, 30, 40, 0.8);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 9999;
-                }
-                .popup-empresas-nieve .popup-fotos-content {
-                    background: #fff;
-                    padding: 20px;
-                    border-radius: 10px;
-                    max-width: 90%;
-                    max-height: 80%;
-                    overflow-y: auto;
-                    text-align: center;
-                    position: relative;
-                }
-                .popup-empresas-nieve .popup-fotos-content img {
-                    max-width: 200px;
-                    margin: 5px;
-                    border-radius: 8px;
-                    transition: transform 0.2s ease;
-                }
-                .popup-empresas-nieve .popup-fotos-content img:hover {
-                    transform: scale(1.05);
-                }
-                .popup-empresas-nieve .close-fotos {
-                    position: absolute;
-                    top: 10px;
-                    right: 15px;
-                    font-size: 28px;
-                    color: #333;
-                    cursor: pointer;
-                }
-                .popup-empresas-nieve .close-fotos:hover {
-                    color: #000;
-                }
 
                 /* Booleanos */
                 .popup-empresas-nieve .boolean-grid {
@@ -1220,75 +999,6 @@ html, body {
                 text-decoration: underline;
             }
 
-            /* Fotos */
-            .popup-empresas-escalada img {
-                max-width: 100px;
-                margin: 3px;
-                border-radius: 6px;
-                transition: transform 0.2s ease;
-            }
-            .popup-empresas-escalada img:hover {
-                transform: scale(1.05);
-            }
-
-            /* Botón ver fotos */
-            .popup-empresas-escalada .btn-fotos {
-                background: #6b4f3f;
-                color: #fff;
-                border: none;
-                border-radius: 6px;
-                padding: 6px 12px;
-                cursor: pointer;
-                font-weight: 600;
-                transition: background 0.2s ease;
-            }
-            .popup-empresas-escalada .btn-fotos:hover {
-                background: #5a4738;
-            }
-
-            /* Popup de fotos */
-            .popup-empresas-escalada .popup-fotos-overlay {
-                position: fixed;
-                top: 0; left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(40, 30, 20, 0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-            }
-            .popup-empresas-escalada .popup-fotos-content {
-                background: #fff;
-                padding: 20px;
-                border-radius: 10px;
-                max-width: 90%;
-                max-height: 80%;
-                overflow-y: auto;
-                text-align: center;
-                position: relative;
-            }
-            .popup-empresas-escalada .popup-fotos-content img {
-                max-width: 200px;
-                margin: 5px;
-                border-radius: 8px;
-                transition: transform 0.2s ease;
-            }
-            .popup-empresas-escalada .popup-fotos-content img:hover {
-                transform: scale(1.05);
-            }
-            .popup-empresas-escalada .close-fotos {
-                position: absolute;
-                top: 10px;
-                right: 15px;
-                font-size: 28px;
-                color: #333;
-                cursor: pointer;
-            }
-            .popup-empresas-escalada .close-fotos:hover {
-                color: #000;
-            }
-
             /* Booleanos */
             .popup-empresas-escalada .boolean-grid {
                 display: grid;
@@ -1412,23 +1122,7 @@ html, body {
                 text-align: center;
                 line-height: 1.1;
             }
-            /* Botón ver fotos */
-            .btn-fotos {
-                background: #6b4f3f;
-                color: #fff;
-                border: none;
-                border-radius: 6px;
-                padding: 6px 12px;
-                cursor: pointer;
-                font-weight: 600;
-                transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-            }
 
-            .btn-fotos:hover {
-                background: #6b4f3f; /* Azul más oscuro */
-                transform: translateY(-1px);
-                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-            }
     /*CONFIGURACION DEL HEADER*/
 
     #filtros-mapa {
@@ -1941,12 +1635,6 @@ html, body {
     transition: transform 0.2s ease, box-shadow 0.2s ease; /* Usamos directamente transition */
 }
 
-/* Carrusel de imágenes */
-.popup-fotos-content img:hover {
-    transform: scale(1.05); /* Eliminamos will-change */
-    transition: transform 0.2s ease; /* Usamos directamente transition */
-}
-
 /* Etiquetas con hover */
 .etiqueta:hover {
     transform: translateY(-2px); /* Eliminamos will-change */
@@ -2001,4 +1689,100 @@ html, body {
 .home-link:hover i {
     color: #2e6bb5;
     transform: scale(1.1);
+}
+
+/* Contenedor del carrusel */
+/* Contenedor del carrusel */
+.carousel-container {
+    position: relative;
+    max-width: 90%; /* Reduce el ancho máximo para que no ocupe todo el espacio */
+    margin: 20px auto; /* Centra el carrusel y agrega espacio superior/inferior */
+    overflow: hidden;
+    border-radius: 12px; /* Bordes redondeados */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
+}
+
+/* Imágenes del carrusel */
+.carousel-slide img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px; /* Bordes redondeados */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición suave */
+}
+
+.carousel-slide img:hover {
+    transform: scale(1.05); /* Efecto de zoom al pasar el cursor */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Sombra más pronunciada */
+}
+
+/* Botones interactivos */
+button {
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px); /* Efecto de elevación */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+}
+
+/* Botones de navegación */
+/* Botones de navegación del carrusel */
+.carousel-prev,
+.carousel-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.6); /* Fondo más oscuro */
+    color: #fff;
+    border: none;
+    width: 40px; /* Ancho y alto iguales para hacerlos circulares */
+    height: 40px;
+    cursor: pointer;
+    border-radius: 50%; /* Hace que sean completamente redondos */
+    font-size: 18px;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); /* Sombra para dar profundidad */
+}
+
+.carousel-prev:hover,
+.carousel-next:hover {
+    background: rgba(0, 0, 0, 0.8); /* Fondo más oscuro al pasar el cursor */
+    transform: scale(1.1); /* Efecto de agrandamiento */
+}
+
+.carousel-prev {
+    left: 15px; /* Ajusta la posición horizontal */
+}
+
+.carousel-next {
+    right: 15px; /* Ajusta la posición horizontal */
+}
+
+/* Indicadores del carrusel */
+.carousel-indicators {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px; /* Espaciado entre indicadores */
+}
+
+.indicator {
+    width: 14px;
+    height: 14px;
+    background: #ccc;
+    border-radius: 50%; /* Indicadores redondos */
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.indicator.active {
+    background: #333; /* Color más oscuro para el indicador activo */
+    transform: scale(1.2); /* Efecto de agrandamiento para el activo */
 }
