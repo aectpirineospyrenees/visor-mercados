@@ -6,8 +6,8 @@ html, body {
 }
 
 #contenedor-mapa {
-    height: calc(100% - 90px); /* Resta la altura del encabezado */
-    width: 100%; /* Asegúrate de que ocupe todo el ancho */
+    height: calc(100vh - 90px); /* Resta la altura del encabezado */
+    width: 100vw; /* Asegúrate de que ocupe todo el ancho */
     position: absolute; /* Posición absoluta para ocupar el espacio */
     top: 90px; /* Desplázalo hacia abajo para dejar espacio al encabezado */
     left: 0;
