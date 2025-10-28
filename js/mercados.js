@@ -1,30 +1,35 @@
 // ================= MAPA =================
 var map = L.map("contenedor-mapa").setView([42.8486, -0.3145], 9);
 
-var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-// Importar el proveedor de OpenStreetMap para GeoSearch
-const { GeoSearchControl, OpenStreetMapProvider } = window.GeoSearch;
-
-// Crear el proveedor de OpenStreetMap
-const provider = new OpenStreetMapProvider();
-
-// Crear el control de búsqueda
-const searchControl = new GeoSearchControl({
-    provider: provider,
-    style: 'bar', // Estilo del buscador (puede ser 'bar' o 'button')
-    autoComplete: true, // Activar autocompletado
-    autoCompleteDelay: 250, // Retraso en ms para el autocompletado
-    showMarker: true, // Mostrar marcador en el mapa
-    marker: {
-        draggable: false, // El marcador no será arrastrable
-    },
-    retainZoomLevel: false, // Ajustar el zoom al resultado
-    animateZoom: true, // Animar el zoom al resultado
-    keepResult: true, // Mantener el resultado visible
+// Definir mapas base típicos de OpenStreetMap
+const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19
 });
+
+const osmTopo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
+    maxZoom: 17
+});
+
+const osmSatelital = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    maxZoom: 19
+});
+
+
+// Añadir el control de capas
+const baseMaps = {
+    "OSM Standard": osmStandard,
+    "OSM Topographic": osmTopo,
+    "OSM Satelital": osmSatelital,
+};
+
+// Añadir el control al mapa
+L.control.layers(baseMaps, null, { position: 'bottomleft', collapsed: false }).addTo(map);
+
+// Establecer el mapa base inicial
+osmStandard.addTo(map);
 
 const iconsProductosAgro = {
     "Bulbos, rizomas y similares": L.icon({ iconUrl: 'icons/bulbos.svg', iconSize:[32,32], iconAnchor:[16,32], popupAnchor:[0,-32] }),
@@ -3073,6 +3078,7 @@ async function initMap(){
     initAcordeonFiltros();
     actualizarFiltrosAcordeon();  
     actualizarLeyenda();
+    
 }
 initMap();
 

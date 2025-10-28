@@ -1786,3 +1786,40 @@ button:hover {
     background: #333; /* Color más oscuro para el indicador activo */
     transform: scale(1.2); /* Efecto de agrandamiento para el activo */
 }
+
+.basemaps-container {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.basemap-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.basemap-option:hover {
+    background: #f0f0f0;
+}
+
+.basemap-option img {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.basemap-option span {
+    font-size: 14px;
+    font-family: 'Montserrat', sans-serif;
+}
