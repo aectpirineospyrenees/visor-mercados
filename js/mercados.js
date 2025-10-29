@@ -82,6 +82,8 @@ const empresasEscaladasIcon = crearIcono("icons/empresas_escalada.svg");
 const viaFerrataIcon = crearIcono("icons/via_ferrata.svg");
 const viaFerrataEmpresasIcon = crearIcono("icons/empresas_escalada.svg");
 const DEFAULT_ICON_AGRO = iconsProductosAgro["Legumbres"] || marketIconMercados;
+const canyoningIcon = crearIcono("icons/canyoning.svg");
+const empresasCanyoningIcon = crearIcono("icons/canyoning.svg");
 
 function normalizaTexto(s){
     return (s || "").toString()
@@ -141,6 +143,8 @@ let puntosEscaladaMarkers = [];
 let empresasEscaladaMarkers = [];
 let viaFerrataMarkers = [];
 let empresasViaFerrataMarkers = [];
+let canyoningMarkers = [];
+let empresasCanyoningMarkers = [];
 const ordenDias = ["Lunes/Lundi","Martes/Mardi","Miércoles/Mercredi","Jueves/Jeudi","Viernes/Vendredi","Sábado/Samedi","Domingo/Dimanche"];
 const ordenSemanas = ["Primera semana del mes/Première semaine du mois","Segunda semana del mes/Deuxième semaine du mois","Tercera semana del mes/Troisième semaine du mois","Cuarta semana del mes/Quatrième semaine du mois","Todas las semanas/Toutes les semaines"];
 
@@ -281,6 +285,8 @@ const puntosEscaladaClusters        = crearCluster("icons/escalada.svg");
 const empresasEscaladaClusters      = crearCluster("icons/empresas_escalada.svg");
 const viaFerrataClusters           = crearCluster("icons/via_ferrata.svg");
 const empresasViaFerrataClusters    = crearCluster("icons/empresas_escalada.svg");
+const canyoningClusters          = crearCluster("icons/canyoning.svg");
+const empresasCanyoningClusters    = crearCluster("icons/canyoning.svg");
 // ================= CARGA GEOJSON =================
 async function cargarLimites(){
     try{
@@ -551,7 +557,7 @@ async function inicializarCapasDistribucionLogistica() {
                                 <button class="carousel-next" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 10px; cursor: pointer; border-radius: 50%;" onclick="plusSlide('${fotosId}', 1)">&#10095;</button>
                                 <div class="carousel-indicators" style="margin-top: 10px;">
                                     ${fotosArray.map((_, index) => `
-                                        <span class="indicator" style="display: inline-block; width: 10px; height: 10px; margin: 0 5px; background: ${index === 0 ? '#007bff' : '#ccc'}; border-radius: 50%; cursor: pointer;" onclick="showSlide('${fotosId}', ${index})"></span>
+                                        <span class="indicator" style="display: inline-block; width: 10px; height: 10px; margin: 0 5px; background: ${index === 0 ? '#ccc' : '#ccc'}; border-radius: 50%; cursor: pointer;" onclick="showSlide('${fotosId}', ${index})"></span>
                                     `).join('')}
                                 </div>
                             </div>
@@ -916,8 +922,6 @@ function updatePopupAlojamientos(layer, props) {
     });
 }
 
-
-
 function updatePopupRestaurantes(layer, props) {
     let html = `<div class="popup-restaurantes" style="background:#fef3e0;padding:10px;border-radius:8px;">
                     <h3>${makeClickable(props.Nom) || makeClickable(props.nombre_establecimiento) || 'Sin nombre'}</h3>`;
@@ -1023,27 +1027,6 @@ function updatePopupBalnearios(layer, props) {
 
     bindPopupGenerico(layer, html, 'popup-productores', 400, 500, 500);
 }
-
-// Funciones para el carrusel (sin cambios)
-function showSlide(carouselId, index){
-    const container = document.getElementById(carouselId);
-    if(!container) return;
-    const slides = container.querySelectorAll(".carousel-slide");
-    slides.forEach((slide,i)=> slide.style.display = i===index ? "block" : "none");
-    container.dataset.currentSlide = index;
-}
-
-function plusSlide(carouselId, n){
-    const container = document.getElementById(carouselId);
-    if(!container) return;
-    const slides = container.querySelectorAll(".carousel-slide");
-    let current = parseInt(container.dataset.currentSlide || 0);
-    let next = current + n;
-    if(next < 0) next = slides.length-1;
-    if(next >= slides.length) next = 0;
-    showSlide(carouselId, next);
-}
-
 
 
 function updatePopupPatrimonioCultural(layer, props){
@@ -1586,6 +1569,131 @@ function updatePopupViasFerratas(layer, props) {
     bindPopupGenerico(layer, html, 'popup-vias-ferratas', 400, 700, 500);
 }
 
+function updatePopupCanyoning(layer, props) {
+    let html = `<div class="popup-canyoning"><h3>${makeClickable(props.nombre) || 'Sin nombre'}</h3>`;
+
+    // Generar etiquetas para `tipo_uso`
+    if (props.tipo_uso) {
+        const tiposUso = Array.isArray(props.tipo_uso)
+            ? props.tipo_uso
+            : props.tipo_uso.split(',').map(t => t.trim());
+
+        html += `<div class="etiquetas-tipo-uso">`;
+        tiposUso.forEach(tipo => {
+            html += `<span class="etiqueta-tipo-uso">${tipo}</span>`;
+        });
+        html += `</div>`;
+    }
+
+    // Continuar con el resto del contenido del popup
+    const titles = {
+        descripcion: "Descripción / Description",
+        web: "Web",
+        corriente: "Corriente / Courant"
+    };
+
+    for (let key in titles) {
+        if (!props.hasOwnProperty(key)) continue;
+        const value = props[key];
+        if (!value || value === "" || value === null) continue;
+        html += `<div class="popup-row"><b>${titles[key]}:</b><span>${makeClickable(value)}</span></div>`;
+    }
+
+    // Generar sección de booleanos
+    const booleanFields = [
+        { key: "accesibilidad_transporte_publico", label: "Accesibilidad transporte público / Accessibilité transport public" }
+    ];
+    html += generarBooleanos(props, booleanFields, "Servicios / Services");
+
+    // Añadir tarjetas para `desn_neg` y `tiempo`
+    if (props.desn_neg || props.tiempo) {
+        html += `<div class="popup-row popup-tarjetas">`;
+
+        if (props.desn_neg) {
+            html += `
+                <div class="popup-number-card">
+                    <div class="number-value">${props.desn_neg || '—'} m</div>
+                    <div class="number-label">Descenso negativo</div>
+                </div>`;
+        }
+
+        if (props.tiempo) {
+            html += `
+                <div class="popup-number-card">
+                    <div class="number-value">${props.tiempo || '—'} h</div>
+                    <div class="number-label">Tiempo estimado</div>
+                </div>`;
+        }
+
+        html += `</div>`;
+    }
+
+    // Mostrar el campo `cuerda` como una tarjeta
+    if (props.cuerda !== null) {
+        const cuerdaLabel = props.cuerda === "Si" ? "Disponible" : props.cuerda === "No" ? "No disponible" : "Desconocido";
+        const cuerdaColor = props.cuerda === "Si" ? "#8dcc8fff" : props.cuerda === "No" ? "#bc7b77ff" : "#9e9e9e"; // Verde, rojo o gris
+
+        html += `
+            <div class="popup-row">
+                <div class="popup-number-card" style="background-color: ${cuerdaColor}; color: white;">
+                    <div class="number-value">${props.cuerda || '—'}</div>
+                    <div class="number-label">Cuerda</div>
+                </div>
+            </div>`;
+    }
+
+    html += "</div>";
+
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-canyoning', 400, 700, 500);
+}
+
+function updatePopupEmpresasCanyoning(layer, props) {
+    let html = `<div class="popup-empresas-canyoning"><h3>${makeClickable(props.nombre) || 'Sin nombre'}</h3>`;
+
+    const titles = {
+        etiquetas: "Etiquetas / Labels",
+        actividad: "Tipo de actividad / Type d'activité",
+        direccion: "Dirección / Adresse",
+        telefono: "Teléfono / Téléphone",
+        email: "E-mail",
+        web: "Web",
+        descripcion: "Descripción / Description",
+        servicios: "Servicios / Services",
+        modo_pago: "Modo de pago / Mode de paiement",
+        equipamiento: "Equipamiento / Équipement",
+        accesibilidad_info: "Info accesibilidad / Info accessibilité",
+    };
+
+    // Mostrar campos definidos en `titles`
+    for (let key in titles) {
+        if (!props.hasOwnProperty(key)) continue;
+        const value = props[key];
+        if (!value || value === "" || value === null) continue;
+
+        html += `<div class="popup-row"><b>${titles[key]}:</b><span>${makeClickable(value)}</span></div>`;
+    }
+
+    // Redes sociales con íconos
+    if (props.redes_sociales) {
+        html += getIconoRedSocial(props.redes_sociales);
+    }
+
+    // Generar sección de booleanos
+    const booleanFields = [
+        { key: "animales_bienvenidos", label: "Animales bienvenidos / Animaux bienvenus" },
+        { key: "accesibilidad", label: "Accesibilidad / Accessibilité" }
+    ];
+    html += generarBooleanos(props, booleanFields, "Servicios / Services");
+
+    // Generar carrusel de fotos
+    html += generarCarruselFotos(props, "fotos");
+
+    html += "</div>";
+
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-empresas-canyoning', 400, 700, 500);
+}
 // ================= FILTROS DINÁMICOS =================
 
 // Mercados
@@ -2587,6 +2695,21 @@ window.addEventListener('load', function(){
                     </div>
                 </div>
             </div>
+            <div class="div-acordeones"></div>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <button class="accordion-header">
+                        Canyoning / Canyoning
+                        <span class="arrow">▶</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="sidebar-checkboxes">
+                            <label><input type="checkbox" id="cb-puntos-canyoning" checked> <img src="icons/canyoning.svg" width="20"> Puntos de Canyoning / Points de Canyoning</label>
+                            <label><input type="checkbox" id="cb-empresas-canyoning" checked> <img src="icons/empresas_canyoning.svg" width="20"> Empresas de Canyoning / Entreprises de Canyoning</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `
     });
     sidebar.addPanel({
@@ -2713,6 +2836,8 @@ window.addEventListener('load', function(){
         document.getElementById('cb-empresas-escalada').checked = map.hasLayer(empresasEscaladaClusters);
         document.getElementById('cb-vias-ferratas').checked = map.hasLayer(viaFerrataClusters);
         document.getElementById('cb-empresas-via-ferrata').checked = map.hasLayer(empresasViaFerrataClusters);
+        document.getElementById('cb-puntos-canyoning').checked = map.hasLayer(canyoningClusters);
+        document.getElementById('cb-empresas-canyoning').checked = map.hasLayer(empresasCanyoningClusters);
     }
 
     sincronizarCheckboxes();
@@ -2748,7 +2873,9 @@ window.addEventListener('load', function(){
     'puntos-escalada': puntosEscaladaClusters,
     'empresas-escalada': empresasEscaladaClusters,
     'vias-ferratas': viaFerrataClusters,
-    'empresas-via-ferrata': empresasViaFerrataClusters
+    'empresas-via-ferrata': empresasViaFerrataClusters,
+    'puntos-canyoning': canyoningClusters,
+    'empresas-canyoning': empresasCanyoningClusters
     };
 
     // ================= EVENTOS CHECKBOXES =================
@@ -2870,10 +2997,18 @@ window.addEventListener('load', function(){
         'empresas-via-ferrata':
             {es: "Información correspondiente a Pirineos Atlánticos",
             fr: "Informations concernant les Pyrénées-Atlantiques.",
+            fuente: 'Tourisme 64' },
+
+        'puntos-canyoning':
+            {fuente: 'IGN France / Observatorio de Montaña (OMS) / Open Street Map (OSM)'},
+
+        'empresas-canyoning':
+            {es: "Información correspondiente a Pirineos Atlánticos",
+            fr: "Informations concernant les Pyrénées-Atlantiques.",
             fuente: 'Tourisme 64' }
     };
 
-    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad', 'puntos-escalada', 'empresas-escalada', 'vias-ferratas', 'empresas-via-ferrata'].forEach(tipo => {
+    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad', 'puntos-escalada', 'empresas-escalada', 'vias-ferratas', 'empresas-via-ferrata', 'puntos-canyoning', 'empresas-canyoning'].forEach(tipo => {
     const checkbox = document.getElementById('cb-' + tipo);
     if (checkbox) {
         checkbox.addEventListener('change', e => {
@@ -2956,6 +3091,8 @@ function actualizarLeyenda(){
     if(map.hasLayer(empresasEscaladaClusters)) html += `<img src="icons/empresas_escalada.svg" width="18"> Empresas de escalada / Entreprises d'escalade <br>`;
     if(map.hasLayer(viaFerrataClusters)) html += `<img src="icons/via_ferrata.svg" width="18"> Vías ferratas / Via ferrata <br>`;
     if(map.hasLayer(empresasViaFerrataClusters)) html += `<img src="icons/empresas_escalada.svg" width="18"> Empresas de Vías Ferratas / Entreprises de Via Ferrata <br>`;
+    if(map.hasLayer(canyoningClusters)) html += `<img src="icons/canyoning.svg" width="18"> Puntos de Canyoning / Points de Canyoning <br>`;
+    if(map.hasLayer(empresasCanyoningClusters)) html += `<img src="icons/empresas_canyoning.svg" width="18"> Empresas de Canyoning / Entreprises de Canyoning <br>`;
      if (map.hasLayer(carreterasLayer)) {
         html += `
             <div style="display: flex; align-items: center; margin-bottom: 5px;">
@@ -3003,7 +3140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 monumentosReligiososCluster, restosArqueologicosCluster, balneariosCluster,
                 museosCluster, arbolesCluster, miradoresCluster, glaciaresClusters,
                 zonasBanosClusters, piscinasClusters, productoresClusters, comerciosClusters, skiClusters,
-                empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters, buffersInfluenciaLayer, puntosEscaladaClusters, empresasEscaladaClusters, viaFerrataClusters, empresasViaFerrataClusters
+                empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters, buffersInfluenciaLayer, puntosEscaladaClusters, empresasEscaladaClusters,  viaFerrataClusters, empresasViaFerrataClusters, canyoningClusters, empresasCanyoningClusters
             }).forEach(capa => {
                 if (map.hasLayer(capa)) map.removeLayer(capa);
             });
@@ -3067,6 +3204,8 @@ async function initMap(){
         cargarGeoJSON('data/turismo_activo/escalada_empresas_64.geojson', empresasEscaladaClusters, empresasEscaladaMarkers, empresasEscaladasIcon, updatePopupEmpresasEscalada),
         cargarGeoJSON('data/turismo_activo/vias_ferratas.geojson', viaFerrataClusters, viaFerrataMarkers, viaFerrataIcon, updatePopupViasFerratas),
         cargarGeoJSON('data/turismo_activo/vias_ferratas_empresas.geojson', empresasViaFerrataClusters, empresasViaFerrataMarkers, empresasEscaladasIcon, updatePopupEmpresasEscalada),
+        cargarGeoJSON('data/turismo_activo/canyoning.geojson', canyoningClusters, canyoningMarkers, canyoningIcon, updatePopupCanyoning),
+        cargarGeoJSON('data/turismo_activo/empresas_canyoning.geojson', empresasCanyoningClusters, empresasCanyoningMarkers, empresasCanyoningIcon, updatePopupEmpresasCanyoning),
         cargarCarreteras(),
         cargarProductosAgro(),
 

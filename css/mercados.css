@@ -1123,6 +1123,185 @@ html, body {
                 line-height: 1.1;
             }
 
+            /* Popup Canyoning */
+            .popup-canyoning {
+                background: rgba(230, 240, 255, 0.95); /* Azul claro translúcido */
+                border-radius: 12px;
+                padding: 16px 20px;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+                font-family: 'Segoe UI', Tahoma, sans-serif;
+                color: #333;
+                text-align: center; /* Centra todo */
+                max-width: 700px;
+                min-width: 250px;
+            }
+
+            /* Título del popup */
+            .popup-canyoning h3 {
+                margin-bottom: 12px;
+                font-size: 18px;
+                font-weight: 700;
+                color: #4a90e2; /* Azul intermedio */
+            }
+
+            /* Cada fila: etiqueta arriba, contenido debajo */
+            .popup-canyoning .popup-row {
+                margin-bottom: 8px;
+            }
+
+            .popup-canyoning .popup-row b {
+                display: block;
+                font-weight: 700;
+                margin-bottom: 4px;
+                color: #2c5a8a; /* Azul oscuro */
+            }
+
+            .popup-canyoning .popup-row span {
+                display: block;
+            }
+
+            /* Contenedor de etiquetas */
+            .etiquetas-tipo-uso {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 10px;
+                justify-content: center;
+            }
+
+            /* Estilo de las etiquetas */
+            .etiqueta-tipo-uso {
+                display: inline-block;
+                padding: 6px 12px;
+                border-radius: 16px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #fff; /* Texto blanco */
+                text-align: center;
+                white-space: nowrap;
+                background-color: #4a90e2; /* Azul predeterminado */
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            /* Efecto hover para las etiquetas */
+            .etiqueta-tipo-uso:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Booleanos */
+            .popup-canyoning .boolean-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 8px 10px;
+                margin-top: 8px;
+                justify-content: center;
+                align-items: center;
+                justify-items: center;
+                width: 100%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .popup-canyoning .boolean-tag {
+                background: #eee;
+                color: #666;
+                border-radius: 8px;
+                padding: 6px 10px;
+                font-size: 13px;
+                text-align: center;
+                font-weight: 500;
+                transition: background 0.2s ease, color 0.2s ease;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                max-width: 180px;
+                box-sizing: border-box;
+            }
+
+            .popup-canyoning .boolean-tag.activo {
+                background: #4a90e2; /* Azul activo */
+                color: #fff;
+                font-weight: 600;
+                box-shadow: 0 2px 6px rgba(74, 144, 226, 0.25);
+            }
+
+            .popup-canyoning .popup-leyenda-boolean {
+                font-size: 12px;
+                color: #666;
+                margin-top: 8px;
+                text-align: left;
+            }
+            /* Tarjetas de números */
+            .popup-number-card {
+                background: #e6f0ff; /* Azul claro */
+                border-radius: 8px;
+                padding: 10px 16px;
+                text-align: center;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                flex: 1;
+                max-width: 150px;
+                margin: 8px auto;
+            }
+
+            .popup-number-card .number-value {
+                font-size: 18px;
+                font-weight: bold;
+                color: #20586a; /* Azul oscuro */
+            }
+
+            .popup-number-card .number-label {
+                font-size: 12px;
+                color: #555;
+                margin-top: 4px;
+            }
+            /* Popup Canyoning */
+            .popup-empresas-canyoning {
+                background: rgba(230, 240, 255, 0.95); /* Azul claro translúcido */
+                border-radius: 16px;
+                padding: 18px 22px;
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+                font-family: 'Segoe UI', Tahoma, sans-serif;
+                color: #1e2e3e; /* Azul oscuro para texto */
+                text-align: center;
+                max-width: 700px;
+                min-width: 250px;
+            }
+
+            /* Título */
+            .popup-empresas-canyoning h3 {
+                margin-bottom: 14px;
+                font-size: 20px;
+                font-weight: 700;
+                color: #2a6fb0; /* Azul más oscuro */
+            }
+
+            /* Fila de información */
+            .popup-empresas-canyoning .popup-row {
+                margin-bottom: 10px;
+            }
+
+            .popup-empresas-canyoning .popup-row b {
+                display: block;
+                font-weight: 600;
+                margin-bottom: 4px;
+                color: #2b4a63; /* Azul intermedio */
+            }
+
+            .popup-empresas-canyoning .popup-row span {
+                display: block;
+            }
+
+            /* Enlaces */
+            .popup-empresas-canyoning a {
+                color: #2a6fb0;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .popup-empresas-canyoning a:hover {
+                text-decoration: underline;
+            }
     /*CONFIGURACION DEL HEADER*/
 
     #filtros-mapa {
