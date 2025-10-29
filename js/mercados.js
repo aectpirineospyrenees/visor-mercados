@@ -83,7 +83,7 @@ const viaFerrataIcon = crearIcono("icons/via_ferrata.svg");
 const viaFerrataEmpresasIcon = crearIcono("icons/empresas_escalada.svg");
 const DEFAULT_ICON_AGRO = iconsProductosAgro["Legumbres"] || marketIconMercados;
 const canyoningIcon = crearIcono("icons/canyoning.svg");
-const empresasCanyoningIcon = crearIcono("icons/canyoning.svg");
+const empresasCanyoningIcon = crearIcono("icons/empresas_canyoning.svg");
 
 function normalizaTexto(s){
     return (s || "").toString()
@@ -286,7 +286,7 @@ const empresasEscaladaClusters      = crearCluster("icons/empresas_escalada.svg"
 const viaFerrataClusters           = crearCluster("icons/via_ferrata.svg");
 const empresasViaFerrataClusters    = crearCluster("icons/empresas_escalada.svg");
 const canyoningClusters          = crearCluster("icons/canyoning.svg");
-const empresasCanyoningClusters    = crearCluster("icons/canyoning.svg");
+const empresasCanyoningClusters    = crearCluster("icons/empresas_canyoning.svg");
 // ================= CARGA GEOJSON =================
 async function cargarLimites(){
     try{
