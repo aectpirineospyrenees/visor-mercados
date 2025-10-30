@@ -1408,13 +1408,6 @@ function updatePopupEscalada(layer, props) {
         html += `<div class="popup-row"><b>${titles[key]}:</b><span>${makeClickable(value)}</span></div>`;
     }
 
-    // Generar sección de booleanos
-    const booleanFields = [
-        { key: "accesibilidad", label: "Accesibilidad / Accessibilité" },
-        { key: "animales_bienvenidos", label: "Animales bienvenidos / Animaux bienvenus" }
-    ];
-    html += generarBooleanos(props, booleanFields, "Servicios / Services");
-
     // Generar carrusel de fotos
     html += generarCarruselFotos(props, "fotos");
 
