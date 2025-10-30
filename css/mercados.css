@@ -717,7 +717,35 @@ html, body {
             .popup-ski .p_azul { background-color: #a5ccff; }  
             .popup-ski .p_roja { background-color: #f7a3a3; }  
             .popup-ski .p_negra { background-color: #5a5a5a; } 
+            /* Contenedor de etiquetas de actividades */
+            .etiquetas-actividades {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 10px;
+                justify-content: center;
+            }
 
+            /* Estilo de cada etiqueta */
+            .etiqueta-actividad {
+                display: inline-block;
+                padding: 6px 12px;
+                border-radius: 16px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #fff; /* Texto blanco */
+                text-align: center;
+                white-space: nowrap;
+                background-color: #4a90e2; /* Azul predeterminado */
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            /* Efecto hover para las etiquetas */
+            .etiqueta-actividad:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
 
         /* EMPRESAS NIEVE - estilo inspirado en Ski */
                 .popup-empresas-nieve {
@@ -1088,6 +1116,7 @@ html, body {
                 font-weight: 700;
                 color: #6b4f3f; /* marrón medio */
             }
+            
 
             .popup-vias-ferratas .popup-number-card {
                 display: inline-flex;

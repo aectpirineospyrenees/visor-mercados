@@ -80,7 +80,7 @@ const nucleosClaveIcon = crearIcono("icons/marker.svg");
 const puntosEscaladaIcon = crearIcono("icons/escalada.svg");
 const empresasEscaladasIcon = crearIcono("icons/empresas_escalada.svg");
 const viaFerrataIcon = crearIcono("icons/via_ferrata.svg");
-const viaFerrataEmpresasIcon = crearIcono("icons/empresas_escalada.svg");
+const viaFerrataEmpresasIcon = crearIcono("icons/empresas_via_ferrata.svg");
 const DEFAULT_ICON_AGRO = iconsProductosAgro["Legumbres"] || marketIconMercados;
 const canyoningIcon = crearIcono("icons/canyoning.svg");
 const empresasCanyoningIcon = crearIcono("icons/empresas_canyoning.svg");
@@ -284,7 +284,7 @@ const nucleosClaveClusters          = crearCluster("icons/marker.svg");
 const puntosEscaladaClusters        = crearCluster("icons/escalada.svg");
 const empresasEscaladaClusters      = crearCluster("icons/empresas_escalada.svg");
 const viaFerrataClusters           = crearCluster("icons/via_ferrata.svg");
-const empresasViaFerrataClusters    = crearCluster("icons/empresas_escalada.svg");
+const empresasViaFerrataClusters    = crearCluster("icons/empresas_via_ferrata.svg");
 const canyoningClusters          = crearCluster("icons/canyoning.svg");
 const empresasCanyoningClusters    = crearCluster("icons/empresas_canyoning.svg");
 // ================= CARGA GEOJSON =================
@@ -519,8 +519,14 @@ async function inicializarCapasDistribucionLogistica() {
             let html = `<div class="popup-row"><b>${titulo}</b><div class="boolean-grid productores-boolean-grid">`;
 
             booleanFields.forEach(({ key, label }) => {
-                const valor = props[key] === true;
-                html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
+                // Verificar si el valor no es null o undefined
+                if (props[key] !== null && props[key] !== undefined) {
+                    const valor = props[key] === true; // Si es true, es "Disponible"
+                    html += `<span class="boolean-tag${valor ? ' activo' : ''}">${label}</span>`;
+                } else if (props[key] === false) {
+                    // Si es false, mostrar como "No disponible"
+                    html += `<span class="boolean-tag">${label}</span>`;
+                }
             });
 
             html += `</div>
@@ -1197,8 +1203,21 @@ function updatePopupComercios(layer, props) {
 }
 
 function updatePopupSki(layer, props) {
-    const name = props.Nombre || 'Sin nombre';
+    const name = props.nombre || 'Sin nombre';
     let html = `<div class="popup-ski"><h3>${makeClickable(name)}</h3>`;
+
+    // Generar etiquetas para el campo `actividades`
+    if (props.actividades) {
+        const actividades = Array.isArray(props.actividades)
+            ? props.actividades
+            : props.actividades.split(',').map(a => a.trim());
+
+        html += `<div class="etiquetas-actividades">`;
+        actividades.forEach(actividad => {
+            html += `<span class="etiqueta-actividad">${actividad}</span>`;
+        });
+        html += `</div>`;
+    }
 
     const titles = {
         direccion: "Dirección / Adresse",
@@ -1207,7 +1226,7 @@ function updatePopupSki(layer, props) {
         telefono: "Teléfono / Téléphone",
         Email: "E-mail",
         Web: "Web",
-        descripcion: "Descripción / Description",
+        descricpion: "Descripción / Description",
         h_min: "Altitud mínima (m) / Altitude minimale (m)",
         km_esqui: "Km esquiables (km) / Km skiables (km)",
         p_verde: "Pistas verdes / Pistes vertes",
@@ -1215,6 +1234,7 @@ function updatePopupSki(layer, props) {
         p_roja: "Pistas rojas / Pistes rouges",
         p_negra: "Pistas negras / Pistes noires",
         n_remontes: "Nº remontes / Nbr de remontées",
+        tipo_locales_complementarios: "Locales complementarios / Locaux complémentaires"
     };
 
     // Mostrar campos definidos en `titles`
@@ -1230,6 +1250,12 @@ function updatePopupSki(layer, props) {
             displayValue = `<a href="${value}" target="_blank" rel="noopener noreferrer">${value}</a>`;
         }
 
+        if (key === "tipo_locales_complementarios") {
+            // Procesar el campo como una lista separada por comas
+            const tipos = Array.isArray(value) ? value : value.split(',').map(t => t.trim());
+            displayValue = tipos.map(tipo => tipo.charAt(0).toUpperCase() + tipo.slice(1).replace(/_/g, ' ')).join(', ');
+        }
+
         if (["p_verde", "p_azul", "p_roja", "p_negra"].includes(key)) {
             displayValue = `<span class="ski-pista ${key}">${value} Km</span>`;
         }
@@ -1243,8 +1269,7 @@ function updatePopupSki(layer, props) {
                 displayValue = `
                     ${hMin ? hMin + ' m' : '?'} – 
                     ${hMax ? hMax + ' m' : '?'}
-                    ${desnivel ? ` (${desnivel} m de desnivel)` : ''}
-                `;
+                    ${desnivel ? ` (${desnivel} m de desnivel)` : ''}`;
                 html += `<div class="popup-row"><b>Altitud / Dénivelé:</b><span>${displayValue}</span></div>`;
                 continue;
             } else continue;
@@ -1252,6 +1277,13 @@ function updatePopupSki(layer, props) {
 
         html += `<div class="popup-row"><b>${titles[key]}:</b><span>${displayValue}</span></div>`;
     }
+
+    // Generar sección de booleanos
+    const booleanFields = [
+        { key: "accesibilidad_discapacidad", label: "Accesibilidad / Accessibilité" },
+        { key: "accesibilidad_transporte_publico.1", label: "Accesibilidad al transporte público / Accessibilité aux transports publics" }
+    ];
+    html += generarBooleanos(props, booleanFields, "Servicios / Services");
 
     // Generar carrusel de fotos
     html += generarCarruselFotos(props, "Fotos");
@@ -1261,7 +1293,6 @@ function updatePopupSki(layer, props) {
     // Usar la función genérica para bindPopup
     bindPopupGenerico(layer, html, 'popup-ski', 400, 700, 500);
 }
-
 function updatePopupEmpresasNieve(layer, props) {
     let html = `<div class="popup-empresas-nieve"><h3>${makeClickable(props.nombre) || 'Sin nombre'}</h3>`;
 
@@ -1515,13 +1546,6 @@ function updatePopupViasFerratas(layer, props) {
             </div>`;
     }
 
-    // Generar sección de booleanos
-    const booleanFields = [
-        { key: "accesibilidad", label: "Accesibilidad / Accessibilité" },
-        { key: "animales_bienvenidos", label: "Animales bienvenidos / Animaux bienvenus" }
-    ];
-    html += generarBooleanos(props, booleanFields, "Servicios / Services");
-
     // Generar carrusel de fotos
     html += generarCarruselFotos(props, "fotos");
 
@@ -1537,6 +1561,7 @@ function updatePopupViasFerratas(layer, props) {
                 huslerColor = '#43b581'; // Verde
                 break;
             case 'K3':
+            case 'K3+':
                 huslerLabel = 'Medio / Moyen';
                 huslerColor = '#f1c40f'; // Amarillo
                 break;
@@ -1972,6 +1997,33 @@ function initFiltersEmpresasNieve() {
     filtroIds.forEach(id => document.getElementById(id).addEventListener('change', filtrarEmpresasNieve));
 }
 
+function initFiltersSki() {
+    const filtroTipoSki = document.getElementById('filtro-tipo-ski');
+    let valores = [];
+
+    // Recorrer los marcadores de Ski para obtener los valores únicos del tipo
+    skiMarkers.forEach(m => {
+        if (m.props.tipo) {
+            const tipos = m.props.tipo.split(',').map(t => normalizaTexto(t.trim())); // Dividir y normalizar
+            valores.push(...tipos);
+        }
+    });
+
+    // Eliminar duplicados y ordenar alfabéticamente
+    valores = [...new Set(valores)].sort();
+
+    // Añadir las opciones al filtro
+    valores.forEach(valor => {
+        const option = document.createElement('option');
+        option.value = valor;
+        option.textContent = valor.charAt(0).toUpperCase() + valor.slice(1);
+        filtroTipoSki.appendChild(option);
+    });
+
+    // Asociar el evento de cambio al filtro
+    filtroTipoSki.addEventListener('change', filtrarSki);
+}
+
 function filtrarMarcadores(){
     const tipo = document.getElementById('filtro-tipo-mercado').value;
     const frecuencia = document.getElementById('filtro-frecuencia').value;
@@ -2175,6 +2227,25 @@ function filtrarEmpresasNieve() {
         }
     });
 }
+
+function filtrarSki() {
+    const tipoSeleccionado = normalizaTexto(document.getElementById('filtro-tipo-ski').value);
+
+    // Limpiar el cluster antes de aplicar los filtros
+    skiClusters.clearLayers();
+
+    // Filtrar los marcadores según el tipo seleccionado
+    skiMarkers.forEach(({ marker, props }) => {
+        const tipos = props.tipo
+            ? props.tipo.split(',').map(t => normalizaTexto(t.trim())) // Dividir y normalizar
+            : [];
+
+        // Verificar si el tipo seleccionado está en la lista de tipos del marcador
+        if (!tipoSeleccionado || tipos.includes(tipoSeleccionado)) {
+            skiClusters.addLayer(marker);
+        }
+    });
+}
 // ================= FILTROS =================
 // ================= FILTROS EN EL MAPA =================
 const FiltrosControl = L.Control.extend({
@@ -2320,6 +2391,14 @@ const FiltrosControl = L.Control.extend({
                 </select>
                     <button class="btn-limpiar-filtros" data-capa="productores-proximidad" type="button">Limpiar filtros / Nettoyer les filtres</button>
                 </div>
+                <button class="toggle-filtros" data-capa="ski">ESTACIONES DE SKI / STATIONS DE SKI</button>
+                <div class="contenedor-filtros" data-capa="ski" style="display:none;">
+                    <label>Tipo de estación / Type de station:</label>
+                    <select id="filtro-tipo-ski">
+                        <option value="">Todos/Tous</option>
+                    </select>
+                    <button class="btn-limpiar-filtros" data-capa="ski" type="button">Limpiar filtros / Nettoyer les filtres</button>
+                </div>
             </div>
         `;
         L.DomEvent.disableClickPropagation(container);
@@ -2366,6 +2445,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (capa === "restaurantes") fitlrarRestaurantes();
             else if (capa === "empresas-nieve") filtrarEmpresasNieve();
             else if (capa === "productores-proximidad") filtrarProductoresProximidad();
+            else if (capa === "ski") filtrarSki();
         });
     });
 });
@@ -2385,6 +2465,7 @@ function actualizarFiltrosAcordeon() {
         else if (capa === 'comercios') capaActiva = map.hasLayer(comerciosClusters);
         else if (capa === 'restaurantes') capaActiva = map.hasLayer(restaurantesCluster);
         else if (capa === 'empresas-nieve') capaActiva = map.hasLayer(empresasNieveClusters);
+        else if (capa === 'ski') capaActiva = map.hasLayer(skiClusters);
 
         const contenedor = btn.nextElementSibling;
 
@@ -2401,6 +2482,7 @@ function actualizarFiltrosAcordeon() {
             else if (capa === 'comercios' && document.getElementById('filtro-productos-comercios').options.length <= 1) initFiltersComercios();
             else if (capa === 'restaurantes' && document.getElementById('filtro-tipo-restaurante').options.length <= 1) initFiltersRestaurantes();
             else if (capa === 'empresas-nieve' && document.getElementById('filtro-tipo-actividad-nieve').options.length <= 1) initFiltersEmpresasNieve();
+            else if (capa === 'ski' && document.getElementById('filtro-tipo-ski').options.length <= 1) initFiltersSki();
         } else {
             btn.style.display = 'none';        // Ocultar botón
             contenedor.style.display = 'none';  // Ocultar contenedor
@@ -2411,11 +2493,11 @@ function actualizarFiltrosAcordeon() {
 
 
 // Modificar los eventos de checkboxes para llamar a actualizarFiltrosAcordeon()
-['mercados','escuelas','otros','productos', 'productores', 'comercios', 'restaurantes', 'empresas-nieve'].forEach(tipo=>{
+['mercados','escuelas','otros','productos', 'productores', 'comercios', 'restaurantes', 'empresas-nieve', 'ski'].forEach(tipo=>{
     const checkbox = document.getElementById('cb-'+tipo);
     if(checkbox){
         checkbox.addEventListener('change', e=>{
-            const capaMap = {'mercados':mercadosCluster,'escuelas':centrosCluster,'otros':otrosCentrosCluster,'productos':productosAgroCluster, 'productores': productoresClusters, 'comercios': comerciosClusters, 'restaurantes': restaurantesCluster, 'empresas-nieve': empresasNieveClusters};
+            const capaMap = {'mercados':mercadosCluster,'escuelas':centrosCluster,'otros':otrosCentrosCluster,'productos':productosAgroCluster, 'productores': productoresClusters, 'comercios': comerciosClusters, 'restaurantes': restaurantesCluster, 'empresas-nieve': empresasNieveClusters, 'ski': skiClusters};
             if(e.target.checked) map.addLayer(capaMap[tipo]); else map.removeLayer(capaMap[tipo]);
             actualizarLeyenda();
             actualizarFiltrosAcordeon();
@@ -2690,7 +2772,7 @@ window.addEventListener('load', function(){
                             <label><input type="checkbox" id="cb-vias-ferratas" checked> <img src="icons/via_ferrata.svg" width="20"> Vías ferratas / Via ferrata</label>
                             <h5> Empresas de escalada y vías ferratas / Entreprises d'escalade et via ferrata </h5>
                             <label><input type="checkbox" id="cb-empresas-escalada" checked> <img src="icons/empresas_escalada.svg" width="20"> Empresas de escalada / Entreprises d'escalade</label>
-                            <label><input type="checkbox" id="cb-empresas-via-ferrata" checked> <img src="icons/empresas_escalada.svg" width="20"> Empresas de Vías Ferratas / Entreprises de Via Ferrata</label>
+                            <label><input type="checkbox" id="cb-empresas-via-ferrata" checked> <img src="icons/empresas_via_ferrata.svg" width="20"> Empresas de Vías Ferratas / Entreprises de Via Ferrata</label>
                         </div>
                     </div>
                 </div>
@@ -3090,7 +3172,7 @@ function actualizarLeyenda(){
     if(map.hasLayer(puntosEscaladaClusters)) html += `<img src="icons/escalada.svg" width="18"> Puntos de escalada / Points d'escalade <br>`;
     if(map.hasLayer(empresasEscaladaClusters)) html += `<img src="icons/empresas_escalada.svg" width="18"> Empresas de escalada / Entreprises d'escalade <br>`;
     if(map.hasLayer(viaFerrataClusters)) html += `<img src="icons/via_ferrata.svg" width="18"> Vías ferratas / Via ferrata <br>`;
-    if(map.hasLayer(empresasViaFerrataClusters)) html += `<img src="icons/empresas_escalada.svg" width="18"> Empresas de Vías Ferratas / Entreprises de Via Ferrata <br>`;
+    if(map.hasLayer(empresasViaFerrataClusters)) html += `<img src="icons/empresas_via_ferrata.svg" width="18"> Empresas de Vías Ferratas / Entreprises de Via Ferrata <br>`;
     if(map.hasLayer(canyoningClusters)) html += `<img src="icons/canyoning.svg" width="18"> Puntos de Canyoning / Points de Canyoning <br>`;
     if(map.hasLayer(empresasCanyoningClusters)) html += `<img src="icons/empresas_canyoning.svg" width="18"> Empresas de Canyoning / Entreprises de Canyoning <br>`;
      if (map.hasLayer(carreterasLayer)) {
@@ -3203,7 +3285,7 @@ async function initMap(){
         cargarGeoJSON('data/turismo_activo/puntos_escalada.geojson', puntosEscaladaClusters, puntosEscaladaMarkers, puntosEscaladaIcon, updatePopupEscalada),
         cargarGeoJSON('data/turismo_activo/escalada_empresas_64.geojson', empresasEscaladaClusters, empresasEscaladaMarkers, empresasEscaladasIcon, updatePopupEmpresasEscalada),
         cargarGeoJSON('data/turismo_activo/vias_ferratas.geojson', viaFerrataClusters, viaFerrataMarkers, viaFerrataIcon, updatePopupViasFerratas),
-        cargarGeoJSON('data/turismo_activo/vias_ferratas_empresas.geojson', empresasViaFerrataClusters, empresasViaFerrataMarkers, empresasEscaladasIcon, updatePopupEmpresasEscalada),
+        cargarGeoJSON('data/turismo_activo/vias_ferratas_empresas.geojson', empresasViaFerrataClusters, empresasViaFerrataMarkers, viaFerrataEmpresasIcon, updatePopupEmpresasEscalada),
         cargarGeoJSON('data/turismo_activo/canyoning.geojson', canyoningClusters, canyoningMarkers, canyoningIcon, updatePopupCanyoning),
         cargarGeoJSON('data/turismo_activo/empresas_canyoning.geojson', empresasCanyoningClusters, empresasCanyoningMarkers, empresasCanyoningIcon, updatePopupEmpresasCanyoning),
         cargarCarreteras(),
