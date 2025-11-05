@@ -836,25 +836,40 @@ function updatePopupProductosAgro(layer, props){
 }
 
 
-function updatePopupOficinasTurismo(layer, props){
+function updatePopupOficinasTurismo(layer, props) {
     let html = `<div class="popup-mercados"><h3>${props.nombre || 'Sin nombre'}</h3>`;
+    
     const titles = {
-        nombre_tipo: "Tipo/Type",
-        direccion: "Dirección",
-        telefono: "Teléfono",
-        email: "E-mail",
-        web: "Web",
-        municipio: "Municipio/Commune"
+        direccion: "Dirección / Adresse",
+        telefono: "Teléfono / Téléphone",
+        email: "E-mail / E-mail",
+        web: "Web / Site",
+        municipio: "Municipio/Commune",
+        dia_semana: "Día de la semana / Jour de la semaine",
+        horario: "Horario / Horaires"
     };
-    for(let key in props){
-        if(!props.hasOwnProperty(key)) continue;
-        if(["row_number","nombre"].includes(key)) continue;
-        if(key.toLowerCase().includes("coord")||key.toLowerCase().includes("id_")) continue;
+
+    // Mostrar solo los campos definidos en `titles`
+    for (let key in titles) {
+        if (!props.hasOwnProperty(key)) continue;
         const val = makeClickable(props[key]);
-        html+=`<div class="popup-row"><b>${titles[key]||key}:</b> <span>${val}</span></div>`;
+        if (val) {
+            html += `<div class="popup-row"><b>${titles[key]}:</b> <span>${val}</span></div>`;
+        }
     }
+
+    // Generar sección de booleanos para apertura
+    const booleanFields = [
+        { key: "abierto_todo_año", label: "Abierto todo el año / Ouvert toute l'année" },
+        { key: "abierto_navidad", label: "Abierto en Navidad / Ouvert à Noël" },
+        { key: "abierto_semana_santa", label: "Abierto en Semana Santa / Ouvert à Pâques" },
+        { key: "abierto_puentes", label: "Abierto en puentes / Ouvert pendant les ponts" }
+    ];
+    html += generarBooleanos(props, booleanFields, "Apertura / Ouverture");
+
     html += "</div>";
-    layer.bindPopup(html,{className:'popup-mercados',minWidth:250,maxWidth:600});
+
+    layer.bindPopup(html, { className: 'popup-mercados', minWidth: 250, maxWidth: 600 });
 }
 
 function updatePopupAlojamientos(layer, props) {
@@ -1354,11 +1369,12 @@ function updatePopupEscalada(layer, props) {
 
     // Campos que se mostrarán en el popup
     const titles = {
-        deportiva: "Tipo de zona / Type de zone",
-        num_vias: "Número de vías / Nombre de voies",
-        altura_maxima: "Altura máxima (m) / Hauteur maximale (m)",
-        descripcion: "Descripción / Description",
-        servicios: "Servicios / Services"
+        tipo_via: "Tipo de vía / Type de voie",
+        web: "Web / Site",
+        numero_vias: "Número de vías / Nombre de voies",
+        altitud: "Altura máxima (m) / Hauteur maximale (m)",
+        desnivel: "Desnivel (m) / Dénivelé (m)",
+        tiempo_acceso_minimo: "Tiempo de acceso mínimo / Temps d'accès minimum"
     };
 
     // Mostrar tarjetas para h_max y h_media
@@ -1376,42 +1392,29 @@ function updatePopupEscalada(layer, props) {
             </div>`;
     }
 
-    // Mostrar tarjetas para grado_max y grado_min
-    if (props.grado_max || props.grado_min) {
+    // Mostrar tarjetas para dif_maxima y dif_minima
+    if (props.dif_maxima || props.dif_minima) {
         html += `
             <div class="popup-row">
                 <div class="popup-number-card">
-                    <div class="number-value">${props.grado_max || '—'}</div>
-                    <div class="number-label">Grado máximo</div>
+                    <div class="number-value">${props.dif_maxima || '—'}</div>
+                    <div class="number-label">Dificultad máxima</div>
                 </div>
                 <div class="popup-number-card">
-                    <div class="number-value">${props.grado_min || '—'}</div>
-                    <div class="number-label">Grado mínimo</div>
+                    <div class="number-value">${props.dif_minima || '—'}</div>
+                    <div class="number-label">Dificultad mínima</div>
                 </div>
             </div>`;
     }
 
-    // Ajustar el campo deportiva
-    const tipoZona = props.deportiva === "SI" ? "Deportivo" : "Otros";
-    html += `
-        <div class="popup-row">
-            <b>${titles.deportiva}:</b>
-            <span>${tipoZona}</span>
-        </div>`;
-
     // Iterar sobre los campos definidos en `titles`
     for (let key in titles) {
-        if (!props.hasOwnProperty(key) || key === "deportiva") continue; // Saltar el campo deportiva (ya procesado)
-        let value = props[key];
-        if (!value || value === "" || value === null) continue; // Ignorar valores vacíos
+        if (!props.hasOwnProperty(key)) continue;
+        const value = props[key];
+        if (!value || value === "" || value === null) continue;
 
         html += `<div class="popup-row"><b>${titles[key]}:</b><span>${makeClickable(value)}</span></div>`;
     }
-
-    // Generar carrusel de fotos
-    html += generarCarruselFotos(props, "fotos");
-
-    html += "</div>";
 
     // Usar la función genérica para bindPopup
     bindPopupGenerico(layer, html, 'popup-escalada', 400, 700, 500);
@@ -1617,11 +1620,6 @@ function updatePopupCanyoning(layer, props) {
         html += `<div class="popup-row"><b>${titles[key]}:</b><span>${makeClickable(value)}</span></div>`;
     }
 
-    // Generar sección de booleanos
-    const booleanFields = [
-        { key: "accesibilidad_transporte_publico", label: "Accesibilidad transporte público / Accessibilité transport public" }
-    ];
-    html += generarBooleanos(props, booleanFields, "Servicios / Services");
 
     // Añadir tarjetas para `desn_neg` y `tiempo`
     if (props.desn_neg || props.tiempo) {
@@ -1631,15 +1629,15 @@ function updatePopupCanyoning(layer, props) {
             html += `
                 <div class="popup-number-card">
                     <div class="number-value">${props.desn_neg || '—'} m</div>
-                    <div class="number-label">Descenso negativo</div>
+                    <div class="number-label">Descenso negativo / Descente négative</div>
                 </div>`;
         }
 
         if (props.tiempo) {
             html += `
                 <div class="popup-number-card">
-                    <div class="number-value">${props.tiempo || '—'} h</div>
-                    <div class="number-label">Tiempo estimado</div>
+                    <div class="number-value">${props.tiempo || '—'} min</div>
+                    <div class="number-label">Tiempo estimado / Estimated time</div>
                 </div>`;
         }
 
@@ -2017,6 +2015,52 @@ function initFiltersSki() {
     filtroTipoSki.addEventListener('change', filtrarSki);
 }
 
+function initFiltersPuntosEscalada() {
+    const filtroTipoVia = document.getElementById('filtro-tipo-via-escalada');
+    const filtroDif = document.getElementById('filtro-dificultad-escalada');
+    let valores = [];
+
+    // Poblar select de tipo de vía
+    puntosEscaladaMarkers.forEach(m => {
+        if (m.props.tipo_via) {
+            const tipos = m.props.tipo_via.split(',').map(t => normalizaTexto(t.trim()));
+            valores.push(...tipos);
+        }
+    });
+
+    valores = [...new Set(valores)].sort();
+    valores.forEach(valor => {
+        const option = document.createElement('option');
+        option.value = valor;
+        option.textContent = valor.charAt(0).toUpperCase() + valor.slice(1);
+        filtroTipoVia.appendChild(option);
+    });
+
+    // Poblar select de dificultad (escala francesa)
+    const gradosFranceses = [
+        '3', '4a', '4b', '4c',
+        '5a', '5b', '5c',
+        '6a', '6a+', '6b', '6b+', '6c', '6c+',
+        '7a', '7a+', '7b', '7b+', '7c', '7c+',
+        '8a', '8a+', '8b', '8b+', '8c', '8c+',
+        '9a', '9a+', '9b', '9b+', '9c'
+    ];
+
+    gradosFranceses.forEach(g => {
+        const option = document.createElement('option');
+        option.value = g;
+        option.textContent = g;
+        filtroDif.appendChild(option);
+    });
+
+    // Asociar eventos
+    filtroTipoVia.addEventListener('change', filtrarPuntosEscalada);
+    filtroDif.addEventListener('change', filtrarPuntosEscalada);
+    document.getElementById('filtro-tiempo-acceso-escalada').addEventListener('input', filtrarPuntosEscalada);
+    document.getElementById('filtro-desnivel-escalada').addEventListener('input', filtrarPuntosEscalada);
+}
+
+
 function filtrarMarcadores(){
     const tipo = document.getElementById('filtro-tipo-mercado').value;
     const frecuencia = document.getElementById('filtro-frecuencia').value;
@@ -2239,6 +2283,76 @@ function filtrarSki() {
         }
     });
 }
+
+function filtrarPuntosEscalada() {
+    const tipoSeleccionado = normalizaTexto(document.getElementById('filtro-tipo-via-escalada').value);
+    const tiempoMaximo = parseFloat(document.getElementById('filtro-tiempo-acceso-escalada').value);
+    const desnivelMinimo = parseFloat(document.getElementById('filtro-desnivel-escalada').value);
+    const difSeleccionada = document.getElementById('filtro-dificultad-escalada').value;
+
+    const gradosFranceses = [
+        '3', '4a', '4b', '4c',
+        '5a', '5b', '5c',
+        '6a', '6a+', '6b', '6b+', '6c', '6c+',
+        '7a', '7a+', '7b', '7b+', '7c', '7c+',
+        '8a', '8a+', '8b', '8b+', '8c', '8c+',
+        '9a', '9a+', '9b', '9b+', '9c'
+    ];
+
+    const gradoIndex = g => {
+        if (!g) return -1;
+        const idx = gradosFranceses.indexOf(normalizaTexto(g));
+        return idx >= 0 ? idx : -1;
+    };
+
+    const difIdx = difSeleccionada ? gradoIndex(difSeleccionada) : -1;
+
+    puntosEscaladaClusters.clearLayers();
+
+    puntosEscaladaMarkers.forEach(({ marker, props }) => {
+        // --- Tipo de vía ---
+        const tipos = props.tipo_via
+            ? props.tipo_via.split(',').map(t => normalizaTexto(t.trim()))
+            : [];
+        const tipoMatch = !tipoSeleccionado || tipos.includes(tipoSeleccionado);
+
+        // --- Tiempo de acceso ---
+        const tiempoAcceso = props.tiempo_acceso_minimo !== null ? parseFloat(props.tiempo_acceso_minimo) : null;
+        const tiempoMatch = !tiempoMaximo || (tiempoAcceso !== null && tiempoAcceso <= tiempoMaximo);
+
+        // --- Desnivel ---
+        const desnivel = props.desnivel !== null ? parseFloat(props.desnivel) : null;
+        const desnivelMatch = !desnivelMinimo || (desnivel !== null && desnivel >= desnivelMinimo);
+
+        // --- Dificultad ---
+        let dificultadMatch = true;
+        const minIdx = gradoIndex(props.dif_minima);
+        const maxIdx = gradoIndex(props.dif_maxima);
+
+        if (difIdx !== -1) {
+            // Si el usuario selecciona una dificultad concreta
+            if (minIdx === -1 && maxIdx === -1) {
+                // No tiene dificultad → no mostrar
+                dificultadMatch = false;
+            } else {
+                const min = minIdx !== -1 ? minIdx : maxIdx;
+                const max = maxIdx !== -1 ? maxIdx : minIdx;
+                dificultadMatch = (difIdx >= min && difIdx <= max);
+            }
+        } else {
+            // Si no se selecciona ningún grado → mostrar todas (incluyendo sin dificultad)
+            dificultadMatch = true;
+        }
+
+        // --- Añadir si cumple todos los criterios ---
+        if (tipoMatch && tiempoMatch && desnivelMatch && dificultadMatch) {
+            puntosEscaladaClusters.addLayer(marker);
+        }
+    });
+}
+
+
+
 // ================= FILTROS =================
 // ================= FILTROS EN EL MAPA =================
 const FiltrosControl = L.Control.extend({
@@ -2392,6 +2506,25 @@ const FiltrosControl = L.Control.extend({
                     </select>
                     <button class="btn-limpiar-filtros" data-capa="ski" type="button">Limpiar filtros / Nettoyer les filtres</button>
                 </div>
+
+                <button class="toggle-filtros" data-capa="puntos-escalada">PUNTOS DE ESCALADA / POINTS D'ESCALADE</button>
+                <div class="contenedor-filtros" data-capa="puntos-escalada" style="display:none;">
+                    <label>Tipo de vía / Type de voie:</label>
+                    <select id="filtro-tipo-via-escalada">
+                        <option value="">Todos/Tous</option>
+                    </select>
+                    <label>Dificultad / Difficulté:</label>
+                    <select id="filtro-dificultad-escalada">
+                        <option value="">Todas / Toutes</option>
+                    </select>
+                    <label>Tiempo de acceso (min) / Temps d'accès (min):</label>
+                    <input type="number" id="filtro-tiempo-acceso-escalada" placeholder="Ej: 30">
+                    <label>Desnivel máximo (m) / Dénivelé maximal (m):</label>
+                    <input type="number" id="filtro-desnivel-escalada" placeholder="Ej: 100">
+                    <p>
+                        <button class="btn-limpiar-filtros" data-capa="puntos-escalada" type="button">Limpiar filtros / Nettoyer les filtres</button>
+                    </p>
+                </div>
             </div>
         `;
         L.DomEvent.disableClickPropagation(container);
@@ -2421,25 +2554,32 @@ function initAcordeonFiltros(){
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.btn-limpiar-filtros').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const capa = btn.dataset.capa;
-            const contenedor = btn.closest('.contenedor-filtros');
-            contenedor.querySelectorAll('select').forEach(sel => {
-                sel.value = "";
-            });
-            // Ejecuta el filtrado correspondiente
-            if (capa === "mercados") filtrarMarcadores();
-            else if (capa === "escuelas") filtrarCentros();
-            else if (capa === "productos") filtrarProductosAgro();
-            else if (capa === "productores") filtrarProductores();
-            else if (capa === "comercios") filtrarComercios();
-            else if (capa === "restaurantes") fitlrarRestaurantes();
-            else if (capa === "empresas-nieve") filtrarEmpresasNieve();
-            else if (capa === "productores-proximidad") filtrarProductoresProximidad();
-            else if (capa === "ski") filtrarSki();
+document.querySelectorAll('.btn-limpiar-filtros').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const capa = btn.dataset.capa;
+        const contenedor = btn.closest('.contenedor-filtros');
+
+        // Limpiar todos los selectores
+        contenedor.querySelectorAll('select').forEach(sel => {
+            sel.value = "";
         });
+
+        // Limpiar todos los campos de entrada (input)
+        contenedor.querySelectorAll('input').forEach(input => {
+            input.value = "";
+        });
+
+        // Ejecutar el filtrado correspondiente
+        if (capa === "mercados") filtrarMarcadores();
+        else if (capa === "escuelas") filtrarCentros();
+        else if (capa === "productos") filtrarProductosAgro();
+        else if (capa === "productores") filtrarProductores();
+        else if (capa === "comercios") filtrarComercios();
+        else if (capa === "restaurantes") fitlrarRestaurantes();
+        else if (capa === "empresas-nieve") filtrarEmpresasNieve();
+        else if (capa === "productores-proximidad") filtrarProductoresProximidad();
+        else if (capa === "ski") filtrarSki();
+        else if (capa === "puntos-escalada") filtrarPuntosEscalada();
     });
 });
 
@@ -2459,6 +2599,7 @@ function actualizarFiltrosAcordeon() {
         else if (capa === 'restaurantes') capaActiva = map.hasLayer(restaurantesCluster);
         else if (capa === 'empresas-nieve') capaActiva = map.hasLayer(empresasNieveClusters);
         else if (capa === 'ski') capaActiva = map.hasLayer(skiClusters);
+        else if (capa === 'puntos-escalada') capaActiva = map.hasLayer(puntosEscaladaClusters);
 
         const contenedor = btn.nextElementSibling;
 
@@ -2476,6 +2617,7 @@ function actualizarFiltrosAcordeon() {
             else if (capa === 'restaurantes' && document.getElementById('filtro-tipo-restaurante').options.length <= 1) initFiltersRestaurantes();
             else if (capa === 'empresas-nieve' && document.getElementById('filtro-tipo-actividad-nieve').options.length <= 1) initFiltersEmpresasNieve();
             else if (capa === 'ski' && document.getElementById('filtro-tipo-ski').options.length <= 1) initFiltersSki();
+            else if (capa === 'puntos-escalada' && document.getElementById('filtro-tipo-via-escalada').options.length <= 1) initFiltersPuntosEscalada();
         } else {
             btn.style.display = 'none';        // Ocultar botón
             contenedor.style.display = 'none';  // Ocultar contenedor
@@ -2486,11 +2628,11 @@ function actualizarFiltrosAcordeon() {
 
 
 // Modificar los eventos de checkboxes para llamar a actualizarFiltrosAcordeon()
-['mercados','escuelas','otros','productos', 'productores', 'comercios', 'restaurantes', 'empresas-nieve', 'ski'].forEach(tipo=>{
+['mercados','escuelas','otros','productos', 'productores', 'comercios', 'restaurantes', 'empresas-nieve', 'ski', 'puntos-escalada'].forEach(tipo=>{
     const checkbox = document.getElementById('cb-'+tipo);
     if(checkbox){
         checkbox.addEventListener('change', e=>{
-            const capaMap = {'mercados':mercadosCluster,'escuelas':centrosCluster,'otros':otrosCentrosCluster,'productos':productosAgroCluster, 'productores': productoresClusters, 'comercios': comerciosClusters, 'restaurantes': restaurantesCluster, 'empresas-nieve': empresasNieveClusters, 'ski': skiClusters};
+            const capaMap = {'mercados':mercadosCluster,'escuelas':centrosCluster,'otros':otrosCentrosCluster,'productos':productosAgroCluster, 'productores': productoresClusters, 'comercios': comerciosClusters, 'restaurantes': restaurantesCluster, 'empresas-nieve': empresasNieveClusters, 'ski': skiClusters, 'puntos-escalada': puntosEscaladaClusters};
             if(e.target.checked) map.addLayer(capaMap[tipo]); else map.removeLayer(capaMap[tipo]);
             actualizarLeyenda();
             actualizarFiltrosAcordeon();
