@@ -1155,7 +1155,7 @@ html, body {
             /* Popup Canyoning */
             .popup-canyoning {
                 background: rgba(230, 240, 255, 0.95); /* Azul claro translúcido */
-                border-radius: 12px;
+                border-radius: 16px;
                 padding: 16px 20px;
                 box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
                 font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -1189,8 +1189,32 @@ html, body {
                 display: block;
             }
 
+            /* Tarjetas de números */
+            .popup-canyoning .popup-number-card {
+                background: #e6f0ff; /* Azul claro */
+                border-radius: 8px;
+                padding: 10px 16px;
+                text-align: center;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                flex: 1;
+                max-width: 150px;
+                margin: 8px auto;
+            }
+
+            .popup-canyoning .popup-number-card .number-value {
+                font-size: 18px;
+                font-weight: bold;
+                color: #20586a; /* Azul oscuro */
+            }
+
+            .popup-canyoning .popup-number-card .number-label {
+                font-size: 12px;
+                color: #555;
+                margin-top: 4px;
+            }
+
             /* Contenedor de etiquetas */
-            .etiquetas-tipo-uso {
+            .popup-canyoning .etiquetas-tipo-uso {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 8px;
@@ -1199,7 +1223,7 @@ html, body {
             }
 
             /* Estilo de las etiquetas */
-            .etiqueta-tipo-uso {
+            .popup-canyoning .etiqueta-tipo-uso {
                 display: inline-block;
                 padding: 6px 12px;
                 border-radius: 16px;
@@ -1214,7 +1238,7 @@ html, body {
             }
 
             /* Efecto hover para las etiquetas */
-            .etiqueta-tipo-uso:hover {
+            .popup-canyoning .etiqueta-tipo-uso:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             }
@@ -1261,6 +1285,25 @@ html, body {
                 margin-top: 8px;
                 text-align: left;
             }
+            
+            /* Sección del popup */
+            .popup-canyoning .popup-section {
+                background: #f9f9f9; /* Fondo claro */
+                border: 1px solid #ddd; /* Borde gris claro */
+                border-radius: 8px;
+                padding: 10px;
+                margin-bottom: 12px;
+            }
+
+            /* Título de la sección */
+            .popup-canyoning .popup-section h4 {
+                margin: 0 0 8px;
+                font-size: 14px;
+                font-weight: bold;
+                color: #20586a; /* Azul oscuro */
+                text-align: left;
+            }
+            
             /* Tarjetas de números */
             .popup-number-card {
                 background: #e6f0ff; /* Azul claro */

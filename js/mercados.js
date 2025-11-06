@@ -205,7 +205,13 @@ function ordenarSegunLista(array, listaReferencia) {
             }, duracion);
         }
 
-
+// Cambiar el texto de las observaciones entre español y francés
+function toggleIdiomaObservaciones(textoEs, textoFr) {
+    const observacionesText = document.getElementById('observaciones-text');
+    if (observacionesText) {
+        observacionesText.textContent = observacionesText.textContent === textoEs ? textoFr : textoEs;
+    }
+}
 
 // ================= CLUSTERS =================
 // Función genérica para crear clusters con icono
@@ -1593,67 +1599,110 @@ function updatePopupViasFerratas(layer, props) {
 function updatePopupCanyoning(layer, props) {
     let html = `<div class="popup-canyoning"><h3>${makeClickable(props.nombre) || 'Sin nombre'}</h3>`;
 
-    // Generar etiquetas para `tipo_uso`
-    if (props.tipo_uso) {
-        const tiposUso = Array.isArray(props.tipo_uso)
-            ? props.tipo_uso
-            : props.tipo_uso.split(',').map(t => t.trim());
-
-        html += `<div class="etiquetas-tipo-uso">`;
-        tiposUso.forEach(tipo => {
-            html += `<span class="etiqueta-tipo-uso">${tipo}</span>`;
-        });
-        html += `</div>`;
-    }
-
-    // Continuar con el resto del contenido del popup
-    const titles = {
-        descripcion: "Descripción / Description",
-        web: "Web",
-        corriente: "Corriente / Courant"
-    };
-
-    for (let key in titles) {
-        if (!props.hasOwnProperty(key)) continue;
-        const value = props[key];
-        if (!value || value === "" || value === null) continue;
-        html += `<div class="popup-row"><b>${titles[key]}:</b><span>${makeClickable(value)}</span></div>`;
-    }
-
-
-    // Añadir tarjetas para `desn_neg` y `tiempo`
-    if (props.desn_neg || props.tiempo) {
-        html += `<div class="popup-row popup-tarjetas">`;
-
-        if (props.desn_neg) {
-            html += `
-                <div class="popup-number-card">
-                    <div class="number-value">${props.desn_neg || '—'} m</div>
-                    <div class="number-label">Descenso negativo / Descente négative</div>
-                </div>`;
-        }
-
-        if (props.tiempo) {
-            html += `
-                <div class="popup-number-card">
-                    <div class="number-value">${props.tiempo || '—'} min</div>
-                    <div class="number-label">Tiempo estimado / Estimated time</div>
-                </div>`;
-        }
-
-        html += `</div>`;
-    }
-
-    // Mostrar el campo `cuerda` como una tarjeta
-    if (props.cuerda !== null) {
-        const cuerdaLabel = props.cuerda === "Si" ? "Disponible" : props.cuerda === "No" ? "No disponible" : "Desconocido";
-        const cuerdaColor = props.cuerda === "Si" ? "#8dcc8fff" : props.cuerda === "No" ? "#bc7b77ff" : "#9e9e9e"; // Verde, rojo o gris
-
+        // Tarjetas para las dificultades
+    if (props.dificultad_vertical || props.dificultad_acuatica || props.dificultad_compromiso) {
         html += `
-            <div class="popup-row">
-                <div class="popup-number-card" style="background-color: ${cuerdaColor}; color: white;">
-                    <div class="number-value">${props.cuerda || '—'}</div>
-                    <div class="number-label">Cuerda</div>
+            <div class="popup-section">
+                <h4>Dificultades / Difficultés</h4>
+                <div class="popup-row">
+                    ${props.dificultad_vertical ? `
+                        <div class="popup-number-card">
+                            <div class="number-value">${props.dificultad_vertical}</div>
+                            <div class="number-label">Dificultad vertical / Difficulté verticale</div>
+                        </div>` : ''}
+                    ${props.dificultad_acuatica ? `
+                        <div class="popup-number-card">
+                            <div class="number-value">${props.dificultad_acuatica}</div>
+                            <div class="number-label">Dificultad acuática / Difficulté aquatique</div>
+                        </div>` : ''}
+                    ${props.dificultad_compromiso ? `
+                        <div class="popup-number-card">
+                            <div class="number-value">${props.dificultad_compromiso}</div>
+                            <div class="number-label">Dificultad compromiso / Difficulté d'engagement</div>
+                        </div>` : ''}
+                </div>
+            </div>`;
+    }
+
+
+     // Tarjetas para tiempos (incluyendo tiempo total)
+    if (props.tpo_acceso || props.tpo_desc || props.tpo_regres || props.tiempo) {
+        html += `
+            <div class="popup-section">
+                <h4>Tiempos / Temps</h4>
+                <div class="popup-row">
+                    ${props.tpo_acceso ? `
+                        <div class="popup-number-card">
+                            <div class="number-value">${props.tpo_acceso} min</div>
+                            <div class="number-label">Tiempo acceso / Temps d'accès</div>
+                        </div>` : ''}
+                    ${props.tpo_desc ? `
+                        <div class="popup-number-card">
+                            <div class="number-value">${props.tpo_desc} min</div>
+                            <div class="number-label">Tiempo descenso / Temps de descente</div>
+                        </div>` : ''}
+                    ${props.tpo_regres ? `
+                        <div class="popup-number-card">
+                            <div class="number-value">${props.tpo_regres} min</div>
+                            <div class="number-label">Tiempo regreso / Temps de retour</div>
+                        </div>` : ''}
+                    ${props.tiempo ? `
+                        <div class="popup-number-card">
+                            <div class="number-value">${props.tiempo} min</div>
+                            <div class="number-label">Tiempo total / Temps total</div>
+                        </div>` : ''}
+                </div>
+            </div>`;
+    }
+
+    // Tarjetas para rápeles y descenso negativo
+    if (props.numero_rapple || props.maximo_rapple || props.desn_neg) {
+        html += `
+            <div class="popup-section">
+                <h4>Rápeles y descenso / Rappels et dénivelé</h4>
+                <div class="popup-row">
+                    ${props.numero_rapple ? `
+                        <div class="popup-number-card">
+                            <div class="number-value">${props.numero_rapple}</div>
+                            <div class="number-label">Número de rápeles / Nombre de rappels</div>
+                        </div>` : ''}
+                    ${props.maximo_rapple ? `
+                        <div class="popup-number-card">
+                            <div class="number-value">${props.maximo_rapple} m</div>
+                            <div class="number-label">Máximo rápel / Rappel maximal</div>
+                        </div>` : ''}
+                    ${props.desn_neg ? `
+                        <div class="popup-number-card">
+                            <div class="number-value">${props.desn_neg} m</div>
+                            <div class="number-label">Descenso negativo / Dénivelé négatif</div>
+                        </div>` : ''}
+                </div>
+            </div>`;
+    }
+
+    // Mostrar época óptima
+    if (props.epoca_optima) {
+        html += `
+            <div class="popup-section">
+                <h4>Época óptima / Période optimale</h4>
+                <div class="popup-row">
+                    <span>${makeClickable(props.epoca_optima)}</span>
+                </div>
+            </div>`;
+    }
+
+    // Mostrar observaciones con cambio de idioma
+    if (props.observaciones_es || props.observaciones_fr) {
+        const observacionesEs = props.observaciones_es || 'Sin observaciones';
+        const observacionesFr = props.observaciones_fr || 'Pas d\'observations';
+        html += `
+            <div class="popup-section">
+                <h4>Observaciones / Observations</h4>
+                <div class="popup-row">
+                    <span id="observaciones-text">${makeClickable(observacionesEs)}</span>
+                    <button onclick="toggleIdiomaObservaciones('${makeClickable(observacionesEs)}', '${makeClickable(observacionesFr)}')" style="margin-left: 10px; padding: 5px 10px; border: none; background-color: #20586a; color: white; border-radius: 4px; cursor: pointer;">
+                        Cambiar idioma / Changer de langue
+                    </button>
                 </div>
             </div>`;
     }
