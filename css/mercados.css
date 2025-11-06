@@ -1303,7 +1303,7 @@ html, body {
                 color: #20586a; /* Azul oscuro */
                 text-align: left;
             }
-            
+
             /* Tarjetas de números */
             .popup-number-card {
                 background: #e6f0ff; /* Azul claro */
@@ -1317,13 +1317,13 @@ html, body {
             }
 
             .popup-number-card .number-value {
-                font-size: 18px;
+                font-size: 9px;
                 font-weight: bold;
                 color: #20586a; /* Azul oscuro */
             }
 
             .popup-number-card .number-label {
-                font-size: 12px;
+                font-size: 9px;
                 color: #555;
                 margin-top: 4px;
             }
