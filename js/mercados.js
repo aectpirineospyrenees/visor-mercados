@@ -81,7 +81,6 @@ const puntosEscaladaIcon = crearIcono("icons/escalada.svg");
 const empresasEscaladasIcon = crearIcono("icons/empresas_escalada.svg");
 const viaFerrataIcon = crearIcono("icons/via_ferrata.svg");
 const viaFerrataEmpresasIcon = crearIcono("icons/empresas_via_ferrata.svg");
-const DEFAULT_ICON_AGRO = iconsProductosAgro["Legumbres"] || marketIconMercados;
 const canyoningIcon = crearIcono("icons/canyoning.svg");
 const empresasCanyoningIcon = crearIcono("icons/empresas_canyoning.svg");
 
@@ -205,19 +204,6 @@ function ordenarSegunLista(array, listaReferencia) {
             }, duracion);
         }
 
-// Cambiar el texto de las observaciones entre español y francés
-function toggleIdiomaObservaciones(textoEs, textoFr) {
-    const observacionesText = document.getElementById('observaciones-text');
-    if (observacionesText) {
-        // Verifica el idioma actual y alterna entre español y francés
-        const textoActual = observacionesText.textContent.trim();
-        if (textoActual === textoEs.trim()) {
-            observacionesText.textContent = textoFr;
-        } else {
-            observacionesText.textContent = textoEs;
-        }
-    }
-}
 // ================= CLUSTERS =================
 // Función genérica para crear clusters con icono
 function crearCluster(rutaIcono) {
@@ -294,10 +280,10 @@ const productoresProximidadClusters = crearCluster("icons/productor.svg");
 const nucleosClaveClusters          = crearCluster("icons/marker.svg");
 const puntosEscaladaClusters        = crearCluster("icons/escalada.svg");
 const empresasEscaladaClusters      = crearCluster("icons/empresas_escalada.svg");
-const viaFerrataClusters           = crearCluster("icons/via_ferrata.svg");
+const viaFerrataClusters            = crearCluster("icons/via_ferrata.svg");
 const empresasViaFerrataClusters    = crearCluster("icons/empresas_via_ferrata.svg");
-const canyoningClusters          = crearCluster("icons/canyoning.svg");
-const empresasCanyoningClusters    = crearCluster("icons/empresas_canyoning.svg");
+const canyoningClusters             = crearCluster("icons/canyoning.svg");
+const empresasCanyoningClusters     = crearCluster("icons/empresas_canyoning.svg");
 // ================= CARGA GEOJSON =================
 async function cargarLimites(){
     try{
@@ -2116,69 +2102,73 @@ function initFiltersCanyoning() {
     const filtroVertical = document.getElementById('filtro-dificultad-vertical-canyoning');
     const filtroAcuatica = document.getElementById('filtro-dificultad-acuatica-canyoning');
     const filtroCompromiso = document.getElementById('filtro-dificultad-compromiso-canyoning');
+    const filtroNivelGeneral = document.getElementById('filtro-nivel-general-canyoning');
 
-    // Verificar si los elementos existen
-    if (!filtroVertical || !filtroAcuatica || !filtroCompromiso) {
+    if (!filtroVertical || !filtroAcuatica || !filtroCompromiso || !filtroNivelGeneral) {
         console.error("Los elementos de filtro para Canyoning no están disponibles en el DOM.");
         return;
     }
 
-    // Poblar select de dificultad vertical (V1-V7)
-    const dificultadesVertical = ['V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7'];
-    dificultadesVertical.forEach(d => {
-        const option = document.createElement('option');
-        option.value = d;
-        option.textContent = d;
-        filtroVertical.appendChild(option);
-    });
+    // Guardamos listas completas para repoblar fácilmente
+    const dificultadesVertical = ['V1','V2','V3','V4','V5','V6','V7'];
+    const dificultadesAcuatica = ['A1','A2','A3','A4','A5','A6','A7'];
+    const dificultadesCompromiso = ['I','II','III','IV','V','VI'];
 
-    // Poblar select de dificultad acuática (A1-A7)
-    const dificultadesAcuatica = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'];
-    dificultadesAcuatica.forEach(d => {
-        const option = document.createElement('option');
-        option.value = d;
-        option.textContent = d;
-        filtroAcuatica.appendChild(option);
-    });
+    // Función auxiliar para poblar select
+    function poblarSelect(select, opciones) {
+        select.innerHTML = '<option value="">Todas</option>';
+        opciones.forEach(op => {
+            const option = document.createElement('option');
+            option.value = op;
+            option.textContent = op;
+            select.appendChild(option);
+        });
+    }
 
-    // Poblar select de dificultad compromiso (I-VI)
-    const dificultadesCompromiso = ['I', 'II', 'III', 'IV', 'V', 'VI'];
-    dificultadesCompromiso.forEach(d => {
-        const option = document.createElement('option');
-        option.value = d;
-        option.textContent = d;
-        filtroCompromiso.appendChild(option);
-    });
+    // Inicial
+    poblarSelect(filtroVertical, dificultadesVertical);
+    poblarSelect(filtroAcuatica, dificultadesAcuatica);
+    poblarSelect(filtroCompromiso, dificultadesCompromiso);
 
-    // Asociar eventos a los filtros
-    filtroVertical.addEventListener('change', filtrarPuntosCanyoning);
-    filtroAcuatica.addEventListener('change', filtrarPuntosCanyoning);
-    filtroCompromiso.addEventListener('change', filtrarPuntosCanyoning);
-    document.getElementById('filtro-tiempo-acceso-canyoning').addEventListener('input', filtrarPuntosCanyoning);
-    document.getElementById('filtro-tiempo-descenso-canyoning').addEventListener('input', filtrarPuntosCanyoning);
-    document.getElementById('filtro-tiempo-retorno-canyoning').addEventListener('input', filtrarPuntosCanyoning);
-    document.getElementById('filtro-tiempo-total-canyoning').addEventListener('input', filtrarPuntosCanyoning);
-}
+    // --- NUEVO: cuando cambia el nivel general ---
+    filtroNivelGeneral.addEventListener('change', () => {
+        const nivel = filtroNivelGeneral.value;
+        let vRange = dificultadesVertical;
+        let aRange = dificultadesAcuatica;
+        let cRange = dificultadesCompromiso;
 
-function filtrarMarcadores(){
-    const tipo = document.getElementById('filtro-tipo-mercado').value;
-    const frecuencia = document.getElementById('filtro-frecuencia').value;
-    const semana = document.getElementById('filtro-semana').value;
-    const dia = document.getElementById('filtro-dia').value;
-    const apertura = document.getElementById('filtro-apertura').value;
-
-    mercadosCluster.clearLayers(); // Limpiar cluster
-
-    markers.forEach(({marker, props})=>{
-        if((!tipo || props.nombre_tipo === tipo) &&
-           (!frecuencia || props.nombre_frecuencia === frecuencia) &&
-           (!semana || props.nombre_semana === semana) &&
-           (!dia || props.nombre_dia === dia) &&
-           (!apertura || props.nombre_apertura === apertura)) {
-               mercadosCluster.addLayer(marker);
+        if (nivel === 'facil') {
+            vRange = dificultadesVertical.slice(0, 2);   // V1-V2
+            aRange = dificultadesAcuatica.slice(0, 2);   // A1-A2
+            cRange = dificultadesCompromiso.slice(0, 2); // I-II
+        } else if (nivel === 'intermedio') {
+            vRange = dificultadesVertical.slice(2, 5);   // V3-V5
+            aRange = dificultadesAcuatica.slice(2, 5);   // A3-A5
+            cRange = dificultadesCompromiso.slice(2, 4); // III-IV
+        } else if (nivel === 'dificil') {
+            vRange = dificultadesVertical.slice(5, 7);   // V6-V7
+            aRange = dificultadesAcuatica.slice(5, 7);   // A6-A7
+            cRange = dificultadesCompromiso.slice(4, 6); // V-VI
         }
+
+        poblarSelect(filtroVertical, vRange);
+        poblarSelect(filtroAcuatica, aRange);
+        poblarSelect(filtroCompromiso, cRange);
+
+        // Después de cambiar opciones, aplicar filtro
+        filtrarPuntosCanyoning();
     });
+
+    // Eventos de los otros filtros
+    [filtroVertical, filtroAcuatica, filtroCompromiso].forEach(f =>
+        f.addEventListener('change', filtrarPuntosCanyoning)
+    );
+
+    document.getElementById('filtro-tiempo-acceso-canyoning').addEventListener('input', filtrarPuntosCanyoning);
+    document.getElementById('filtro-tiempo-total-canyoning').addEventListener('input', filtrarPuntosCanyoning);
+    document.getElementById('filtro-numero-rapeles-canyoning').addEventListener('input', filtrarPuntosCanyoning);
 }
+
 
 function filtrarProductosAgro() {
     const tipoProducto = normalizaTexto(document.getElementById('filtro-tipo-producto').value);
@@ -2452,50 +2442,80 @@ function filtrarPuntosEscalada() {
 
 function filtrarPuntosCanyoning() {
     const tiempoAccesoMax = parseFloat(document.getElementById('filtro-tiempo-acceso-canyoning').value) || null;
-    const tiempoDescensoMax = parseFloat(document.getElementById('filtro-tiempo-descenso-canyoning').value) || null;
-    const tiempoRetornoMax = parseFloat(document.getElementById('filtro-tiempo-retorno-canyoning').value) || null;
     const tiempoTotalMax = parseFloat(document.getElementById('filtro-tiempo-total-canyoning').value) || null;
     const dificultadVertical = document.getElementById('filtro-dificultad-vertical-canyoning').value || null;
     const dificultadAcuatica = document.getElementById('filtro-dificultad-acuatica-canyoning').value || null;
     const dificultadCompromiso = document.getElementById('filtro-dificultad-compromiso-canyoning').value || null;
+    const numeroRapelesMax = parseInt(document.getElementById('filtro-numero-rapeles-canyoning').value) || null;
+    const nivelGeneral = document.getElementById('filtro-nivel-general-canyoning').value || null;
 
     canyoningClusters.clearLayers();
 
     canyoningMarkers.forEach(({ marker, props }) => {
-        const tiempoAcceso = props.tpo_acceso !== null ? parseFloat(props.tpo_acceso) : null;
-        const tiempoDescenso = props.tpo_desc !== null ? parseFloat(props.tpo_desc) : null;
-        const tiempoRetorno = props.tpo_regres !== null ? parseFloat(props.tpo_regres) : null;
-        const tiempoTotal = props.tiempo !== null ? parseFloat(props.tiempo) : null;
+        const tiempoAcceso = props.tpo_acceso ? parseFloat(props.tpo_acceso) : null;
+        const tiempoTotal = props.tiempo ? parseFloat(props.tiempo) : null;
+        const numeroRapeles = props.maximo_rapple ? parseInt(props.maximo_rapple) : null;
 
-        const dificultadVerticalProp = props.dificultad_vertical || null;
-        const dificultadAcuaticaProp = props.dificultad_acuatica || null;
-        const dificultadCompromisoProp = props.dificultad_compromiso || null;
+        const v = props.dificultad_vertical;
+        const a = props.dificultad_acuatica;
+        const c = props.dificultad_compromiso;
 
-        // Verificar coincidencias solo si el filtro está definido
-        const tiempoAccesoMatch = tiempoAccesoMax === null || (tiempoAcceso !== null && tiempoAcceso <= tiempoAccesoMax);
-        const tiempoDescensoMatch = tiempoDescensoMax === null || (tiempoDescenso !== null && tiempoDescenso <= tiempoDescensoMax);
-        const tiempoRetornoMatch = tiempoRetornoMax === null || (tiempoRetorno !== null && tiempoRetorno <= tiempoRetornoMax);
-        const tiempoTotalMatch = tiempoTotalMax === null || (tiempoTotal !== null && tiempoTotal <= tiempoTotalMax);
+        // --- Transformar a valores numéricos ---
+        const mapV = { V1:1, V2:2, V3:3, V4:4, V5:5, V6:6, V7:7 };
+        const mapA = { A1:1, A2:2, A3:3, A4:4, A5:5, A6:6, A7:7 };
+        const mapC = { I:1, II:2, III:3, IV:4, V:5, VI:6 };
 
-        const dificultadVerticalMatch = !dificultadVertical || dificultadVertical === dificultadVerticalProp;
-        const dificultadAcuaticaMatch = !dificultadAcuatica || dificultadAcuatica === dificultadAcuaticaProp;
-        const dificultadCompromisoMatch = !dificultadCompromiso || dificultadCompromiso === dificultadCompromisoProp;
+        const vVal = mapV[v] || null;
+        const aVal = mapA[a] || null;
+        const cVal = mapC[c] || null;
 
-        // Solo añadir el marcador si todos los filtros coinciden
+        // --- Filtrado base ---
+        const tiempoAccesoMatch = tiempoAccesoMax === null || (tiempoAcceso && tiempoAcceso <= tiempoAccesoMax);
+        const tiempoTotalMatch = tiempoTotalMax === null || (tiempoTotal && tiempoTotal <= tiempoTotalMax);
+        const numeroRapelesMatch = numeroRapelesMax === null || (numeroRapeles && numeroRapeles <= numeroRapelesMax);
+        const dificultadVerticalMatch = !dificultadVertical || dificultadVertical === v;
+        const dificultadAcuaticaMatch = !dificultadAcuatica || dificultadAcuatica === a;
+        const dificultadCompromisoMatch = !dificultadCompromiso || dificultadCompromiso === c;
+
+        // --- Nivel general (Fácil / Intermedio / Difícil) ---
+        let nivelMatch = true;
+        if (nivelGeneral) {
+            const tercioV = Math.ceil(7 / 3); // ≈3
+            const tercioA = Math.ceil(7 / 3);
+            const tercioC = Math.ceil(6 / 3); // =2
+
+            if (nivelGeneral === 'facil') {
+                nivelMatch =
+                    (vVal && vVal <= tercioV) &&
+                    (aVal && aVal <= tercioA) &&
+                    (cVal && cVal <= tercioC);
+            } else if (nivelGeneral === 'intermedio') {
+                nivelMatch =
+                    (vVal && vVal > tercioV && vVal <= tercioV * 2) &&
+                    (aVal && aVal > tercioA && aVal <= tercioA * 2) &&
+                    (cVal && cVal > tercioC && cVal <= tercioC * 2);
+            } else if (nivelGeneral === 'dificil') {
+                nivelMatch =
+                    (vVal && vVal > tercioV * 2) ||
+                    (aVal && aVal > tercioA * 2) ||
+                    (cVal && cVal > tercioC * 2);
+            }
+        }
+
+        // --- Resultado final ---
         if (
             tiempoAccesoMatch &&
-            tiempoDescensoMatch &&
-            tiempoRetornoMatch &&
             tiempoTotalMatch &&
+            numeroRapelesMatch &&
             dificultadVerticalMatch &&
             dificultadAcuaticaMatch &&
-            dificultadCompromisoMatch
+            dificultadCompromisoMatch &&
+            nivelMatch
         ) {
             canyoningClusters.addLayer(marker);
         }
     });
 
-    // Si no hay marcadores visibles, mostrar un mensaje o restaurar todos
     if (canyoningClusters.getLayers().length === 0) {
         console.warn("No se encontraron resultados para los filtros aplicados.");
     }
@@ -2676,6 +2696,13 @@ const FiltrosControl = L.Control.extend({
                 <!-- Filtros para Canyoning -->
                 <button class="toggle-filtros" data-capa="puntos-canyoning">CANYONING / CANYONING</button>
                 <div class="contenedor-filtros" data-capa="puntos-canyoning" style="display:none;">
+                    <label>Nivel general / Niveau général:</label>
+                    <select id="filtro-nivel-general-canyoning">
+                        <option value="">Todos / Tous</option>
+                        <option value="facil">Fácil / Facile</option>
+                        <option value="intermedio">Intermedio / Intermédiaire</option>
+                        <option value="dificil">Difícil / Difficile</option>
+                    </select>
                     <label>Dificultad vertical / Difficulté verticale:</label>
                     <select id="filtro-dificultad-vertical-canyoning">
                         <option value="">Todas / Toutes</option>
@@ -2688,19 +2715,17 @@ const FiltrosControl = L.Control.extend({
                     <select id="filtro-dificultad-compromiso-canyoning">
                         <option value="">Todas / Toutes</option>
                     </select>
-                    <p>
+                    <p style="text-align: center">
                     <label>Tiempo total (min) / Temps total (min):</label>
                     <input type="number" id="filtro-tiempo-total-canyoning" placeholder="Ej: 120">
-                    </p>
                     <label>Tiempo de acceso (min) / Temps d'accès (min):</label>
                     <input type="number" id="filtro-tiempo-acceso-canyoning" placeholder="Ej: 30">
-                    <label>Tiempo de descenso (min) / Temps de descente (min):</label>
-                    <input type="number" id="filtro-tiempo-descenso-canyoning" placeholder="Ej: 60">
-                    <label>Tiempo de retorno (min) / Temps de retour (min):</label>
-                    <input type="number" id="filtro-tiempo-retorno-canyoning" placeholder="Ej: 30">
-                    <p>
-                    <button class="btn-limpiar-filtros" data-capa="puntos-canyoning" type="button">Limpiar filtros / Nettoyer les filtres</button>
                     </p>
+                    <p style="text-align: center">
+                    <label>Maxima altitud de rápeles / Altitude maximale des rappels (m):</label>
+                    <input type="number" id="filtro-numero-rapeles-canyoning" placeholder="Ej: 50">
+                    </p>
+                    <button class="btn-limpiar-filtros" data-capa="puntos-canyoning" type="button">Limpiar filtros / Nettoyer les filtres</button>
                 </div>
             </div>
         `;
