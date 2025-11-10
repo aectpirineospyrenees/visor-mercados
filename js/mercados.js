@@ -209,10 +209,15 @@ function ordenarSegunLista(array, listaReferencia) {
 function toggleIdiomaObservaciones(textoEs, textoFr) {
     const observacionesText = document.getElementById('observaciones-text');
     if (observacionesText) {
-        observacionesText.textContent = observacionesText.textContent === textoEs ? textoFr : textoEs;
+        // Verifica el idioma actual y alterna entre español y francés
+        const textoActual = observacionesText.textContent.trim();
+        if (textoActual === textoEs.trim()) {
+            observacionesText.textContent = textoFr;
+        } else {
+            observacionesText.textContent = textoEs;
+        }
     }
 }
-
 // ================= CLUSTERS =================
 // Función genérica para crear clusters con icono
 function crearCluster(rutaIcono) {
@@ -1691,6 +1696,7 @@ function updatePopupCanyoning(layer, props) {
     }
 
     // Mostrar observaciones con cambio de idioma
+    // Mostrar observaciones en español y francés
     if (props.observaciones_es || props.observaciones_fr) {
         const observacionesEs = props.observaciones_es || 'Sin observaciones';
         const observacionesFr = props.observaciones_fr || 'Pas d\'observations';
@@ -1698,10 +1704,8 @@ function updatePopupCanyoning(layer, props) {
             <div class="popup-section">
                 <h4>Observaciones / Observations</h4>
                 <div class="popup-row">
-                    <span id="observaciones-text">${makeClickable(observacionesEs)}</span>
-                    <button onclick="toggleIdiomaObservaciones('${makeClickable(observacionesEs)}', '${makeClickable(observacionesFr)}')" style="margin-left: 10px; padding: 5px 10px; border: none; background-color: #20586a; color: white; border-radius: 4px; cursor: pointer;">
-                        Cambiar idioma / Changer de langue
-                    </button>
+                    <p><strong>Español:</strong> ${makeClickable(observacionesEs)}</p>
+                    <p><strong>Français:</strong> ${makeClickable(observacionesFr)}</p>
                 </div>
             </div>`;
     }
@@ -2153,6 +2157,7 @@ function initFiltersCanyoning() {
     document.getElementById('filtro-tiempo-acceso-canyoning').addEventListener('input', filtrarPuntosCanyoning);
     document.getElementById('filtro-tiempo-descenso-canyoning').addEventListener('input', filtrarPuntosCanyoning);
     document.getElementById('filtro-tiempo-retorno-canyoning').addEventListener('input', filtrarPuntosCanyoning);
+    document.getElementById('filtro-tiempo-total-canyoning').addEventListener('input', filtrarPuntosCanyoning);
 }
 
 function filtrarMarcadores(){
@@ -2686,6 +2691,7 @@ const FiltrosControl = L.Control.extend({
                     <p>
                     <label>Tiempo total (min) / Temps total (min):</label>
                     <input type="number" id="filtro-tiempo-total-canyoning" placeholder="Ej: 120">
+                    </p>
                     <label>Tiempo de acceso (min) / Temps d'accès (min):</label>
                     <input type="number" id="filtro-tiempo-acceso-canyoning" placeholder="Ej: 30">
                     <label>Tiempo de descenso (min) / Temps de descente (min):</label>
@@ -2693,7 +2699,7 @@ const FiltrosControl = L.Control.extend({
                     <label>Tiempo de retorno (min) / Temps de retour (min):</label>
                     <input type="number" id="filtro-tiempo-retorno-canyoning" placeholder="Ej: 30">
                     <p>
-                        <button class="btn-limpiar-filtros" data-capa="puntos-canyoning" type="button">Limpiar filtros / Nettoyer les filtres</button>
+                    <button class="btn-limpiar-filtros" data-capa="puntos-canyoning" type="button">Limpiar filtros / Nettoyer les filtres</button>
                     </p>
                 </div>
             </div>

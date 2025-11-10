@@ -524,14 +524,14 @@ html, body {
             }
 
             .popup-number-card .number-value {
-            font-size: 1.3em;
+            font-size: 2em;
             font-weight: bold;
             color: #d17a00;
             line-height: 1.2;
             }
 
             .popup-number-card .number-label {
-            font-size: 0.8em;
+            font-size: 1.2em;
             color: #666;
             text-align: center;
             line-height: 1.1;
