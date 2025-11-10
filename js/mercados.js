@@ -2440,6 +2440,78 @@ function filtrarPuntosEscalada() {
     });
 }
 
+function actualizarOpcionesDisponibles() {
+    const vSel = document.getElementById('filtro-dificultad-vertical-canyoning').value || null;
+    const aSel = document.getElementById('filtro-dificultad-acuatica-canyoning').value || null;
+    const cSel = document.getElementById('filtro-dificultad-compromiso-canyoning').value || null;
+    const nivelGeneral = document.getElementById('filtro-nivel-general-canyoning').value || null;
+
+    const verticalDisponibles = new Set();
+    const acuaticasDisponibles = new Set();
+    const compromisosDisponibles = new Set();
+
+    canyoningMarkers.forEach(({ props }) => {
+        const v = props.dificultad_vertical;
+        const a = props.dificultad_acuatica;
+        const c = props.dificultad_compromiso;
+
+        // Transformar a valores numéricos para nivel general
+        const mapV = { V1:1,V2:2,V3:3,V4:4,V5:5,V6:6,V7:7 };
+        const mapA = { A1:1,A2:2,A3:3,A4:4,A5:5,A6:6,A7:7 };
+        const mapC = { I:1,II:2,III:3,IV:4,V:5,VI:6 };
+
+        const vVal = mapV[v] || null;
+        const aVal = mapA[a] || null;
+        const cVal = mapC[c] || null;
+
+        const tercioV = Math.ceil(7/3);
+        const tercioA = Math.ceil(7/3);
+        const tercioC = Math.ceil(6/3);
+
+        // --- Comprobar coincidencia con filtros ---
+        let match = true;
+        if (vSel && v !== vSel) match = false;
+        if (aSel && a !== aSel) match = false;
+        if (cSel && c !== cSel) match = false;
+
+        if (nivelGeneral) {
+            if (nivelGeneral === 'facil' && (!(vVal <= tercioV && aVal <= tercioA && cVal <= tercioC))) match = false;
+            if (nivelGeneral === 'intermedio' && (!((vVal > tercioV && vVal <= tercioV*2) &&
+                                                   (aVal > tercioA && aVal <= tercioA*2) &&
+                                                   (cVal > tercioC && cVal <= tercioC*2)))) match = false;
+            if (nivelGeneral === 'dificil' && (!(vVal > tercioV*2 || aVal > tercioA*2 || cVal > tercioC*2))) match = false;
+        }
+
+        // --- Agregar valores disponibles si coinciden ---
+        if (match) {
+            if (v) verticalDisponibles.add(v);
+            if (a) acuaticasDisponibles.add(a);
+            if (c) compromisosDisponibles.add(c);
+        }
+    });
+
+    function poblarSelectConDisponibles(select, disponibles) {
+        const currentValue = select.value;
+        select.innerHTML = '<option value="">Todas</option>';
+        Array.from(disponibles).sort().forEach(op => {
+            const option = document.createElement('option');
+            option.value = op;
+            option.textContent = op;
+            select.appendChild(option);
+        });
+        if (disponibles.has(currentValue)) {
+            select.value = currentValue;
+        } else {
+            select.value = "";
+        }
+    }
+
+    poblarSelectConDisponibles(document.getElementById('filtro-dificultad-vertical-canyoning'), verticalDisponibles);
+    poblarSelectConDisponibles(document.getElementById('filtro-dificultad-acuatica-canyoning'), acuaticasDisponibles);
+    poblarSelectConDisponibles(document.getElementById('filtro-dificultad-compromiso-canyoning'), compromisosDisponibles);
+}
+
+
 function filtrarPuntosCanyoning() {
     const tiempoAccesoMax = parseFloat(document.getElementById('filtro-tiempo-acceso-canyoning').value) || null;
     const tiempoTotalMax = parseFloat(document.getElementById('filtro-tiempo-total-canyoning').value) || null;
@@ -2484,6 +2556,7 @@ function filtrarPuntosCanyoning() {
             const tercioA = Math.ceil(7 / 3);
             const tercioC = Math.ceil(6 / 3); // =2
 
+
             if (nivelGeneral === 'facil') {
                 nivelMatch =
                     (vVal && vVal <= tercioV) &&
@@ -2519,6 +2592,8 @@ function filtrarPuntosCanyoning() {
     if (canyoningClusters.getLayers().length === 0) {
         console.warn("No se encontraron resultados para los filtros aplicados.");
     }
+    // Actualizar las opciones disponibles en los selectores
+    actualizarOpcionesDisponibles();
 }
 // ================= FILTROS =================
 // ================= FILTROS EN EL MAPA =================
