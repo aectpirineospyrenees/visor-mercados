@@ -1808,14 +1808,14 @@ function updatePopupVTT(layer, props) {
             <div class="popup-number-card">
                 <div class="number-value">
                     <i class="fas fa-arrow-up" style="color:green; margin-right:5px;"></i>
-                    ${props.desnivel_positivo || '—'} m
+                    ${props.desnivel_positivo ? props.desnivel_positivo.toFixed(2) : '—'} m
                 </div>
                 <div class="number-label">Desnivel positivo / Dénivelé positif</div>
             </div>
             <div class="popup-number-card">
                 <div class="number-value">
                     <i class="fas fa-arrow-down" style="color:red; margin-right:5px;"></i>
-                    ${props.desnivel_negativo || '—'} m
+                    ${props.desnivel_negativo ? props.desnivel_negativo.toFixed(2) : '—'} m
                 </div>
                 <div class="number-label">Desnivel negativo / Dénivelé négatif</div>
             </div>
@@ -1825,11 +1825,11 @@ function updatePopupVTT(layer, props) {
     html += `
         <div class="popup-row">
             <div class="popup-number-card">
-                <div class="number-value">${props.longitud || '—'} km</div>
+                <div class="number-value">${props.longitud ? props.longitud.toFixed(2) : '—'} km</div>
                 <div class="number-label">Longitud / Longueur</div>
             </div>
             <div class="popup-number-card">
-                <div class="number-value">${props.tiempo || '—'} min</div>
+                <div class="number-value">${props.tiempo ? props.tiempo.toFixed(2) : '—'} min</div>
                 <div class="number-label">Tiempo / Temps</div>
             </div>
         </div>`;
@@ -1868,7 +1868,6 @@ function updatePopupVTT(layer, props) {
     // Usar la función genérica para bindPopup
     bindPopupGenerico(layer, html, 'popup-vtt', 400, 600, 500);
 }
-
 // ================= FILTROS DINÁMICOS =================
 
 // Mercados
