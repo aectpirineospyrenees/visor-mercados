@@ -112,6 +112,7 @@ function getIconoProductoAgro(tipo){
 let buffersInfluenciaLayer;
 let limitesLayer;
 let carreterasLayer;
+let vttLayer;
 let markers = [];
 let markersCentros = [];
 let productosMarkers = [];
@@ -204,6 +205,7 @@ function ordenarSegunLista(array, listaReferencia) {
             }, duracion);
         }
 
+        
 // ================= CLUSTERS =================
 // Función genérica para crear clusters con icono
 function crearCluster(rutaIcono) {
@@ -398,6 +400,54 @@ async function cargarBuffersInfluencia() {
         console.error("Error cargando los buffers de influencia:", e);
     }
 }
+
+// Definir estiloVTT globalmente
+const estiloVTT = (feature) => {
+    const dificultad = feature.properties.grado_dificultad || '';
+    let color;
+
+    switch (dificultad.toLowerCase()) {
+        case 'fácil / facile':
+            color = 'green'; // Verde
+            break;
+        case 'intermedio / intermédiaire':
+            color = 'blue'; // Azul
+            break;
+        case 'dificil / difficile':
+            color = 'red'; // Roja
+            break;
+        case 'muy dificil / très difficile':
+            color = 'black'; // Negra
+            break;
+        default:
+            color = '#cccccc'; // Gris para valores desconocidos
+    }
+
+    return {
+        color: color,
+        weight: 3,
+        opacity: 0.8,
+        lineCap: 'round',
+        lineJoin: 'round'
+    };
+};
+
+async function cargarCapaVTT() {
+    try {
+        const data = await (await fetch('data/turismo_activo/btt.geojson')).json();
+
+        // Crear la capa GeoJSON y asignarla a la variable global
+        vttLayer = L.geoJSON(data, {
+            style: estiloVTT, // Usa la función global estiloVTT
+            onEachFeature: (feature, layer) => updatePopupVTT(layer, feature.properties)
+        });
+        console.log('Capa VTT cargada correctamente.');
+        initFiltersVTT();
+    } catch (error) {
+        console.error('Error al cargar la capa VTT:', error);
+    }
+}
+
 // ================= GRUPO DE CAPAS DE DISTRIBUCIÓN Y LOGÍSTICA =================
 async function inicializarCapasDistribucionLogistica() {
     await cargarCarreteras(); // Asegurarse de que la capa de carreteras esté cargada
@@ -1748,6 +1798,77 @@ function updatePopupEmpresasCanyoning(layer, props) {
     // Usar la función genérica para bindPopup
     bindPopupGenerico(layer, html, 'popup-empresas-canyoning', 400, 700, 500);
 }
+
+function updatePopupVTT(layer, props) {
+    let html = `<div class="popup-vtt"><h3>${props.nombre || 'Sin nombre'}</h3>`;
+
+    // Tarjetas para desnivel positivo y negativo
+    html += `
+        <div class="popup-row">
+            <div class="popup-number-card">
+                <div class="number-value">
+                    <i class="fas fa-arrow-up" style="color:green; margin-right:5px;"></i>
+                    ${props.desnivel_positivo || '—'} m
+                </div>
+                <div class="number-label">Desnivel positivo / Dénivelé positif</div>
+            </div>
+            <div class="popup-number-card">
+                <div class="number-value">
+                    <i class="fas fa-arrow-down" style="color:red; margin-right:5px;"></i>
+                    ${props.desnivel_negativo || '—'} m
+                </div>
+                <div class="number-label">Desnivel negativo / Dénivelé négatif</div>
+            </div>
+        </div>`;
+
+    // Tarjetas para longitud y tiempo
+    html += `
+        <div class="popup-row">
+            <div class="popup-number-card">
+                <div class="number-value">${props.longitud || '—'} km</div>
+                <div class="number-label">Longitud / Longueur</div>
+            </div>
+            <div class="popup-number-card">
+                <div class="number-value">${props.tiempo || '—'} min</div>
+                <div class="number-label">Tiempo / Temps</div>
+            </div>
+        </div>`;
+
+    // Campos adicionales (solo si existen)
+    const fields = {
+        dificultad: "Dificultad / Difficulté",
+        tipo_via: "Tipo de vía / Type de voie",
+        itinerario: "Itinerario / Itinéraire",
+        enlace_web: "Enlace web / Lien web",
+        enlace_web_2: "Enlace web 2 / Lien web 2"
+    };
+
+    for (const [key, label] of Object.entries(fields)) {
+        if (props[key]) {
+            const value = key.startsWith("enlace") ? `<a href="${props[key]}" target="_blank" rel="noopener noreferrer">${label}</a>` : props[key];
+            html += `
+                <div class="popup-row">
+                    <b>${label}:</b>
+                    <span>${value}</span>
+                </div>`;
+        }
+    }
+
+    // Enlaces KML y GPX en la misma línea
+    if (props.enlace_kml || props.enlace_gpx) {
+        html += `
+            <div class="popup-row" style="display: flex; gap: 10px;">
+                ${props.enlace_kml ? `<a href="${props.enlace_kml}" target="_blank" rel="noopener noreferrer">KML</a>` : ''}
+                ${props.enlace_gpx ? `<a href="${props.enlace_gpx}" target="_blank" rel="noopener noreferrer">GPX</a>` : ''}
+            </div>`;
+    }
+
+    html += "</div>";
+
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-vtt', 400, 600, 500);
+}
+
 // ================= FILTROS DINÁMICOS =================
 
 // Mercados
@@ -2169,6 +2290,69 @@ function initFiltersCanyoning() {
     document.getElementById('filtro-numero-rapeles-canyoning').addEventListener('input', filtrarPuntosCanyoning);
 }
 
+function initFiltersVTT() {
+    const filtroIds = ['filtro-grado-dificultad', 'filtro-tipo-via'];
+    const keys = ['grado_dificultad', 'tipo_via'];
+
+    // Orden específico para el filtro de grado_dificultad
+    const ordenDificultad = [
+        'facil / facile',
+        'intermedio / intermediaire',
+        'dificil / difficile',
+        'muy dificil / tres difficile'
+    ];
+
+    // Limpiar los filtros antes de poblarlos
+    filtroIds.forEach(id => {
+        const filtro = document.getElementById(id);
+        filtro.innerHTML = '<option value="">Todos / Tous</option>';
+    });
+
+    // Recorrer las features de la capa para obtener valores únicos
+    const valoresUnicos = {};
+    keys.forEach(key => (valoresUnicos[key] = new Set()));
+
+    vttLayer.eachLayer(layer => {
+        const props = layer.feature.properties;
+        keys.forEach(key => {
+            if (props[key]) {
+                valoresUnicos[key].add(props[key]);
+            }
+        });
+    });
+
+    // Poblar los filtros con los valores únicos
+    keys.forEach((key, i) => {
+        const filtro = document.getElementById(filtroIds[i]);
+        let valores = Array.from(valoresUnicos[key]);
+
+        // Ordenar según el orden deseado para grado_dificultad
+        if (key === 'grado_dificultad') {
+            valores.sort((a, b) => {
+                const indexA = ordenDificultad.indexOf(normalizaTexto(a));
+                const indexB = ordenDificultad.indexOf(normalizaTexto(b));
+                return indexA - indexB;
+            });
+        } else {
+            valores.sort(); // Orden alfabético para otros filtros
+        }
+
+        // Añadir las opciones al filtro
+        valores.forEach(valor => {
+            const option = document.createElement('option');
+            option.value = valor;
+            option.textContent = valor.charAt(0).toUpperCase() + valor.slice(1);
+            filtro.appendChild(option);
+        });
+    });
+
+    // Asociar eventos de cambio a los filtros
+    filtroIds.forEach(id => document.getElementById(id).addEventListener('change', filtrarVTT));
+
+    // Asociar eventos de entrada a los nuevos campos numéricos
+    ['filtro-longitud-min', 'filtro-tiempo-max', 'filtro-desnivel-positivo-min', 'filtro-desnivel-negativo-max']
+        .forEach(id => document.getElementById(id).addEventListener('input', filtrarVTT));
+}
 
 function filtrarProductosAgro() {
     const tipoProducto = normalizaTexto(document.getElementById('filtro-tipo-producto').value);
@@ -2595,6 +2779,58 @@ function filtrarPuntosCanyoning() {
     // Actualizar las opciones disponibles en los selectores
     actualizarOpcionesDisponibles();
 }
+function filtrarVTT() {
+    const gradoDificultad = normalizaTexto(document.getElementById('filtro-grado-dificultad').value);
+    const tipoVia = normalizaTexto(document.getElementById('filtro-tipo-via').value);
+    const longitudMax = parseFloat(document.getElementById('filtro-longitud-min').value) || null; // Cambiar a longitud máxima
+    const tiempoMax = parseFloat(document.getElementById('filtro-tiempo-max').value) || null;
+    const desnivelPositivoMax = parseFloat(document.getElementById('filtro-desnivel-positivo-min').value) || null; // Cambiar a desnivel positivo máximo
+    const desnivelNegativoMax = parseFloat(document.getElementById('filtro-desnivel-negativo-max').value) || null;
+
+    vttLayer.clearLayers();
+
+    fetch('data/turismo_activo/btt.geojson')
+        .then(response => response.json())
+        .then(data => {
+            const rutasFiltradas = data.features.filter(feature => {
+                const props = feature.properties;
+
+                const dificultad = normalizaTexto(props.grado_dificultad || '');
+                const tipo = normalizaTexto(props.tipo_via || '');
+                const longitud = parseFloat(props.longitud) || 0;
+                const tiempo = parseFloat(props.tiempo) || 0;
+                const desnivelPositivo = parseFloat(props.desnivel_positivo) || 0;
+                const desnivelNegativo = parseFloat(props.desnivel_negativo) || 0;
+
+                const dificultadMatch = !gradoDificultad || dificultad === gradoDificultad;
+                const tipoMatch = !tipoVia || tipo === tipoVia;
+                const longitudMatch = !longitudMax || longitud <= longitudMax; // Cambiar a "menor o igual"
+                const tiempoMatch = !tiempoMax || tiempo <= tiempoMax;
+                const desnivelPositivoMatch = !desnivelPositivoMax || desnivelPositivo <= desnivelPositivoMax; // Cambiar a "menor o igual"
+                const desnivelNegativoMatch = !desnivelNegativoMax || desnivelNegativo <= desnivelNegativoMax;
+
+                return (
+                    dificultadMatch &&
+                    tipoMatch &&
+                    longitudMatch &&
+                    tiempoMatch &&
+                    desnivelPositivoMatch &&
+                    desnivelNegativoMatch
+                );
+            });
+
+            if (rutasFiltradas.length === 0) {
+                console.warn('No se encontraron rutas que coincidan con los filtros.');
+                return;
+            }
+
+            L.geoJSON(rutasFiltradas, {
+                style: estiloVTT,
+                onEachFeature: (feature, layer) => updatePopupVTT(layer, feature.properties)
+            }).addTo(vttLayer);
+        })
+        .catch(error => console.error('Error al filtrar las rutas VTT:', error));
+}
 // ================= FILTROS =================
 // ================= FILTROS EN EL MAPA =================
 const FiltrosControl = L.Control.extend({
@@ -2802,6 +3038,30 @@ const FiltrosControl = L.Control.extend({
                     </p>
                     <button class="btn-limpiar-filtros" data-capa="puntos-canyoning" type="button">Limpiar filtros / Nettoyer les filtres</button>
                 </div>
+                <button class="toggle-filtros" data-capa="itinerarios-btt">ITINERARIOS BTT / ITINÉRAIRES VTT</button>
+                <div class="contenedor-filtros" data-capa="itinerarios-btt" style="display:none;">
+                    <label>Grado de dificultad / Niveau de difficulté:</label>
+                    <select id="filtro-grado-dificultad">
+                        <option value="">Todos / Tous</option>
+                    </select>
+                    <label>Tipo de vía / Type de voie:</label>
+                    <select id="filtro-tipo-via">
+                        <option value="">Todos / Tous</option>
+                    </select>
+                    <p style="text-align: center">
+                    <label>Longitud mínima (km) / Longueur minimale (km):</label>
+                    <input type="number" id="filtro-longitud-min" placeholder="Ej: 5">
+                    <label>Tiempo máximo (min) / Temps maximal (min):</label>
+                    <input type="number" id="filtro-tiempo-max" placeholder="Ej: 3">
+                    <label>Desnivel positivo mínimo (m) / Dénivelé positif minimal (m):</label>
+                    <input type="number" id="filtro-desnivel-positivo-min" placeholder="Ej: 100">
+                    <label>Desnivel negativo máximo (m) / Dénivelé négatif maximal (m):</label>
+                    <input type="number" id="filtro-desnivel-negativo-max" placeholder="Ej: 200">
+                    </p>
+                    <p>
+                    <button class="btn-limpiar-filtros" data-capa="itinerarios-btt" type="button">Limpiar filtros / Nettoyer les filtres</button>
+                    </p>
+                </div>
             </div>
         `;
         L.DomEvent.disableClickPropagation(container);
@@ -2858,6 +3118,7 @@ document.querySelectorAll('.btn-limpiar-filtros').forEach(btn => {
         else if (capa === "ski") filtrarSki();
         else if (capa === "puntos-escalada") filtrarPuntosEscalada();
         else if (capa === "puntos-canyoning") filtrarPuntosCanyoning();
+        else if (capa === "itinerarios-btt") filtrarVTT();
     });
 });
 
@@ -2879,6 +3140,7 @@ function actualizarFiltrosAcordeon() {
         else if (capa === 'ski') capaActiva = map.hasLayer(skiClusters);
         else if (capa === 'puntos-escalada') capaActiva = map.hasLayer(puntosEscaladaClusters);
         else if (capa === 'puntos-canyoning') capaActiva = map.hasLayer(canyoningClusters);
+        else if (capa === 'itinerarios-btt') capaActiva = map.hasLayer(vttLayer);
 
         const contenedor = btn.nextElementSibling;
 
@@ -2900,7 +3162,8 @@ function actualizarFiltrosAcordeon() {
             else if (capa === 'puntos-canyoning' && document.getElementById('filtro-dificultad-vertical-canyoning').options.length <= 1) initFiltersCanyoning();
             else if (capa === 'puntos-canyoning' && document.getElementById('filtro-dificultad-acuatica-canyoning').options.length <= 1) initFiltersCanyoning();
             else if (capa === 'puntos-canyoning' && document.getElementById('filtro-dificultad-compromiso-canyoning').options.length <= 1) initFiltersCanyoning();
-            
+            else if (capa === 'itinerarios-btt' && document.getElementById('filtro-grado-dificultad').options.length <= 1) initFiltersVTT();
+            else if (capa === 'itinerarios-btt' && document.getElementById('filtro-tipo-via').options.length <= 1) initFiltersVTT();
 
         } else {
             btn.style.display = 'none';        // Ocultar botón
@@ -2916,13 +3179,14 @@ function actualizarFiltrosAcordeon() {
     const checkbox = document.getElementById('cb-'+tipo);
     if(checkbox){
         checkbox.addEventListener('change', e=>{
-            const capaMap = {'mercados':mercadosCluster,'escuelas':centrosCluster,'otros':otrosCentrosCluster,'productos':productosAgroCluster, 'productores': productoresClusters, 'comercios': comerciosClusters, 'restaurantes': restaurantesCluster, 'empresas-nieve': empresasNieveClusters, 'ski': skiClusters, 'puntos-escalada': puntosEscaladaClusters, 'puntos-canyoning': canyoningClusters};
+            const capaMap = {'mercados':mercadosCluster,'escuelas':centrosCluster,'otros':otrosCentrosCluster,'productos':productosAgroCluster, 'productores': productoresClusters, 'comercios': comerciosClusters, 'restaurantes': restaurantesCluster, 'empresas-nieve': empresasNieveClusters, 'ski': skiClusters, 'puntos-escalada': puntosEscaladaClusters, 'puntos-canyoning': canyoningClusters, 'itinerarios-btt': vttLayer };
             if(e.target.checked) map.addLayer(capaMap[tipo]); else map.removeLayer(capaMap[tipo]);
             actualizarLeyenda();
             actualizarFiltrosAcordeon();
         });
     }
 });
+
 
 // ================= SIDEBAR =================
 window.addEventListener('load', function(){
@@ -3211,6 +3475,20 @@ window.addEventListener('load', function(){
                     </div>
                 </div>
             </div>
+            <div class="div-acordeones"></div>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <button class="accordion-header">
+                        Itinerarios BTT / Itinéraires VTT
+                        <span class="arrow">▶</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="sidebar-checkboxes">
+                            <label><input type="checkbox" id="cb-itinerarios-btt" checked> <img src="icons/btt.svg" width="20"> Itinerarios BTT / Itinéraires VTT</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `
     });
     sidebar.addPanel({
@@ -3339,6 +3617,7 @@ window.addEventListener('load', function(){
         document.getElementById('cb-empresas-via-ferrata').checked = map.hasLayer(empresasViaFerrataClusters);
         document.getElementById('cb-puntos-canyoning').checked = map.hasLayer(canyoningClusters);
         document.getElementById('cb-empresas-canyoning').checked = map.hasLayer(empresasCanyoningClusters);
+        document.getElementById('cb-itinerarios-btt').checked = vttLayer && map.hasLayer(vttLayer);
     }
 
     sincronizarCheckboxes();
@@ -3376,7 +3655,8 @@ window.addEventListener('load', function(){
     'vias-ferratas': viaFerrataClusters,
     'empresas-via-ferrata': empresasViaFerrataClusters,
     'puntos-canyoning': canyoningClusters,
-    'empresas-canyoning': empresasCanyoningClusters
+    'empresas-canyoning': empresasCanyoningClusters,
+    'itinerarios-btt': vttLayer
     };
 
     // ================= EVENTOS CHECKBOXES =================
@@ -3506,7 +3786,12 @@ window.addEventListener('load', function(){
         'empresas-canyoning':
             {es: "Información correspondiente a Pirineos Atlánticos",
             fr: "Informations concernant les Pyrénées-Atlantiques.",
-            fuente: 'Tourisme 64' }
+            fuente: 'Tourisme 64' },
+        'itinerarios-btt':
+            {
+            es: "Información correspondiente a Pirineos Atlánticos y provincia de Huesca",
+            fr: "Informations concernant les Pyrénées-Atlantiques et la province de Huesca.",
+            fuente: 'Departement 64 / Observatorio de Montaña (OMS)' }
     };
 
     ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad', 'puntos-escalada', 'empresas-escalada', 'vias-ferratas', 'empresas-via-ferrata', 'puntos-canyoning', 'empresas-canyoning'].forEach(tipo => {
@@ -3523,6 +3808,18 @@ window.addEventListener('load', function(){
             }
             actualizarFiltrosAcordeon();
             actualizarLeyenda()
+        });
+    }
+    const checkbox_btt = document.getElementById('cb-itinerarios-btt');
+    if (checkbox_btt) {
+        checkbox_btt.addEventListener('change', e => {
+            if (e.target.checked) {
+                map.addLayer(vttLayer);
+            } else {
+                map.removeLayer(vttLayer);
+            }
+            actualizarFiltrosAcordeon();
+            actualizarLeyenda();
         });
     }
 });
@@ -3594,7 +3891,7 @@ function actualizarLeyenda(){
     if(map.hasLayer(empresasViaFerrataClusters)) html += `<img src="icons/empresas_via_ferrata.svg" width="18"> Empresas de Vías Ferratas / Entreprises de Via Ferrata <br>`;
     if(map.hasLayer(canyoningClusters)) html += `<img src="icons/canyoning.svg" width="18"> Puntos de Canyoning / Points de Canyoning <br>`;
     if(map.hasLayer(empresasCanyoningClusters)) html += `<img src="icons/empresas_canyoning.svg" width="18"> Empresas de Canyoning / Entreprises de Canyoning <br>`;
-     if (map.hasLayer(carreterasLayer)) {
+    if (map.hasLayer(carreterasLayer)) {
         html += `
             <div style="display: flex; align-items: center; margin-bottom: 5px;">
                 <div style="width: 30px; height: 6px; background: #737373; border-radius: 3px; margin-right: 5px; position: relative;">
@@ -3614,7 +3911,28 @@ function actualizarLeyenda(){
         `;
     }
 
-    
+    if (map.hasLayer(vttLayer)) {
+        html += `<p style="text-align: center"><strong>Itinerarios BTT / Itinéraires VTT:</strong><br>`;
+        html += `
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <div style="width: 30px; height: 4px; background: green; margin-right: 5px;"></div>
+                Fácil / Facile
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <div style="width: 30px; height: 4px; background: blue; margin-right: 5px;"></div>
+                Intermedio / Intermédiaire
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <div style="width: 30px; height: 4px; background: red; margin-right: 5px;"></div>
+                Difícil / Difficile
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <div style="width: 30px; height: 4px; background: black; margin-right: 5px;"></div>
+                Muy difícil / Très difficile
+            </div>
+        `;
+    }
+
     div.innerHTML = html;
 }
 
@@ -3641,7 +3959,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 monumentosReligiososCluster, restosArqueologicosCluster, balneariosCluster,
                 museosCluster, arbolesCluster, miradoresCluster, glaciaresClusters,
                 zonasBanosClusters, piscinasClusters, productoresClusters, comerciosClusters, skiClusters,
-                empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters, buffersInfluenciaLayer, puntosEscaladaClusters, empresasEscaladaClusters,  viaFerrataClusters, empresasViaFerrataClusters, canyoningClusters, empresasCanyoningClusters
+                empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters, buffersInfluenciaLayer, puntosEscaladaClusters, empresasEscaladaClusters,  viaFerrataClusters, empresasViaFerrataClusters, canyoningClusters, empresasCanyoningClusters, vttLayer
             }).forEach(capa => {
                 if (map.hasLayer(capa)) map.removeLayer(capa);
             });
@@ -3674,6 +3992,7 @@ async function initMap(){
     // Cargar datos
     await cargarLimites();
     await cargarBuffersInfluencia();
+    await cargarCapaVTT();
     await Promise.all([
         cargarGeoJSON('data/mercados_aect.geojson', mercadosCluster, markers, marketIconMercados, updatePopupMercados),
         cargarGeoJSON('data/escuelas_formacion.geojson', centrosCluster, markersCentros, marketIconEscuelas, updatePopupEscuelas),
