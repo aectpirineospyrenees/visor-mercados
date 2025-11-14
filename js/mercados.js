@@ -83,6 +83,10 @@ const viaFerrataIcon = crearIcono("icons/via_ferrata.svg");
 const viaFerrataEmpresasIcon = crearIcono("icons/empresas_via_ferrata.svg");
 const canyoningIcon = crearIcono("icons/canyoning.svg");
 const empresasCanyoningIcon = crearIcono("icons/empresas_canyoning.svg");
+const itinerariosadaptadosIcon = crearIcono("icons/itinerarios_adaptados.svg");
+const itinerariospedestresIcon = crearIcono("icons/itinerarios_pedestres.svg");
+const itinerariosequestresIcon = crearIcono("icons/itinerarios_equestres.svg");
+const ittinerariostrailrunningIcon = crearIcono("icons/itinerarios_trailrunning.svg");
 
 function normalizaTexto(s){
     return (s || "").toString()
@@ -145,6 +149,10 @@ let viaFerrataMarkers = [];
 let empresasViaFerrataMarkers = [];
 let canyoningMarkers = [];
 let empresasCanyoningMarkers = [];
+let itinerariosAdaptadosMarkers = [];
+let itinerariosPedestresMarkers = [];
+let itinerariosEquestresMarkers = [];
+let itinerariosTrailrunningMarkers = [];
 const ordenDias = ["Lunes/Lundi","Martes/Mardi","Miércoles/Mercredi","Jueves/Jeudi","Viernes/Vendredi","Sábado/Samedi","Domingo/Dimanche"];
 const ordenSemanas = ["Primera semana del mes/Première semaine du mois","Segunda semana del mes/Deuxième semaine du mois","Tercera semana del mes/Troisième semaine du mois","Cuarta semana del mes/Quatrième semaine du mois","Todas las semanas/Toutes les semaines"];
 
@@ -286,6 +294,10 @@ const viaFerrataClusters            = crearCluster("icons/via_ferrata.svg");
 const empresasViaFerrataClusters    = crearCluster("icons/empresas_via_ferrata.svg");
 const canyoningClusters             = crearCluster("icons/canyoning.svg");
 const empresasCanyoningClusters     = crearCluster("icons/empresas_canyoning.svg");
+const itinerariosAdaptadosClusters  = crearCluster("icons/itinerarios_adaptados.svg");
+const itinerariosPedestresClusters  = crearCluster("icons/itinerarios_pedestres.svg");
+const itinerariosEquestresClusters  = crearCluster("icons/itinerarios_equestres.svg");
+const itinerariosTrailrunningClusters = crearCluster("icons/itinerarios_trailrunning.svg");
 // ================= CARGA GEOJSON =================
 async function cargarLimites(){
     try{
@@ -1049,13 +1061,21 @@ function updatePopupRestaurantes(layer, props) {
     ];
     html += generarBooleanos(props, booleanFields, "Servicios / Services");
 
+        // Añadir redes sociales
+    if (props.redes_sociales) {
+        html += getIconoRedSocial(props.redes_sociales);
+    }
     // Generar carrusel de fotos
     html += generarCarruselFotos(props, "fotos");
-
     html += "</div>";
 
     // Usar la función genérica para bindPopup
-    bindPopupGenerico(layer, html, 'popup-restaurantes', 400, 500, 500);
+        layer.bindPopup(html, {
+        className: "popup-restaurantes",
+        minWidth: 450,
+        maxWidth: 500,
+        maxHeight: 500
+    });
 }
 
 
@@ -1666,6 +1686,7 @@ function updatePopupCanyoning(layer, props) {
     }
 
     // Tarjetas para tiempos (incluyendo tiempo total)
+// Tarjetas para tiempos (incluyendo tiempo total)
     if (props.tpo_acceso || props.tpo_desc || props.tpo_regres || props.tiempo) {
         html += `
             <div class="popup-section">
@@ -1673,22 +1694,34 @@ function updatePopupCanyoning(layer, props) {
                 <div class="popup-row">
                     ${props.tpo_acceso !== undefined ? `
                         <div class="popup-number-card">
-                            <div class="number-value">${props.tpo_acceso === 0 ? '0' : `${props.tpo_acceso} min`}</div>
+                            <div class="number-value">
+                                <i class="fas fa-arrow-right" style="color:#007bff; margin-right:5px;"></i>
+                                ${props.tpo_acceso === 0 ? '0' : `${props.tpo_acceso} min`}
+                            </div>
                             <div class="number-label">Tiempo acceso / Temps d'accès</div>
                         </div>` : ''}
                     ${props.tpo_desc !== undefined ? `
                         <div class="popup-number-card">
-                            <div class="number-value">${props.tpo_desc === 0 ? '0' : `${props.tpo_desc} min`}</div>
+                            <div class="number-value">
+                                <i class="fas fa-arrow-down" style="color:#28a745; margin-right:5px;"></i>
+                                ${props.tpo_desc === 0 ? '0' : `${props.tpo_desc} min`}
+                            </div>
                             <div class="number-label">Tiempo descenso / Temps de descente</div>
                         </div>` : ''}
                     ${props.tpo_regres !== undefined ? `
                         <div class="popup-number-card">
-                            <div class="number-value">${props.tpo_regres === 0 ? '0' : `${props.tpo_regres} min`}</div>
+                            <div class="number-value">
+                                <i class="fas fa-arrow-left" style="color:#dc3545; margin-right:5px;"></i>
+                                ${props.tpo_regres === 0 ? '0' : `${props.tpo_regres} min`}
+                            </div>
                             <div class="number-label">Tiempo regreso / Temps de retour</div>
                         </div>` : ''}
                     ${props.tiempo !== undefined ? `
                         <div class="popup-number-card">
-                            <div class="number-value">${props.tiempo === 0 ? '0' : `${props.tiempo} min`}</div>
+                            <div class="number-value">
+                                <i class="fas fa-clock" style="color:#6c757d; margin-right:5px;"></i>
+                                ${props.tiempo === 0 ? '0' : `${props.tiempo} min`}
+                            </div>
                             <div class="number-label">Tiempo total / Temps total</div>
                         </div>` : ''}
                 </div>
@@ -1825,11 +1858,17 @@ function updatePopupVTT(layer, props) {
     html += `
         <div class="popup-row">
             <div class="popup-number-card">
-                <div class="number-value">${props.longitud ? props.longitud.toFixed(2) : '—'} km</div>
+                <div class="number-value">
+                    <i class="fas fa-ruler" style="color:gray; margin-right:5px;"></i>
+                    ${props.longitud ? props.longitud.toFixed(2) : '—'} km
+                </div>
                 <div class="number-label">Longitud / Longueur</div>
             </div>
             <div class="popup-number-card">
-                <div class="number-value">${props.tiempo ? props.tiempo.toFixed(2) : '—'} min</div>
+                <div class="number-value">
+                    <i class="fas fa-clock" style="color:gray; margin-right:5px;"></i>
+                    ${props.tiempo ? props.tiempo.toFixed(2) : '—'} min
+                </div>
                 <div class="number-label">Tiempo / Temps</div>
             </div>
         </div>`;
@@ -1867,6 +1906,77 @@ function updatePopupVTT(layer, props) {
 
     // Usar la función genérica para bindPopup
     bindPopupGenerico(layer, html, 'popup-vtt', 400, 600, 500);
+}
+
+function updatePopupItinerarios(layer, props) {
+    let html = `<div class="popup-itinerarios"><h3>${props.nombre || 'Sin nombre'}</h3>`;
+
+    // Tarjeta para dificultad en una línea
+    html += `
+        <div class="popup-row">
+            <div class="popup-number-card">
+                <div class="number-value">${props.dificultad || '—'}</div>
+                <div class="number-label">Dificultad / Difficulté</div>
+            </div>
+        </div>`;
+
+    // Tarjetas para duración y distancia en otra línea
+    html += `
+        <div class="popup-row">
+            <div class="popup-number-card">
+                <div class="number-value">
+                    <i class="fas fa-clock" style="color:gray; margin-right:5px;"></i>
+                    ${props.duracion || '—'} min
+                </div>
+                <div class="number-label">Duración / Durée</div>
+            </div>
+            <div class="popup-number-card">
+                <div class="number-value">
+                    <i class="fas fa-ruler" style="color:gray; margin-right:5px;"></i>
+                    ${props.distancia_km ? props.distancia_km.toFixed(2) : '—'} km
+                </div>
+                <div class="number-label">Distancia / Distance</div>
+            </div>
+        </div>`;
+
+    // Mostrar campos definidos en `titles` (solo descripcion y paisaje)
+    const titles = {
+        descripcion: "Descripción / Description",
+        paisaje: "Paisaje / Paysage"
+    };
+
+    for (let key in titles) {
+        if (!props.hasOwnProperty(key)) continue;
+        const value = props[key];
+        if (!value || value === "" || value === null) continue;
+
+        // Etiqueta centrada arriba y valor centrado abajo
+        html += `
+            <div class="popup-row" style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: 10px;">
+                <b style="margin-bottom: 5px; font-size: 1em;">${titles[key]}</b>
+                <span style="max-width: 90%; font-size: 0.95em;">${makeClickable(value)}</span>
+            </div>`;
+    }
+
+    // Carrusel de fotos
+    if (props.fotos) {
+        html += generarCarruselFotos(props, 'fotos');
+    }
+
+    // Enlaces GPX, KML y PDF
+    if (props.url_gpx || props.url_kml || props.url_pdf) {
+        html += `
+            <div class="popup-row" style="display: flex; gap: 10px; justify-content: center;">
+                ${props.url_gpx ? `<a href="${props.url_gpx}" target="_blank" rel="noopener noreferrer">GPX</a>` : ''}
+                ${props.url_kml ? `<a href="${props.url_kml}" target="_blank" rel="noopener noreferrer">KML</a>` : ''}
+                ${props.url_pdf ? `<a href="${props.url_pdf}" target="_blank" rel="noopener noreferrer">PDF</a>` : ''}
+            </div>`;
+    }
+
+    html += "</div>";
+
+    // Usar la función genérica para bindPopup
+    bindPopupGenerico(layer, html, 'popup-itinerarios', 400, 600, 500);
 }
 // ================= FILTROS DINÁMICOS =================
 
@@ -2353,6 +2463,261 @@ function initFiltersVTT() {
         .forEach(id => document.getElementById(id).addEventListener('input', filtrarVTT));
 }
 
+function initFiltersItinerariosAdaptados() {
+    const filtroDificultad = document.getElementById('filtro-dificultad-itinerarios-adaptados');
+    const filtroPaisaje = document.getElementById('filtro-paisaje-itinerarios-adaptados');
+
+    // Reiniciar selects
+    filtroDificultad.innerHTML = '<option value="">Todas / Toutes</option>';
+    filtroPaisaje.innerHTML = '<option value="">Todos / Tous</option>';
+
+    // Sets donde guardamos los valores que realmente existen
+    let dificultades = new Set();
+    let paisajes = new Set();
+
+    // Recoger valores reales de los itinerarios
+    itinerariosAdaptadosMarkers.forEach(({ props }) => {
+        // --- DIFICULTAD ---
+        if (props.dificultad) {
+            dificultades.add(props.dificultad.toLowerCase().trim());
+        }
+        // --- PAISAJE ---
+        if (props.paisaje) {
+            props.paisaje
+                .split(',')
+                .map(p => normalizaTexto(p.trim()))
+                .forEach(p => paisajes.add(p));
+        }
+    });
+    
+    // ORDEN FIJO PARA DIFICULTAD
+    const ORDEN_DIFICULTAD = [
+        "muy fácil / très facile",
+        "fácil / facile",
+        "medio / moyenne",
+        "difícil / difficile",
+        "muy difícil / très difficile"
+    ];
+
+    // Añadir dificultades en el orden correcto
+    ORDEN_DIFICULTAD
+        .map(d => d.toLowerCase())
+        .filter(d => dificultades.has(d))
+        .forEach(d => {
+            const option = document.createElement('option');
+            option.value = d;
+            option.textContent = d
+                .split('/')
+                .map(p => p.trim())
+                .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+                .join(' / ');
+            filtroDificultad.appendChild(option);
+        });
+
+    // Añadir paisajes (orden alfabético)
+    [...paisajes].sort().forEach(p => {
+        const option = document.createElement('option');
+        option.value = p;
+        option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+        filtroPaisaje.appendChild(option);
+    });
+
+    // Eventos del filtro
+    filtroDificultad.addEventListener('change', filtrarItinerariosAdaptados);
+    filtroPaisaje.addEventListener('change', filtrarItinerariosAdaptados);
+    document.getElementById('filtro-distancia-itinerarios-adaptados')
+        .addEventListener('input', filtrarItinerariosAdaptados);
+}
+
+function initFiltersItinerariosPedestres() {
+    const filtroDificultad = document.getElementById('filtro-dificultad-itinerarios-pedestres');
+    const filtroPaisaje = document.getElementById('filtro-paisaje-itinerarios-pedestres');
+
+    // Reiniciar selects
+    filtroDificultad.innerHTML = '<option value="">Todas / Toutes</option>';
+    filtroPaisaje.innerHTML = '<option value="">Todos / Tous</option>';
+
+    // Sets donde guardamos los valores que realmente existen (ya normalizados)
+    let dificultades = new Set();
+    let paisajes = new Set();
+
+    // Recoger valores reales de los itinerarios
+    itinerariosPedestresMarkers.forEach(({ props }) => {
+        // --- DIFICULTAD ---
+        if (props.dificultad) {
+            dificultades.add(normalizaTexto(String(props.dificultad)));
+        }
+
+        // --- PAISAJE ---
+        if (props.paisaje) {
+            props.paisaje
+                .split(',')
+                .map(p => normalizaTexto(p.trim()))
+                .forEach(p => paisajes.add(p));
+        }
+    });
+
+    // ORDEN FIJO PARA DIFICULTAD (texto legible en español/francés)
+    const ORDEN_DIFICULTAD = [
+        "Muy fácil / Très facile",
+        "Fácil / Facile",
+        "Medio / Moyenne",
+        "Difícil / Difficile",
+        "Muy difícil / Très difficile"
+    ];
+
+    // Añadir dificultades en el orden correcto, usando normalizaTexto() para comparar
+    ORDEN_DIFICULTAD
+        .map(d => ({ raw: d, norm: normalizaTexto(d) }))
+        .filter(d => dificultades.has(d.norm))
+        .forEach(d => {
+            const option = document.createElement('option');
+            option.value = d.norm; // value normalizado (para comparar después)
+            option.textContent = d.raw; // texto legible tal cual
+            filtroDificultad.appendChild(option);
+        });
+
+    // Añadir paisajes (orden alfabético por el texto normalizado)
+    [...paisajes].sort().forEach(p => {
+        const option = document.createElement('option');
+        option.value = p; // ya normalizado
+        option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+        filtroPaisaje.appendChild(option);
+    });
+
+    // Eventos del filtro
+    filtroDificultad.addEventListener('change', filtrarItinerariosPedestres);
+    filtroPaisaje.addEventListener('change', filtrarItinerariosPedestres);
+    document.getElementById('filtro-distancia-itinerarios-pedestres')
+        .addEventListener('input', filtrarItinerariosPedestres);
+}
+
+function initFiltersItinerariosEquestres() {
+    const filtroDificultad = document.getElementById('filtro-dificultad-itinerarios-equestres');
+    const filtroPaisaje = document.getElementById('filtro-paisaje-itinerarios-equestres');
+
+    // Reiniciar selects
+    filtroDificultad.innerHTML = '<option value="">Todas / Toutes</option>';
+    filtroPaisaje.innerHTML = '<option value="">Todos / Tous</option>';
+
+    // Sets donde guardamos los valores que realmente existen (ya normalizados)
+    let dificultades = new Set();
+    let paisajes = new Set();
+
+    // Recoger valores reales de los itinerarios
+    itinerariosEquestresMarkers.forEach(({ props }) => {
+        // --- DIFICULTAD ---
+        if (props.dificultad) {
+            dificultades.add(normalizaTexto(String(props.dificultad)));
+        }
+
+        // --- PAISAJE ---
+        if (props.paisaje) {
+            props.paisaje
+                .split(',')
+                .map(p => normalizaTexto(p.trim()))
+                .forEach(p => paisajes.add(p));
+        }
+    });
+
+    // ORDEN FIJO PARA DIFICULTAD (texto legible en español/francés)
+    const ORDEN_DIFICULTAD = [
+        "Muy fácil / Très facile",
+        "Fácil / Facile",
+        "Medio / Moyenne",
+        "Difícil / Difficile",
+        "Muy difícil / Très difficile"
+    ];
+
+    // Añadir dificultades en el orden correcto, usando normalizaTexto() para comparar
+    ORDEN_DIFICULTAD
+        .map(d => ({ raw: d, norm: normalizaTexto(d) }))
+        .filter(d => dificultades.has(d.norm))
+        .forEach(d => {
+            const option = document.createElement('option');
+            option.value = d.norm; // value normalizado (para comparar después)
+            option.textContent = d.raw; // texto legible tal cual
+            filtroDificultad.appendChild(option);
+        });
+
+    // Añadir paisajes (orden alfabético por el texto normalizado)
+    [...paisajes].sort().forEach(p => {
+        const option = document.createElement('option');
+        option.value = p; // ya normalizado
+        option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+        filtroPaisaje.appendChild(option);
+    });
+
+    // Eventos del filtro
+    filtroDificultad.addEventListener('change', filtrarItinerariosEquestres);
+    filtroPaisaje.addEventListener('change', filtrarItinerariosEquestres);
+    document.getElementById('filtro-distancia-itinerarios-equestres')
+        .addEventListener('input', filtrarItinerariosEquestres);
+}
+
+function initFiltersItinerariosTrail() {
+    const filtroDificultad = document.getElementById('filtro-dificultad-itinerarios-trail');
+    const filtroPaisaje = document.getElementById('filtro-paisaje-itinerarios-trail');
+
+    // Reiniciar selects
+    filtroDificultad.innerHTML = '<option value="">Todas / Toutes</option>';
+    filtroPaisaje.innerHTML = '<option value="">Todos / Tous</option>';
+
+    // Sets donde guardamos los valores que realmente existen (ya normalizados)
+    let dificultades = new Set();
+    let paisajes = new Set();
+
+    // Recoger valores reales de los itinerarios
+    itinerariosTrailrunningMarkers.forEach(({ props }) => {
+        // --- DIFICULTAD ---
+        if (props.dificultad) {
+            dificultades.add(normalizaTexto(String(props.dificultad)));
+        }
+
+        // --- PAISAJE ---
+        if (props.paisaje) {
+            props.paisaje
+                .split(',')
+                .map(p => normalizaTexto(p.trim()))
+                .forEach(p => paisajes.add(p));
+        }
+    });
+
+    // ORDEN FIJO PARA DIFICULTAD (texto legible en español/francés)
+    const ORDEN_DIFICULTAD = [
+        "Muy fácil / Très facile",
+        "Fácil / Facile",
+        "Medio / Moyenne",
+        "Difícil / Difficile",
+        "Muy difícil / Très difficile"
+    ];
+
+    // Añadir dificultades en el orden correcto, usando normalizaTexto() para comparar
+    ORDEN_DIFICULTAD
+        .map(d => ({ raw: d, norm: normalizaTexto(d) }))
+        .filter(d => dificultades.has(d.norm))
+        .forEach(d => {
+            const option = document.createElement('option');
+            option.value = d.norm; // value normalizado (para comparar después)
+            option.textContent = d.raw; // texto legible tal cual
+            filtroDificultad.appendChild(option);
+        });
+
+    // Añadir paisajes (orden alfabético por el texto normalizado)
+    [...paisajes].sort().forEach(p => {
+        const option = document.createElement('option');
+        option.value = p; // ya normalizado
+        option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+        filtroPaisaje.appendChild(option);
+    });
+
+    // Eventos del filtro
+    filtroDificultad.addEventListener('change', filtrarItinerariosTrail);
+    filtroPaisaje.addEventListener('change', filtrarItinerariosTrail);
+    document.getElementById('filtro-distancia-itinerarios-trail')
+        .addEventListener('input', filtrarItinerariosTrail);
+}
+
 function filtrarProductosAgro() {
     const tipoProducto = normalizaTexto(document.getElementById('filtro-tipo-producto').value);
     const comercializacion = normalizaTexto(document.getElementById('filtro-comercializacion-producto').value);
@@ -2830,6 +3195,138 @@ function filtrarVTT() {
         })
         .catch(error => console.error('Error al filtrar las rutas VTT:', error));
 }
+
+function filtrarItinerariosPedestres() {
+    // Normalizamos el valor seleccionado (ahora los option.value están normalizados)
+    const dificultadSeleccionada = normalizaTexto(document.getElementById('filtro-dificultad-itinerarios-pedestres').value);
+    const distanciaMaxima = parseFloat(document.getElementById('filtro-distancia-itinerarios-pedestres').value);
+    const paisajeSeleccionado = normalizaTexto(document.getElementById('filtro-paisaje-itinerarios-pedestres').value);
+
+    itinerariosPedestresClusters.clearLayers();
+
+    itinerariosPedestresMarkers.forEach(({ marker, props }) => {
+        // Normalizar la dificultad del propio marker
+        const dificultadMarker = props.dificultad ? normalizaTexto(String(props.dificultad)) : "";
+
+        const dificultadMatch = !dificultadSeleccionada || dificultadMarker === dificultadSeleccionada;
+        const distanciaMatch = !distanciaMaxima || (props.distancia_km && parseFloat(props.distancia_km) <= distanciaMaxima);
+
+        // Limpieza y división más robusta del campo paisaje
+        const paisajes = props.paisaje
+            ? props.paisaje
+                .split(',')
+                .map(p => normalizaTexto(p.trim()))
+                .filter(p => p.length > 0)
+            : [];
+
+        // Coincidencia flexible: permite que "bosque" coincida con "bosque y río" o similares
+        const paisajeMatch = !paisajeSeleccionado ||
+            paisajes.some(p => p.includes(paisajeSeleccionado) || paisajeSeleccionado.includes(p));
+
+        if (dificultadMatch && distanciaMatch && paisajeMatch) {
+            itinerariosPedestresClusters.addLayer(marker);
+        }
+    });
+}
+
+
+function filtrarItinerariosAdaptados() {
+    // Normalizamos el valor seleccionado (ahora los option.value están normalizados)
+    const dificultadSeleccionada = normalizaTexto(document.getElementById('filtro-dificultad-itinerarios-adaptados').value);
+    const distanciaMaxima = parseFloat(document.getElementById('filtro-distancia-itinerarios-adaptados').value);
+    const paisajeSeleccionado = normalizaTexto(document.getElementById('filtro-paisaje-itinerarios-adaptados').value);
+    itinerariosAdaptadosClusters.clearLayers();
+
+    itinerariosAdaptadosMarkers.forEach(({ marker, props }) => {
+        // Normalizar la dificultad del propio marker
+        const dificultadMarker = props.dificultad ? normalizaTexto(String(props.dificultad)) : "";
+
+        const dificultadMatch = !dificultadSeleccionada || dificultadMarker === dificultadSeleccionada;
+        const distanciaMatch = !distanciaMaxima || (props.distancia_km && parseFloat(props.distancia_km) <= distanciaMaxima);
+
+        // Limpieza y división más robusta del campo paisaje
+        const paisajes = props.paisaje
+            ? props.paisaje
+                .split(',')
+                .map(p => normalizaTexto(p.trim()))
+                .filter(p => p.length > 0)
+            : [];
+
+        // Coincidencia flexible: permite que "bosque" coincida con "bosque y río" o similares
+        const paisajeMatch = !paisajeSeleccionado ||
+            paisajes.some(p => p.includes(paisajeSeleccionado) || paisajeSeleccionado.includes(p));
+
+        if (dificultadMatch && distanciaMatch && paisajeMatch) {
+            itinerariosAdaptadosClusters.addLayer(marker);
+        }
+    });
+}
+
+function filtrarItinerariosEquestres() {
+    // Normalizamos el valor seleccionado (ahora los option.value están normalizados)
+    const dificultadSeleccionada = normalizaTexto(document.getElementById('filtro-dificultad-itinerarios-equestres').value);
+    const distanciaMaxima = parseFloat(document.getElementById('filtro-distancia-itinerarios-equestres').value);
+    const paisajeSeleccionado = normalizaTexto(document.getElementById('filtro-paisaje-itinerarios-equestres').value);
+    itinerariosEquestresClusters.clearLayers();
+
+    itinerariosEquestresMarkers.forEach(({ marker, props }) => {
+        // Normalizar la dificultad del propio marker
+        const dificultadMarker = props.dificultad ? normalizaTexto(String(props.dificultad)) : "";
+
+        const dificultadMatch = !dificultadSeleccionada || dificultadMarker === dificultadSeleccionada;
+        const distanciaMatch = !distanciaMaxima || (props.distancia_km && parseFloat(props.distancia_km) <= distanciaMaxima);
+
+        // Limpieza y división más robusta del campo paisaje
+        const paisajes = props.paisaje
+            ? props.paisaje
+                .split(',')
+                .map(p => normalizaTexto(p.trim()))
+                .filter(p => p.length > 0)
+            : [];
+
+        // Coincidencia flexible: permite que "bosque" coincida con "bosque y río" o similares
+        const paisajeMatch = !paisajeSeleccionado ||
+            paisajes.some(p => p.includes(paisajeSeleccionado) || paisajeSeleccionado.includes(p));
+
+        if (dificultadMatch && distanciaMatch && paisajeMatch) {
+            itinerariosEquestresClusters.addLayer(marker);
+        }
+    });
+}
+
+function filtrarItinerariosTrail() {
+    // Normalizamos el valor seleccionado (ahora los option.value están normalizados)
+    const dificultadSeleccionada = normalizaTexto(document.getElementById('filtro-dificultad-itinerarios-trail').value);
+    const distanciaMaxima = parseFloat(document.getElementById('filtro-distancia-itinerarios-trail').value);
+    const paisajeSeleccionado = normalizaTexto(document.getElementById('filtro-paisaje-itinerarios-trail').value);
+    itinerariosTrailrunningClusters.clearLayers();
+
+    itinerariosTrailrunningMarkers.forEach(({ marker, props }) => {
+        // Normalizar la dificultad del propio marker
+        const dificultadMarker = props.dificultad ? normalizaTexto(String(props.dificultad)) : "";
+
+        const dificultadMatch = !dificultadSeleccionada || dificultadMarker === dificultadSeleccionada;
+        const distanciaMatch = !distanciaMaxima || (props.distancia_km && parseFloat(props.distancia_km) <= distanciaMaxima);
+
+        // Limpieza y división más robusta del campo paisaje
+        const paisajes = props.paisaje
+            ? props.paisaje
+                .split(',')
+                .map(p => normalizaTexto(p.trim()))
+                .filter(p => p.length > 0)
+            : [];
+
+        // Coincidencia flexible: permite que "bosque" coincida con "bosque y río" o similares
+        const paisajeMatch = !paisajeSeleccionado ||
+            paisajes.some(p => p.includes(paisajeSeleccionado) || paisajeSeleccionado.includes(p));
+
+        if (dificultadMatch && distanciaMatch && paisajeMatch) {
+            itinerariosTrailrunningClusters.addLayer(marker);
+        }
+    });
+}
+
+
 // ================= FILTROS =================
 // ================= FILTROS EN EL MAPA =================
 const FiltrosControl = L.Control.extend({
@@ -3061,6 +3558,62 @@ const FiltrosControl = L.Control.extend({
                     <button class="btn-limpiar-filtros" data-capa="itinerarios-btt" type="button">Limpiar filtros / Nettoyer les filtres</button>
                     </p>
                 </div>
+                <button class="toggle-filtros" data-capa="itinerarios-adaptados">ITINERARIOS ADAPTADOS / ITINÉRAIRES ADAPTÉS</button>
+                <div class="contenedor-filtros" data-capa="itinerarios-adaptados" style="display:none;">
+                    <label>Dificultad / Difficulté:</label>
+                    <select id="filtro-dificultad-itinerarios-adaptados">
+                        <option value="">Todas / Toutes</option>
+                    </select>
+                    <label>Distancia máxima (km) / Distance maximale (km):</label>
+                    <input type="number" id="filtro-distancia-itinerarios-adaptados" placeholder="Ej: 10">
+                    <label>Paisaje / Paysage:</label>
+                    <select id="filtro-paisaje-itinerarios-adaptados">
+                        <option value="">Todos / Tous</option>
+                    </select>
+                    <button class="btn-limpiar-filtros" data-capa="itinerarios-adaptados" type="button">Limpiar filtros / Nettoyer les filtres</button>
+                </div>
+                <button class="toggle-filtros" data-capa="itinerarios-pedestres">ITINERARIOS PEDESTRES / ITINÉRAIRES PÉDESTRES</button>
+                <div class="contenedor-filtros" data-capa="itinerarios-pedestres" style="display:none;">
+                    <label>Dificultad / Difficulté:</label>
+                    <select id="filtro-dificultad-itinerarios-pedestres">
+                        <option value="">Todas / Toutes</option>
+                    </select>
+                    <label>Distancia máxima (km) / Distance maximale (km):</label>
+                    <input type="number" id="filtro-distancia-itinerarios-pedestres" placeholder="Ej: 10">
+                    <label>Paisaje / Paysage:</label>
+                    <select id="filtro-paisaje-itinerarios-pedestres">
+                        <option value="">Todos / Tous</option>
+                    </select>
+                    <button class="btn-limpiar-filtros" data-capa="itinerarios-pedestres" type="button">Limpiar filtros / Nettoyer les filtres</button>
+                </div>
+                <button class="toggle-filtros" data-capa="itinerarios-equestres">ITINERARIOS EQUESTRES / ITINÉRAIRES ÉQUESTRES</button>
+                <div class="contenedor-filtros" data-capa="itinerarios-equestres" style="display:none;">
+                    <label>Dificultad / Difficulté:</label>
+                    <select id="filtro-dificultad-itinerarios-equestres">
+                        <option value="">Todas / Toutes</option>
+                    </select>
+                    <label>Distancia máxima (km) / Distance maximale (km):</label>
+                    <input type="number" id="filtro-distancia-itinerarios-equestres" placeholder="Ej: 10">
+                    <label>Paisaje / Paysage:</label>
+                    <select id="filtro-paisaje-itinerarios-equestres">
+                        <option value="">Todos / Tous</option>
+                    </select>
+                    <button class="btn-limpiar-filtros" data-capa="itinerarios-equestres" type="button">Limpiar filtros / Nettoyer les filtres</button>
+                </div>
+                <button class="toggle-filtros" data-capa="itinerarios-trailrunning">ITINERARIOS TRAIL / ITINÉRAIRES TRAIL</button>
+                <div class="contenedor-filtros" data-capa="itinerarios-trailrunning" style="display:none;">
+                    <label>Dificultad / Difficulté:</label>
+                    <select id="filtro-dificultad-itinerarios-trail">
+                        <option value="">Todas / Toutes</option>
+                    </select>
+                    <label>Distancia máxima (km) / Distance maximale (km):</label>
+                    <input type="number" id="filtro-distancia-itinerarios-trail" placeholder="Ej: 10">
+                    <label>Paisaje / Paysage:</label>
+                    <select id="filtro-paisaje-itinerarios-trail">
+                        <option value="">Todos / Tous</option>
+                    </select>
+                    <button class="btn-limpiar-filtros" data-capa="itinerarios-trailrunning" type="button">Limpiar filtros / Nettoyer les filtres</button>
+                </div>
             </div>
         `;
         L.DomEvent.disableClickPropagation(container);
@@ -3118,7 +3671,10 @@ document.querySelectorAll('.btn-limpiar-filtros').forEach(btn => {
         else if (capa === "puntos-escalada") filtrarPuntosEscalada();
         else if (capa === "puntos-canyoning") filtrarPuntosCanyoning();
         else if (capa === "itinerarios-btt") filtrarVTT();
-    });
+        else if (capa === "itinerarios-adaptados") filtrarItinerariosAdaptados();
+        else if (capa === "itinerarios-pedestres") filtrarItinerariosPedestres();
+        else if (capa === "itinerarios-equestres") filtrarItinerariosEquestres();
+        else if (capa === "itinerarios-trailrunning") filtrarItinerariosTrail();});
 });
 
 // ================= ACTUALIZACIÓN DINÁMICA DE FILTROS =================
@@ -3140,6 +3696,10 @@ function actualizarFiltrosAcordeon() {
         else if (capa === 'puntos-escalada') capaActiva = map.hasLayer(puntosEscaladaClusters);
         else if (capa === 'puntos-canyoning') capaActiva = map.hasLayer(canyoningClusters);
         else if (capa === 'itinerarios-btt') capaActiva = map.hasLayer(vttLayer);
+        else if (capa === 'itinerarios-adaptados') capaActiva = map.hasLayer(itinerariosAdaptadosClusters);
+        else if (capa === 'itinerarios-pedestres') capaActiva = map.hasLayer(itinerariosPedestresClusters);
+        else if (capa === 'itinerarios-trailrunning') capaActiva = map.hasLayer(itinerariosTrailrunningClusters);
+        else if (capa === 'itinerarios-equestres') capaActiva = map.hasLayer(itinerariosEquestresClusters);
 
         const contenedor = btn.nextElementSibling;
 
@@ -3163,6 +3723,14 @@ function actualizarFiltrosAcordeon() {
             else if (capa === 'puntos-canyoning' && document.getElementById('filtro-dificultad-compromiso-canyoning').options.length <= 1) initFiltersCanyoning();
             else if (capa === 'itinerarios-btt' && document.getElementById('filtro-grado-dificultad').options.length <= 1) initFiltersVTT();
             else if (capa === 'itinerarios-btt' && document.getElementById('filtro-tipo-via').options.length <= 1) initFiltersVTT();
+            else if (capa === 'itinerarios-adaptados' && document.getElementById('filtro-dificultad-itinerarios-adaptados').options.length <= 1) initFiltersItinerariosAdaptados();
+            else if (capa === 'itinerarios-adaptados' && document.getElementById('filtro-paisaje-itinerarios-adaptados').options.length <= 1) initFiltersItinerariosAdaptados();
+            else if (capa === 'itinerarios-pedestres' && document.getElementById('filtro-dificultad-itinerarios-pedestres').options.length <= 1) initFiltersItinerariosPedestres();
+            else if (capa === 'itinerarios-pedestres' && document.getElementById('filtro-paisaje-itinerarios-pedestres').options.length <= 1) initFiltersItinerariosPedestres();
+            else if (capa === 'itinerarios-equestres' && document.getElementById('filtro-dificultad-itinerarios-equestres').options.length <= 1) initFiltersItinerariosEquestres();
+            else if (capa === 'itinerarios-equestres' && document.getElementById('filtro-paisaje-itinerarios-equestres').options.length <= 1) initFiltersItinerariosEquestres();
+            else if (capa === 'itinerarios-trailrunning' && document.getElementById('filtro-dificultad-itinerarios-trail').options.length <= 1) initFiltersItinerariosTrail();
+            else if (capa === 'itinerarios-trailrunning' && document.getElementById('filtro-paisaje-itinerarios-trail').options.length <= 1) initFiltersItinerariosTrail();
 
         } else {
             btn.style.display = 'none';        // Ocultar botón
@@ -3174,11 +3742,26 @@ function actualizarFiltrosAcordeon() {
 
 
 // Modificar los eventos de checkboxes para llamar a actualizarFiltrosAcordeon()
-['mercados','escuelas','otros','productos', 'productores', 'comercios', 'restaurantes', 'empresas-nieve', 'ski', 'puntos-escalada', 'puntos-canyoning'].forEach(tipo=>{
+['mercados','escuelas','otros','productos', 'productores', 'comercios', 'restaurantes', 'empresas-nieve', 'ski', 'puntos-escalada', 'puntos-canyoning', 'itinerarios-adaptados', 'itinerarios-pedestres', 'itinerarios-equestres', 'itinerarios-trailrunning'].forEach(tipo=>{
     const checkbox = document.getElementById('cb-'+tipo);
     if(checkbox){
         checkbox.addEventListener('change', e=>{
-            const capaMap = {'mercados':mercadosCluster,'escuelas':centrosCluster,'otros':otrosCentrosCluster,'productos':productosAgroCluster, 'productores': productoresClusters, 'comercios': comerciosClusters, 'restaurantes': restaurantesCluster, 'empresas-nieve': empresasNieveClusters, 'ski': skiClusters, 'puntos-escalada': puntosEscaladaClusters, 'puntos-canyoning': canyoningClusters, 'itinerarios-btt': vttLayer };
+            const capaMap = 
+                {'mercados':mercadosCluster,
+                'escuelas':centrosCluster,
+                'otros':otrosCentrosCluster,
+                'productores': productoresClusters, 
+                'comercios': comerciosClusters, 
+                'restaurantes': restaurantesCluster, 
+                'empresas-nieve': empresasNieveClusters, 
+                'ski': skiClusters, 
+                'puntos-escalada': puntosEscaladaClusters, 
+                'puntos-canyoning': canyoningClusters, 
+                'itinerarios-btt': vttLayer, 
+                'itinerarios-adaptados': itinerariosAdaptadosClusters,
+                'itinerarios-pedestres': itinerariosPedestresClusters,
+                'itinerarios-equestres': itinerariosEquestresClusters,
+                'itinerarios-trailrunning': itinerariosTrailrunningClusters};
             if(e.target.checked) map.addLayer(capaMap[tipo]); else map.removeLayer(capaMap[tipo]);
             actualizarLeyenda();
             actualizarFiltrosAcordeon();
@@ -3190,7 +3773,7 @@ function actualizarFiltrosAcordeon() {
 // ================= SIDEBAR =================
 window.addEventListener('load', function(){
     // Crear el control sidebar y hacerlo accesible globalmente
-    window.sidebar = L.control.sidebar({ container: "sidebar" }).addTo(map);
+    window.sidebar = L.control.sidebar({ container: "sidebar"}).addTo(map);
 
     // -------------------------------
     // PANEL HOME
@@ -3478,12 +4061,16 @@ window.addEventListener('load', function(){
             <div class="accordion">
                 <div class="accordion-item">
                     <button class="accordion-header">
-                        Itinerarios BTT / Itinéraires VTT
+                        Itinerarios / Itinéraires
                         <span class="arrow">▶</span>
                     </button>
                     <div class="accordion-content">
                         <div class="sidebar-checkboxes">
                             <label><input type="checkbox" id="cb-itinerarios-btt" checked> <img src="icons/btt.svg" width="20"> Itinerarios BTT / Itinéraires VTT</label>
+                            <label><input type="checkbox" id = "cb-itinerarios-adaptados" checked> <img src="icons/itinerarios_adaptados.svg" width="20"> Itinerarios adaptados / Itinéraires adaptés</label>
+                            <label><input type="checkbox" id = "cb-itinerarios-pedestres" checked> <img src="icons/itinerarios_pedestres.svg" width="20"> Itinerarios pedestres / Itinéraires pédestres</label>
+                            <label><input type="checkbox" id = "cb-itinerarios-equestres" checked> <img src="icons/itinerarios_equestres.svg" width="20"> Itinerarios equestres / Itinéraires équestres</label>
+                            <label><input type="checkbox" id = "cb-itinerarios-trailrunning" checked> <img src="icons/itinerarios_trailrunning.svg" width="20"> Itinerarios trailrunning / Itinéraires trailrunning</label>
                         </div>
                     </div>
                 </div>
@@ -3617,6 +4204,10 @@ window.addEventListener('load', function(){
         document.getElementById('cb-puntos-canyoning').checked = map.hasLayer(canyoningClusters);
         document.getElementById('cb-empresas-canyoning').checked = map.hasLayer(empresasCanyoningClusters);
         document.getElementById('cb-itinerarios-btt').checked = vttLayer && map.hasLayer(vttLayer);
+        document.getElementById('cb-itinerarios-adaptados').checked = vttLayer && map.hasLayer(itinerariosAdaptadosClusters);
+        document.getElementById('cb-itinerarios-pedestres').checked = vttLayer && map.hasLayer(itinerariosPedestresClusters);
+        document.getElementById('cb-itinerarios-equestres').checked = vttLayer && map.hasLayer(itinerariosEquestresClusters);
+        document.getElementById('cb-itinerarios-trailrunning').checked = vttLayer && map.hasLayer(itinerariosTrailrunningClusters);
     }
 
     sincronizarCheckboxes();
@@ -3655,7 +4246,11 @@ window.addEventListener('load', function(){
     'empresas-via-ferrata': empresasViaFerrataClusters,
     'puntos-canyoning': canyoningClusters,
     'empresas-canyoning': empresasCanyoningClusters,
-    'itinerarios-btt': vttLayer
+    'itinerarios-btt': vttLayer,
+    'itinerarios-adaptados': itinerariosAdaptadosClusters,
+    'itinerarios-pedestres': itinerariosPedestresClusters,
+    'itinerarios-equestres': itinerariosEquestresClusters,
+    'itinerarios-trailrunning': itinerariosTrailrunningClusters
     };
 
     // ================= EVENTOS CHECKBOXES =================
@@ -3786,14 +4381,25 @@ window.addEventListener('load', function(){
             {es: "Información correspondiente a Pirineos Atlánticos",
             fr: "Informations concernant les Pyrénées-Atlantiques.",
             fuente: 'Tourisme 64' },
-        'itinerarios-btt':
-            {
-            es: "Información correspondiente a Pirineos Atlánticos y provincia de Huesca",
-            fr: "Informations concernant les Pyrénées-Atlantiques et la province de Huesca.",
-            fuente: 'Departement 64 / Observatorio de Montaña (OMS)' }
+        'itinerarios-adaptados':
+            {es: "Información correspondiente a Pirineos Atlánticos",
+            fr: "Informations concernant les Pyrénées-Atlantiques.",
+            fuente: 'Tourisme 64' },
+        'itinerarios-pedestres':
+            {es: "Información correspondiente a Pirineos Atlánticos",
+            fr: "Informations concernant les Pyrénées-Atlantiques.",
+            fuente: 'Tourisme 64' },
+        'itinerarios-equestres':
+            {es: "Información correspondiente a Pirineos Atlánticos",
+            fr: "Informations concernant les Pyrénées-Atlantiques.",
+            fuente: 'Tourisme 64' },
+        'itinerarios-trailrunning':
+            {es: "Información correspondiente a Pirineos Atlánticos",
+            fr: "Informations concernant les Pyrénées-Atlantiques.",
+            fuente: 'Tourisme 64' }
     };
 
-    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad', 'puntos-escalada', 'empresas-escalada', 'vias-ferratas', 'empresas-via-ferrata', 'puntos-canyoning', 'empresas-canyoning'].forEach(tipo => {
+    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad', 'puntos-escalada', 'empresas-escalada', 'vias-ferratas', 'empresas-via-ferrata', 'puntos-canyoning', 'empresas-canyoning', 'itinerarios-adaptados', 'itinerarios-pedestres', 'itinerarios-equestres', 'itinerarios-trailrunning'].forEach(tipo => {
     const checkbox = document.getElementById('cb-' + tipo);
     if (checkbox) {
         checkbox.addEventListener('change', e => {
@@ -3890,6 +4496,10 @@ function actualizarLeyenda(){
     if(map.hasLayer(empresasViaFerrataClusters)) html += `<img src="icons/empresas_via_ferrata.svg" width="18"> Empresas de Vías Ferratas / Entreprises de Via Ferrata <br>`;
     if(map.hasLayer(canyoningClusters)) html += `<img src="icons/canyoning.svg" width="18"> Puntos de Canyoning / Points de Canyoning <br>`;
     if(map.hasLayer(empresasCanyoningClusters)) html += `<img src="icons/empresas_canyoning.svg" width="18"> Empresas de Canyoning / Entreprises de Canyoning <br>`;
+    if(map.hasLayer(itinerariosAdaptadosClusters)) html += `<img src="icons/itinerarios_adaptados.svg" width="18"> Itinerarios adaptados / Itinéraires adaptés <br>`;
+    if(map.hasLayer(itinerariosPedestresClusters)) html += `<img src="icons/itinerarios_pedestres.svg" width="18"> Itinerarios pedestres / Itinéraires pédestres <br>`;
+    if(map.hasLayer(itinerariosEquestresClusters)) html += `<img src="icons/itinerarios_equestres.svg" width="18"> Itinerarios equestres / Itinéraires équestres <br>`;
+    if(map.hasLayer(itinerariosTrailrunningClusters)) html += `<img src="icons/itinerarios_trailrunning.svg" width="18"> Itinerarios trailrunning / Itinéraires trailrunning <br>`;
     if (map.hasLayer(carreterasLayer)) {
         html += `
             <div style="display: flex; align-items: center; margin-bottom: 5px;">
@@ -3958,7 +4568,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 monumentosReligiososCluster, restosArqueologicosCluster, balneariosCluster,
                 museosCluster, arbolesCluster, miradoresCluster, glaciaresClusters,
                 zonasBanosClusters, piscinasClusters, productoresClusters, comerciosClusters, skiClusters,
-                empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters, buffersInfluenciaLayer, puntosEscaladaClusters, empresasEscaladaClusters,  viaFerrataClusters, empresasViaFerrataClusters, canyoningClusters, empresasCanyoningClusters, vttLayer
+                empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters, 
+                buffersInfluenciaLayer, puntosEscaladaClusters, empresasEscaladaClusters,  viaFerrataClusters, 
+                empresasViaFerrataClusters, canyoningClusters, empresasCanyoningClusters, vttLayer, itinerariosAdaptadosClusters, 
+                itinerariosPedestresClusters, itinerariosEquestresClusters, itinerariosTrailrunningClusters
             }).forEach(capa => {
                 if (map.hasLayer(capa)) map.removeLayer(capa);
             });
@@ -4025,6 +4638,10 @@ async function initMap(){
         cargarGeoJSON('data/turismo_activo/vias_ferratas_empresas.geojson', empresasViaFerrataClusters, empresasViaFerrataMarkers, viaFerrataEmpresasIcon, updatePopupEmpresasEscalada),
         cargarGeoJSON('data/turismo_activo/canyoning.geojson', canyoningClusters, canyoningMarkers, canyoningIcon, updatePopupCanyoning),
         cargarGeoJSON('data/turismo_activo/empresas_canyoning.geojson', empresasCanyoningClusters, empresasCanyoningMarkers, empresasCanyoningIcon, updatePopupEmpresasCanyoning),
+        cargarGeoJSON('data/turismo_activo/itinerarios_64/itinerarios_adaptados.geojson', itinerariosAdaptadosClusters, itinerariosAdaptadosMarkers, itinerariosadaptadosIcon, updatePopupItinerarios),
+        cargarGeoJSON('data/turismo_activo/itinerarios_64/itinerarios_pedestre.geojson', itinerariosPedestresClusters, itinerariosPedestresMarkers, itinerariospedestresIcon, updatePopupItinerarios),
+        cargarGeoJSON('data/turismo_activo/itinerarios_64/itinerarios_equestre.geojson', itinerariosEquestresClusters, itinerariosEquestresMarkers, itinerariosequestresIcon, updatePopupItinerarios),
+        cargarGeoJSON('data/turismo_activo/itinerarios_64/itinerarios_trail.geojson', itinerariosTrailrunningClusters, itinerariosTrailrunningMarkers, ittinerariostrailrunningIcon, updatePopupItinerarios),
         cargarCarreteras(),
         cargarProductosAgro(),
 
@@ -4039,4 +4656,3 @@ async function initMap(){
     
 }
 initMap();
-
