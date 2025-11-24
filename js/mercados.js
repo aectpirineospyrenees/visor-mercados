@@ -18,6 +18,8 @@ const osmSatelital = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/se
 });
 
 
+
+
 // Añadir el control de capas
 const baseMaps = {
     "OSM Standard": osmStandard,
@@ -87,6 +89,7 @@ const itinerariosadaptadosIcon = crearIcono("icons/itinerarios_adaptados.svg");
 const itinerariospedestresIcon = crearIcono("icons/itinerarios_pedestres.svg");
 const itinerariosequestresIcon = crearIcono("icons/itinerarios_equestres.svg");
 const ittinerariostrailrunningIcon = crearIcono("icons/itinerarios_trailrunning.svg");
+const bosqueIcon = crearIcono("icons/bosque.svg");
 
 function normalizaTexto(s){
     return (s || "").toString()
@@ -153,6 +156,9 @@ let itinerariosAdaptadosMarkers = [];
 let itinerariosPedestresMarkers = [];
 let itinerariosEquestresMarkers = [];
 let itinerariosTrailrunningMarkers = [];
+const itinerariosPedestresTracksMarkers = L.layerGroup();
+const rutasArboledasLayer = L.layerGroup();
+let bosquesMarkers = [];
 const ordenDias = ["Lunes/Lundi","Martes/Mardi","Miércoles/Mercredi","Jueves/Jeudi","Viernes/Vendredi","Sábado/Samedi","Domingo/Dimanche"];
 const ordenSemanas = ["Primera semana del mes/Première semaine du mois","Segunda semana del mes/Deuxième semaine du mois","Tercera semana del mes/Troisième semaine du mois","Cuarta semana del mes/Quatrième semaine du mois","Todas las semanas/Toutes les semaines"];
 
@@ -298,6 +304,7 @@ const itinerariosAdaptadosClusters  = crearCluster("icons/itinerarios_adaptados.
 const itinerariosPedestresClusters  = crearCluster("icons/itinerarios_pedestres.svg");
 const itinerariosEquestresClusters  = crearCluster("icons/itinerarios_equestres.svg");
 const itinerariosTrailrunningClusters = crearCluster("icons/itinerarios_trailrunning.svg");
+const bosquesClusters              = crearCluster("icons/bosque.svg");
 // ================= CARGA GEOJSON =================
 async function cargarLimites(){
     try{
@@ -345,6 +352,34 @@ async function cargarGeoJSON(url, cluster, markersArray, icon, popupFn) {
         // map.addLayer(cluster);
     } catch (e) {
         console.error("Error loading GeoJSON:", url, e);
+    }
+}
+
+async function cargarLineas(url, layerGroup, styleFn, popupFn) {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        // Crear la capa GeoJSON
+        const geoJsonLayer = L.geoJSON(data, {
+            style: styleFn, // Función para el estilo de las líneas
+            onEachFeature: (feature, layer) => {
+                if (popupFn) popupFn(layer, feature.properties); // Vincular popups si se proporciona
+            }
+        });
+
+        // Si se proporciona un `layerGroup`, añadir la capa al grupo
+        if (layerGroup) {
+            layerGroup.addLayer(geoJsonLayer);
+        } else {
+            // Si no se proporciona un `layerGroup`, añadir directamente al mapa
+            geoJsonLayer.addTo(map);
+        }
+
+        return geoJsonLayer; // Retornar la capa creada
+    } catch (error) {
+        console.error("Error al cargar las líneas GeoJSON:", error);
+        return null;
     }
 }
 
@@ -459,6 +494,7 @@ async function cargarCapaVTT() {
         console.error('Error al cargar la capa VTT:', error);
     }
 }
+
 
 // ================= GRUPO DE CAPAS DE DISTRIBUCIÓN Y LOGÍSTICA =================
 async function inicializarCapasDistribucionLogistica() {
@@ -728,6 +764,51 @@ async function inicializarCapasDistribucionLogistica() {
                     </div>
                 </div>`;
         }
+
+    //============== ESTILOS CONCRETOS CAPAS =============
+
+const estilo_itinerarios = (feature) => {
+    const dificultad = feature.properties.dificultad || '';
+    let color;
+
+    switch (dificultad.toLowerCase()) {
+        case 'muy fácil / très facile':
+            color = 'green'; // Verde
+            break;
+        case 'fácil / facile':
+            color = 'blue'; // Azul
+            break;
+        case 'media / moyenne':
+            color = 'orange'; // Naranja
+            break;
+        case 'difícil / difficile':
+            color = 'red'; // Roja
+            break;
+        case 'muy difícil / très difficile':
+            color = 'black'; // Negra
+            break;
+        default:
+            color = '#cccccc'; // Gris para valores desconocidos
+    }
+
+    return {
+        color: color,
+        weight: 3,
+        opacity: 0.8,
+        lineCap: 'round',
+        lineJoin: 'round'
+    };
+};
+
+const estilo_rutas_arboledas = () => {
+    return {
+        color: '#228B22', // Verde bosque
+        weight: 3,
+        opacity: 0.8,
+        lineCap: 'round',
+        lineJoin: 'round'
+    };
+};
 
     //============= POPUPS ESPECÍFICOS =============
 function updatePopupMercados(layer, props) {
@@ -1976,8 +2057,129 @@ function updatePopupItinerarios(layer, props) {
     html += "</div>";
 
     // Usar la función genérica para bindPopup
-    bindPopupGenerico(layer, html, 'popup-itinerarios', 400, 600, 500);
+    bindPopupGenerico(layer, html, 'popup-itinerarios', 400, 500, 500);
 }
+
+function updatePopupArbolesSingulares(layer, props) {
+    let html = `<div class="popup-arboles" style="background:#e6f7e6;padding:10px;border-radius:8px;">`;
+    html += `<h3 style="color:#2c3e50; margin-bottom:8px;">${props.nombre_arbol || 'Sin nombre'}</h3>`;
+    // Tarjetas para el nombre común y científico
+    html += `
+        <div class="popup-row">
+            <div class="popup-number-card" style="background:#d4edda;color:#155724;">
+                <div class="number-value">${props.nombre_comun_especie || '—'}</div>
+                <div class="number-label">Nombre común / Nom commun</div>
+            </div>
+            <div class="popup-number-card" style="background:#d4edda;color:#155724;">
+                <div class="number-value"><i>${props.nombre_cienifico_especie || '—'}</i></div>
+                <div class="number-label">Nombre científico / Nom scientifique</div>
+            </div>
+        </div>`;
+
+    // Tarjeta para la edad estimada
+    html += `
+        <div class="popup-row">
+            <div class="popup-number-card" style="background:#d4edda;color:#155724;">
+                <div class="number-value">${props.edad_estimada || '—'}</div>
+                <div class="number-label">Edad estimada / Âge estimé</div>
+            </div>
+        </div>`;
+
+    // Campos normales (ubicación y propiedad)
+    const titles = {
+        ubicacion: "Ubicación / Emplacement",
+        propiedad: "Propiedad / Propriété"
+    };
+
+    for (let key in titles) {
+        if (props[key]) {
+            html += `
+                <div class="popup-row">
+                    <b>${titles[key]}:</b> <span>${props[key]}</span>
+                </div>`;
+        }
+    }
+
+    // Enlace de descarga (ficha técnica)
+    if (props.ficha_tecnica) {
+        html += `
+            <div class="popup-row">
+                <a href="${props.ficha_tecnica}" target="_blank" rel="noopener noreferrer" style="color:#155724;text-decoration:underline;">
+                    Descargar ficha técnica / Télécharger la fiche technique
+                </a>
+            </div>`;
+    }
+
+    html += `</div>`;
+
+    // Vincular el popup al layer
+    layer.bindPopup(html, {
+        className: "popup-arboles",
+        minWidth: 300,
+        maxWidth: 500
+    });
+}
+
+function updatePopupArboledasSingulares(layer, props) {
+    let html = `<div class="popup-arboles" style="background:#e6f7e6;padding:10px;border-radius:8px;">`;
+    html += `<h3 style="color:#2c3e50; margin-bottom:8px;">${props.nombre_arboleda || 'Sin nombre'}</h3>`;
+    // Tarjetas para el nombre común y científico
+    html += `
+        <div class="popup-row">
+            <div class="popup-number-card" style="background:#d4edda;color:#155724;">
+                <div class="number-value">${props.nomcomun_especie_dominante || '—'}</div>
+                <div class="number-label">Nombre común especie dominante / Nom commun espèce dominante</div>
+            </div>
+            <div class="popup-number-card" style="background:#d4edda;color:#155724;">
+                <div class="number-value"><i>${props.nomcientifico_especie_dominante || '—'}</i></div>
+                <div class="number-label">Nombre científico especie dominante / Nom scientifique espèce dominante</div>
+            </div>
+        </div>`;
+
+    // Tarjeta para la edad estimada
+    html += `
+        <div class="popup-row">
+            <div class="popup-number-card" style="background:#d4edda;color:#155724;">
+                <div class="number-value">${props.superficie_arboleda || '—'}</div>
+                <div class="number-label">Superficie de la arboleda / Surface de la bosquet</div>
+            </div>
+        </div>`;
+
+    // Campos normales (ubicación y propiedad)
+    const titles = {
+        ubicacion: "Ubicación / Emplacement",
+        propiedad: "Propiedad / Propriété"
+    };
+
+    for (let key in titles) {
+        if (props[key]) {
+            html += `
+                <div class="popup-row">
+                    <b>${titles[key]}:</b> <span>${props[key]}</span>
+                </div>`;
+        }
+    }
+
+    // Enlace de descarga (ficha técnica)
+    if (props.ficha_tecnica) {
+        html += `
+            <div class="popup-row">
+                <a href="${props.ficha_tecnica}" target="_blank" rel="noopener noreferrer" style="color:#155724;text-decoration:underline;">
+                    Descargar ficha técnica / Télécharger la fiche technique
+                </a>
+            </div>`;
+    }
+
+    html += `</div>`;
+
+    // Vincular el popup al layer
+    layer.bindPopup(html, {
+        className: "popup-arboles",
+        minWidth: 300,
+        maxWidth: 500
+    });
+}
+
 // ================= FILTROS DINÁMICOS =================
 
 // Mercados
@@ -3975,9 +4177,25 @@ window.addEventListener('load', function(){
                         </button>
                         <div class="accordion-content">
                             <div class="sidebar-checkboxes">
-                                <label><input type="checkbox" id="cb-arboles" checked> <img src="icons/arbol.svg" width="20"> Árboles emblemáticos / Arbres emblématiques</label>
                                 <label><input type="checkbox" id="cb-miradores" checked> <img src="icons/mirador.svg" width="20"> Miradores / Belvédères</label>
                                 <label><input type="checkbox" id="cb-glaciares" checked> <img src="icons/glaciar.svg" width="20"> Glaciares / Glaciers</label>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <div class = "div-acordeones"></div>
+            <div class="accordion">
+                <!-- Grupo 2 -->
+                    <div class="accordion-item">
+                        <button class="accordion-header">
+                            Arboles y arboledas / Arbres et bosquets
+                            <span class="arrow">▶</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="sidebar-checkboxes">
+                                <label><input type="checkbox" id="cb-arboles" checked> <img src="icons/arbol.svg" width="20"> Árboles emblemáticos / Arbres emblématiques</label>
+                                <label><input type="checkbox" id="cb-arboledas" checked> <img src="icons/bosque.svg" width="20"> Arboledas / Bosquets</label>
+                                <label><input type= "checkbox" id= "cb-rutas-arboles" checked> <img src="icons/camino_bosque.svg" width="20"> Rutas de árboles / Itinéraires des arbres</label>
                             </div>
                         </div>
                     </div>
@@ -4061,7 +4279,7 @@ window.addEventListener('load', function(){
             <div class="accordion">
                 <div class="accordion-item">
                     <button class="accordion-header">
-                        Itinerarios / Itinéraires
+                        Itinerarios / Itinéraires (Point)
                         <span class="arrow">▶</span>
                     </button>
                     <div class="accordion-content">
@@ -4075,8 +4293,24 @@ window.addEventListener('load', function(){
                     </div>
                 </div>
             </div>
+
+            <div class="div-acordeones"></div>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <button class="accordion-header">
+                        Itinerarios / Itinéraires (Tracks)
+                        <span class="arrow">▶</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="sidebar-checkboxes">
+                            <label><input type="checkbox" id = "cb-itinerarios-pedestres-tracks" checked> <img src="icons/itinerarios_pedestres.svg" width="20"> Tracks de Itinerarios pedestres / Traces d'Itinéraires pédestres</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `
     });
+
     sidebar.addPanel({
         id: 'distribucion-logistica',
         tab: '<i class="fas fa-truck-moving"></i>', // Icono moderno de camión de reparto
@@ -4208,6 +4442,9 @@ window.addEventListener('load', function(){
         document.getElementById('cb-itinerarios-pedestres').checked = vttLayer && map.hasLayer(itinerariosPedestresClusters);
         document.getElementById('cb-itinerarios-equestres').checked = vttLayer && map.hasLayer(itinerariosEquestresClusters);
         document.getElementById('cb-itinerarios-trailrunning').checked = vttLayer && map.hasLayer(itinerariosTrailrunningClusters);
+        document.getElementById('cb-itinerarios-pedestres-tracks').checked = vttLayer && map.hasLayer(itinerariosPedestresTracksMarkers);
+        document.getElementById('cb-arboledas').checked = map.hasLayer(bosquesClusters);
+        document.getElementById('cb-rutas-arboles').checked = map.hasLayer(rutasArboledasLayer);
     }
 
     sincronizarCheckboxes();
@@ -4250,7 +4487,10 @@ window.addEventListener('load', function(){
     'itinerarios-adaptados': itinerariosAdaptadosClusters,
     'itinerarios-pedestres': itinerariosPedestresClusters,
     'itinerarios-equestres': itinerariosEquestresClusters,
-    'itinerarios-trailrunning': itinerariosTrailrunningClusters
+    'itinerarios-trailrunning': itinerariosTrailrunningClusters,
+    'itinerarios-pedestres-tracks': itinerariosPedestresTracksMarkers,
+    'arboledas': bosquesClusters,
+    'rutas-arboles': rutasArboledasLayer
     };
 
     // ================= EVENTOS CHECKBOXES =================
@@ -4396,10 +4636,24 @@ window.addEventListener('load', function(){
         'itinerarios-trailrunning':
             {es: "Información correspondiente a Pirineos Atlánticos",
             fr: "Informations concernant les Pyrénées-Atlantiques.",
-            fuente: 'Tourisme 64' }
+            fuente: 'Tourisme 64' },
+        'itinerarios-pedestres-tracks':
+            {es: "Información correspondiente a Pirineos Atlánticos y provincia de Huesca",
+            fr: "Informations concernant les Pyrénées-Atlantiques et la province de Huesca.",
+            fuente: 'Tourisme 64, Observatorio de Montaña (OMS)' },
+        'arboledas':
+            { 
+            es: "Información correspondiente únicamente a la provincia de Huesca y comarca de las Cinco Villas", 
+            fr: "Informations concernant uniquement la province de Huesca et la région des Cinco Villas.", 
+            fuente: 'IGN España' },
+        'rutas-arboles':
+            { 
+            es: "Información correspondiente únicamente a la provincia de Huesca y comarca de las Cinco Villas", 
+            fr: "Informations concernant uniquement la province de Huesca et la région des Cinco Villas.", 
+            fuente: 'IGN España' }
     };
 
-    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad', 'puntos-escalada', 'empresas-escalada', 'vias-ferratas', 'empresas-via-ferrata', 'puntos-canyoning', 'empresas-canyoning', 'itinerarios-adaptados', 'itinerarios-pedestres', 'itinerarios-equestres', 'itinerarios-trailrunning'].forEach(tipo => {
+    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad', 'puntos-escalada', 'empresas-escalada', 'vias-ferratas', 'empresas-via-ferrata', 'puntos-canyoning', 'empresas-canyoning', 'itinerarios-adaptados', 'itinerarios-pedestres', 'itinerarios-equestres', 'itinerarios-trailrunning', 'itinerarios-pedestres-tracks', 'arboledas', 'rutas-arboles'].forEach(tipo => {
     const checkbox = document.getElementById('cb-' + tipo);
     if (checkbox) {
         checkbox.addEventListener('change', e => {
@@ -4500,6 +4754,7 @@ function actualizarLeyenda(){
     if(map.hasLayer(itinerariosPedestresClusters)) html += `<img src="icons/itinerarios_pedestres.svg" width="18"> Itinerarios pedestres / Itinéraires pédestres <br>`;
     if(map.hasLayer(itinerariosEquestresClusters)) html += `<img src="icons/itinerarios_equestres.svg" width="18"> Itinerarios equestres / Itinéraires équestres <br>`;
     if(map.hasLayer(itinerariosTrailrunningClusters)) html += `<img src="icons/itinerarios_trailrunning.svg" width="18"> Itinerarios trailrunning / Itinéraires trailrunning <br>`;
+    if(map.hasLayer(bosquesClusters)) html += `<img src="icons/bosque.svg" width="18"> Arboledas / Bosquets <br>`;
     if (map.hasLayer(carreterasLayer)) {
         html += `
             <div style="display: flex; align-items: center; margin-bottom: 5px;">
@@ -4517,6 +4772,15 @@ function actualizarLeyenda(){
             <span style="display:inline-block;width:18px;height:18px;background:#dfa6b4;margin-right:5px;"></span> 10 km<br>
             <span style="display:inline-block;width:18px;height:18px;background:#b9d564;margin-right:5px;"></span> 30 km<br>
             <span style="display:inline-block;width:18px;height:18px;background:#b2f7f1;margin-right:5px;"></span> 50 km<br>
+        `;
+    }
+
+        if (map.hasLayer(rutasArboledasLayer)) {
+        html += `
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <div style="width: 30px; height: 4px; background: #228B22; margin-right: 5px;"></div>
+                Rutas de árboles / Itinéraires des arbres
+            </div>
         `;
     }
 
@@ -4542,6 +4806,31 @@ function actualizarLeyenda(){
         `;
     }
 
+    if (map.hasLayer(itinerariosPedestresTracksMarkers)) {
+    html += `<p style="text-align: center"><strong>Itinerarios Pedestres (Tracks) / Itinéraires Pédestres (Traces):</strong></p>`;
+    html += `
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <div style="width: 30px; height: 4px; background: green; margin-right: 5px;"></div>
+            Muy fácil / Très facile
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <div style="width: 30px; height: 4px; background: blue; margin-right: 5px;"></div>
+            Fácil / Facile
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <div style="width: 30px; height: 4px; background: orange; margin-right: 5px;"></div>
+            Media / Moyenne
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <div style="width: 30px; height: 4px; background: red; margin-right: 5px;"></div>
+            Difícil / Difficile
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <div style="width: 30px; height: 4px; background: black; margin-right: 5px;"></div>
+            Muy difícil / Très difficile
+        </div>
+    `;
+}
     div.innerHTML = html;
 }
 
@@ -4571,7 +4860,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters, 
                 buffersInfluenciaLayer, puntosEscaladaClusters, empresasEscaladaClusters,  viaFerrataClusters, 
                 empresasViaFerrataClusters, canyoningClusters, empresasCanyoningClusters, vttLayer, itinerariosAdaptadosClusters, 
-                itinerariosPedestresClusters, itinerariosEquestresClusters, itinerariosTrailrunningClusters
+                itinerariosPedestresClusters, itinerariosEquestresClusters, itinerariosTrailrunningClusters, itinerariosPedestresTracksMarkers, bosquesClusters, rutasArboledasLayer
             }).forEach(capa => {
                 if (map.hasLayer(capa)) map.removeLayer(capa);
             });
@@ -4621,7 +4910,7 @@ async function initMap(){
         cargarGeoJSON('data/restaurantes/restaurantes.geojson', restaurantesCluster, restaurantesMarkers, restaurantesIcon, updatePopupRestaurantes),
         cargarGeoJSON('data/equipamiento/balnearios_64_Huesca.geojson', balneariosCluster, balneariosMarkers, balneariosIcon, updatePopupBalnearios),
         cargarGeoJSON('data/equipamiento/museos.geojson', museosCluster, museosMarkers, museosIcon, popupSoloNombre),
-        cargarGeoJSON('data/turismo_natural/arboles_emblematicos_huesca.geojson', arbolesCluster, arbolesMarkers, arbolesIcon, popupSoloNombre),
+        cargarGeoJSON('data/turismo_natural/arboles_emblematicos_huesca.geojson', arbolesCluster, arbolesMarkers, arbolesIcon, updatePopupArbolesSingulares),
         cargarGeoJSON('data/turismo_natural/miradores.geojson', miradoresCluster, miradoresMarkers, miradoresIcon, popupSoloNombre),
         cargarGeoJSON('data/turismo_natural/glaciares_Huesca.geojson', glaciaresClusters, glaciaresMarkers, glaciaresIcon, popupSoloNombre),
         cargarGeoJSON('data/turismo_natural/zonas_bano_Huesca.geojson', zonasBanosClusters, zonasBanosMarkers, zonaBanoIcon, popupSoloNombre),
@@ -4642,6 +4931,9 @@ async function initMap(){
         cargarGeoJSON('data/turismo_activo/itinerarios_64/itinerarios_pedestre.geojson', itinerariosPedestresClusters, itinerariosPedestresMarkers, itinerariospedestresIcon, updatePopupItinerarios),
         cargarGeoJSON('data/turismo_activo/itinerarios_64/itinerarios_equestre.geojson', itinerariosEquestresClusters, itinerariosEquestresMarkers, itinerariosequestresIcon, updatePopupItinerarios),
         cargarGeoJSON('data/turismo_activo/itinerarios_64/itinerarios_trail.geojson', itinerariosTrailrunningClusters, itinerariosTrailrunningMarkers, ittinerariostrailrunningIcon, updatePopupItinerarios),
+        cargarLineas('data/turismo_activo/itinerarios_64/itinerarios_pedestre_tracks.geojson', itinerariosPedestresTracksMarkers, estilo_itinerarios,  updatePopupItinerarios),
+        cargarGeoJSON('data/turismo_natural/arboledas_singulares.geojson', bosquesClusters, bosquesMarkers, bosqueIcon, updatePopupArboledasSingulares),
+        cargarLineas('data/turismo_natural/rutas_arboles_arboledas.geojson', rutasArboledasLayer, estilo_rutas_arboledas, updatePopupItinerarios),
         cargarCarreteras(),
         cargarProductosAgro(),
 
