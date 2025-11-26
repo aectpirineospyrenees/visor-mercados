@@ -89,6 +89,7 @@ const itinerariosadaptadosIcon = crearIcono("icons/itinerarios_adaptados.svg");
 const itinerariospedestresIcon = crearIcono("icons/itinerarios_pedestres.svg");
 const itinerariosequestresIcon = crearIcono("icons/itinerarios_equestres.svg");
 const ittinerariostrailrunningIcon = crearIcono("icons/itinerarios_trailrunning.svg");
+const zoologicosIcon = crearIcono("icons/zoologico.svg");
 const bosqueIcon = crearIcono("icons/bosque.svg");
 
 function normalizaTexto(s){
@@ -156,6 +157,7 @@ let itinerariosAdaptadosMarkers = [];
 let itinerariosPedestresMarkers = [];
 let itinerariosEquestresMarkers = [];
 let itinerariosTrailrunningMarkers = [];
+let zoologicosMarkers = [];
 const itinerariosPedestresTracksMarkers = L.layerGroup();
 const rutasArboledasLayer = L.layerGroup();
 let bosquesMarkers = [];
@@ -305,6 +307,7 @@ const itinerariosPedestresClusters  = crearCluster("icons/itinerarios_pedestres.
 const itinerariosEquestresClusters  = crearCluster("icons/itinerarios_equestres.svg");
 const itinerariosTrailrunningClusters = crearCluster("icons/itinerarios_trailrunning.svg");
 const bosquesClusters              = crearCluster("icons/bosque.svg");
+const zoologicosClusters           = crearCluster("icons/zoologico.svg");
 // ================= CARGA GEOJSON =================
 async function cargarLimites(){
     try{
@@ -764,6 +767,7 @@ async function inicializarCapasDistribucionLogistica() {
                     </div>
                 </div>`;
         }
+
 
     //============== ESTILOS CONCRETOS CAPAS =============
 
@@ -2173,6 +2177,53 @@ function updatePopupArboledasSingulares(layer, props) {
     html += `</div>`;
 
     // Vincular el popup al layer
+    layer.bindPopup(html, {
+        className: "popup-arboles",
+        minWidth: 300,
+        maxWidth: 500
+    });
+}
+
+function updatePopupZoologicos(layer, props) {
+    let html = `<div class="popup-zoologicos"><h3>${props.nombre_zoologico || 'Sin nombre'}</h3>`;
+
+    // Mostrar otros campos normalmente
+    const titles = {
+        descripcion: "Descripción / Description",
+        ubicacion: "Ubicación / Emplacement",
+        telefono: "Teléfono / Téléphone",
+        correo: "Correo / Courriel",
+        url_web: "Web",
+        tarifas: "Tarifas / Tarifs"
+    };
+
+    for (let key in titles) {
+        if (props[key]) {
+            if (key === "tarifas") {
+                // Mostrar tarifas como una lista
+                const tarifas = props[key].split(',').map(t => t.trim()); // Dividir por comas y limpiar espacios
+                html += `
+                    <div class="popup-row">
+                        <b>${titles[key]}:</b>
+                        <ul>
+                            ${tarifas.map(tarifa => `<li>${tarifa}</li>`).join('')}
+                        </ul>
+                    </div>`;
+            } else {
+                // Mostrar otros campos normalmente
+                html += `
+                    <div class="popup-row">
+                        <b>${titles[key]}:</b> <span>${props[key]}</span>
+                    </div>`;
+            }
+        }
+    }
+
+    if (props.fotos) {
+        html += generarCarruselFotos(props, 'fotos');
+    }
+
+    html += `</div>`;
     layer.bindPopup(html, {
         className: "popup-arboles",
         minWidth: 300,
@@ -4211,6 +4262,7 @@ window.addEventListener('load', function(){
                         <div class="accordion-content">
                             <div class="sidebar-checkboxes">
                                 <label><input type="checkbox" id="cb-zonasbano" checked> <img src="icons/zona_bano.svg" width="20"> Zonas de Baño / Zones de baignade</label>
+                                <label><input type = "checkbox" id= "cb-zoologicos" checked> <img src="icons/zoologico.svg" width="20"> Zoológicos / Zoos</label>
                             </div>
                         </div>
                     </div>
@@ -4445,6 +4497,7 @@ window.addEventListener('load', function(){
         document.getElementById('cb-itinerarios-pedestres-tracks').checked = vttLayer && map.hasLayer(itinerariosPedestresTracksMarkers);
         document.getElementById('cb-arboledas').checked = map.hasLayer(bosquesClusters);
         document.getElementById('cb-rutas-arboles').checked = map.hasLayer(rutasArboledasLayer);
+        document.getElementById('cb-zoologicos').checked = map.hasLayer(zoologicosClusters);
     }
 
     sincronizarCheckboxes();
@@ -4490,7 +4543,8 @@ window.addEventListener('load', function(){
     'itinerarios-trailrunning': itinerariosTrailrunningClusters,
     'itinerarios-pedestres-tracks': itinerariosPedestresTracksMarkers,
     'arboledas': bosquesClusters,
-    'rutas-arboles': rutasArboledasLayer
+    'rutas-arboles': rutasArboledasLayer,
+    'zoologicos': zoologicosClusters
     };
 
     // ================= EVENTOS CHECKBOXES =================
@@ -4653,7 +4707,7 @@ window.addEventListener('load', function(){
             fuente: 'IGN España' }
     };
 
-    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad', 'puntos-escalada', 'empresas-escalada', 'vias-ferratas', 'empresas-via-ferrata', 'puntos-canyoning', 'empresas-canyoning', 'itinerarios-adaptados', 'itinerarios-pedestres', 'itinerarios-equestres', 'itinerarios-trailrunning', 'itinerarios-pedestres-tracks', 'arboledas', 'rutas-arboles'].forEach(tipo => {
+    ['mercados','escuelas','otros','productos','oficinas-turismo','restaurantes','hoteles', 'campings', 'albergues', 'refugios', 'fortalezas','monumentos','monumentos-religiosos','restos-arqueologicos', 'balnearios', 'museos', 'arboles', 'miradores', 'glaciares', 'zonasbano', 'piscinas', 'productores', 'comercios', 'ski', 'empresas-nieve', 'productores-proximidad', 'puntos-escalada', 'empresas-escalada', 'vias-ferratas', 'empresas-via-ferrata', 'puntos-canyoning', 'empresas-canyoning', 'itinerarios-adaptados', 'itinerarios-pedestres', 'itinerarios-equestres', 'itinerarios-trailrunning', 'itinerarios-pedestres-tracks', 'arboledas', 'rutas-arboles', 'zoologicos'].forEach(tipo => {
     const checkbox = document.getElementById('cb-' + tipo);
     if (checkbox) {
         checkbox.addEventListener('change', e => {
@@ -4754,6 +4808,7 @@ function actualizarLeyenda(){
     if(map.hasLayer(itinerariosPedestresClusters)) html += `<img src="icons/itinerarios_pedestres.svg" width="18"> Itinerarios pedestres / Itinéraires pédestres <br>`;
     if(map.hasLayer(itinerariosEquestresClusters)) html += `<img src="icons/itinerarios_equestres.svg" width="18"> Itinerarios equestres / Itinéraires équestres <br>`;
     if(map.hasLayer(itinerariosTrailrunningClusters)) html += `<img src="icons/itinerarios_trailrunning.svg" width="18"> Itinerarios trailrunning / Itinéraires trailrunning <br>`;
+    if(map.hasLayer(zoologicosClusters)) html += `<img src="icons/zoologico.svg" width="18"> Zoológicos / Zoos <br>`;
     if(map.hasLayer(bosquesClusters)) html += `<img src="icons/bosque.svg" width="18"> Arboledas / Bosquets <br>`;
     if (map.hasLayer(carreterasLayer)) {
         html += `
@@ -4860,7 +4915,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 empresasNieveClusters, productoresProximidadClusters, carreterasLayer, nucleosClaveClusters, 
                 buffersInfluenciaLayer, puntosEscaladaClusters, empresasEscaladaClusters,  viaFerrataClusters, 
                 empresasViaFerrataClusters, canyoningClusters, empresasCanyoningClusters, vttLayer, itinerariosAdaptadosClusters, 
-                itinerariosPedestresClusters, itinerariosEquestresClusters, itinerariosTrailrunningClusters, itinerariosPedestresTracksMarkers, bosquesClusters, rutasArboledasLayer
+                itinerariosPedestresClusters, itinerariosEquestresClusters, itinerariosTrailrunningClusters, itinerariosPedestresTracksMarkers, bosquesClusters, rutasArboledasLayer, zoologicosClusters
             }).forEach(capa => {
                 if (map.hasLayer(capa)) map.removeLayer(capa);
             });
@@ -4934,6 +4989,7 @@ async function initMap(){
         cargarLineas('data/turismo_activo/itinerarios_64/itinerarios_pedestre_tracks.geojson', itinerariosPedestresTracksMarkers, estilo_itinerarios,  updatePopupItinerarios),
         cargarGeoJSON('data/turismo_natural/arboledas_singulares.geojson', bosquesClusters, bosquesMarkers, bosqueIcon, updatePopupArboledasSingulares),
         cargarLineas('data/turismo_natural/rutas_arboles_arboledas.geojson', rutasArboledasLayer, estilo_rutas_arboledas, updatePopupItinerarios),
+        cargarGeoJSON('data/turismo_natural/zoologico.geojson', zoologicosClusters, zoologicosMarkers, zoologicosIcon, updatePopupZoologicos),
         cargarCarreteras(),
         cargarProductosAgro(),
 
