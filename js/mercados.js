@@ -2971,6 +2971,27 @@ function initFiltersItinerariosTrail() {
         .addEventListener('input', filtrarItinerariosTrail);
 }
 
+
+
+
+function filtrarMarcadores(){
+    const tipo = document.getElementById('filtro-tipo-mercado').value;
+    const frecuencia = document.getElementById('filtro-frecuencia').value;
+    const semana = document.getElementById('filtro-semana').value;
+    const dia = document.getElementById('filtro-dia').value;
+    const apertura = document.getElementById('filtro-apertura').value;
+    mercadosCluster.clearLayers(); // Limpiar cluster
+    markers.forEach(({marker, props})=>{
+        if((!tipo || props.nombre_tipo === tipo) &&
+           (!frecuencia || props.nombre_frecuencia === frecuencia) &&
+           (!semana || props.nombre_semana === semana) &&
+           (!dia || props.nombre_dia === dia) &&
+           (!apertura || props.nombre_apertura === apertura)) {
+               mercadosCluster.addLayer(marker);
+        }
+    });
+}
+
 function filtrarProductosAgro() {
     const tipoProducto = normalizaTexto(document.getElementById('filtro-tipo-producto').value);
     const comercializacion = normalizaTexto(document.getElementById('filtro-comercializacion-producto').value);
@@ -4962,7 +4983,7 @@ async function initMap(){
         cargarGeoJSON('data/patrimonio_cultural/monumentos_religiosos.geojson', monumentosReligiososCluster, monumentosReligiososMarkers, monumentoReligiosoIcon, updatePopupPatrimonioCultural),
         cargarGeoJSON('data/patrimonio_cultural/restos_arqueologicos.geojson', restosArqueologicosCluster, restosArqueologicosMarkers, restosArqueologicosIcon, updatePopupPatrimonioCultural),
         cargarGeoJSON('data/otros_centros.geojson', otrosCentrosCluster, null, marketIconOtrosCentros, popupSoloNombre),
-        cargarGeoJSON('data/restaurantes/restaurantes.geojson', restaurantesCluster, restaurantesMarkers, restaurantesIcon, updatePopupRestaurantes),
+        cargarGeoJSON('data/restaurantes/restaurantes_antiguo.geojson', restaurantesCluster, restaurantesMarkers, restaurantesIcon, updatePopupRestaurantes),
         cargarGeoJSON('data/equipamiento/balnearios_64_Huesca.geojson', balneariosCluster, balneariosMarkers, balneariosIcon, updatePopupBalnearios),
         cargarGeoJSON('data/equipamiento/museos.geojson', museosCluster, museosMarkers, museosIcon, popupSoloNombre),
         cargarGeoJSON('data/turismo_natural/arboles_emblematicos_huesca.geojson', arbolesCluster, arbolesMarkers, arbolesIcon, updatePopupArbolesSingulares),
