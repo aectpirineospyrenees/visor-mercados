@@ -2971,9 +2971,6 @@ function initFiltersItinerariosTrail() {
         .addEventListener('input', filtrarItinerariosTrail);
 }
 
-
-
-
 function filtrarMarcadores(){
     const tipo = document.getElementById('filtro-tipo-mercado').value;
     const frecuencia = document.getElementById('filtro-frecuencia').value;
